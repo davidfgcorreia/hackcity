@@ -1,23 +1,23 @@
 # Cascais micromobility: municipal recovery and network oversight
 
-**Project brief · 23 September 2026 · Draft for discussion with the Câmara Municipal de Cascais, Cascais Próxima and the contracted provider**
+**Product brief and working requirements · Updated 24 September 2026 · Operational decisions supplied by the project team; provider capabilities and municipal policy still require verification**
 
 ## 1. Theme, challenge and proposed solution
 
 Shared bicycles and other micromobility vehicles can extend access to jobs, services, leisure and public transport. Their value depends on vehicles being available in useful places and parked where the network permits. A vehicle left beyond a permitted station area can obstruct public space, disappear from useful service and require a recovery trip. Repeated cases may reveal either operational shortcomings or a gap in the station network.
 
-**Hack the City Challenge #9** asks for real-time detection of vehicles parked outside a station's coverage area plus a 30-metre buffer for **more than 120 minutes**, dynamic optimization of collection routes when vehicles appear or disappear, and supply/demand indicators by location. The challenge is framed for micromobility vehicles generally; this proposal initially focuses on bicycles. The attached handbook defines the challenge, while the attached metadata says to use the actual `station_area` polygons with a 30-metre buffer rather than measuring from station centres. [S1, S2]
+**Hack the City Challenge #9** asks for real-time detection of vehicles parked outside a station's coverage area plus a 30-metre buffer for **more than 120 minutes**, dynamic optimization of collection routes when vehicles appear or disappear, and supply/demand indicators by location. The challenge is framed for micromobility vehicles generally; this product's first release is limited to bicycles. The attached handbook defines the challenge, while the attached metadata says to use the actual `station_area` polygons with a 30-metre buffer rather than measuring from station centres. [S1, S2]
 
 ### What we want to build
 
 A system for two connected municipal responsibilities:
 
-1. **Operations: municipal recovery.** Identify potentially abandoned bicycles, establish whether a case is eligible for municipal action under the applicable process, and guide a Câmara Municipal de Cascais operator from the **Complexo Multisserviços da Câmara de Cascais** to the bicycles and back to that same depot. The operator collects abandoned bicycles the contracted company has not recovered. The municipal route does **not** perform fleet balancing or deliver bicycles to stations.
-2. **Analytics: oversight and planning.** Measure abandonment and the outcomes of company and municipal recovery separately; assess the contracted company's station balancing and service quality; calculate penalties only under documented contractual rules; and examine where additional or changed stations might improve the network. A multimodal analysis will evaluate how walking, cycling, bus and rail work together for complete journeys.
+1. **Operations: municipal recovery.** Identify potentially abandoned bicycles, automatically dispatch eligible cases, and guide municipal operators from their current positions through pickups to the **Complexo Multisserviços da Câmara de Cascais**. The operator collects bicycles the contracted company has failed to recover. The municipal route does **not** perform fleet balancing or deliver bicycles to stations.
+2. **Analytics: oversight and planning.** Measure abandonment and company and municipal recovery separately; assess station balancing and service quality; export evidence to the municipality's existing penalty process; and examine where additional or changed stations might improve the network. A multimodal analysis will evaluate how walking, cycling, bus and rail work together for complete journeys. Analytics requirements remain to be agreed in a later review.
 
-The contracted company remains responsible for its bicycles, their maintenance, ordinary recovery and distribution across stations. Municipal custody after pickup must be recorded separately from ownership and from any subsequent transfer back to the company. **The exact contract, response deadline, legal authority for collection, custody procedure and penalty schedule have not been supplied; none is assumed in this document.**
+The contracted company remains responsible for its bicycles, their maintenance, ordinary recovery and distribution across stations. The municipality remains responsible for custody after its pickup, but custody tracking is outside this application's first release. **The exact contract, legal authority for collection, custody procedure and penalty schedule have not been supplied; none is assumed in this document.**
 
-A successful pilot would demonstrate a full case: an evidence-backed outside-station interval, a company notification or status check, a municipal pickup when eligible, a route from and back to the Complexo Multisserviços, a recorded handover, and dashboards that distinguish observed outcomes from estimates.
+A successful first release supports real municipal collections; a separate demonstration mode may replay historical data. It must show an evidence-backed outside-station interval, automatic dispatch only when eligibility is supported, route updates when bicycles appear or disappear, pickup evidence, and a route ending at the Complexo Multisserviços. Company notices, penalty issuance, and depot check-in are outside this product's operational scope.
 
 ## 2. Data available now
 
@@ -42,7 +42,7 @@ The attached files are a historical sample and two GBFS snapshots. Counts below 
 |---|---|---|
 | **Provider's authenticated operations feed** | Stable vehicle ID, timestamped positions or parking-state transitions, location accuracy, trip/collection events, responsible crew and event ingestion time. | Necessary for evidence-based live dwell and company recovery attribution. Ask the contracted provider for an authorized feed and retention rules. |
 | **Current GBFS feeds** | `free_bike_status`, `station_status`, geofencing, vehicle types, feed timestamps and polling logs. | Current visibility and station supply proxies; test endpoints before promising live functionality. Volatile public IDs constrain longitudinal tracking. The provided directory is only a pointer. |
-| **Municipal case, dispatch and depot records** | Case ID, detection, notification, deadline, eligibility decision, assignment, arrival, pickup, condition, return, custody and release timestamps; crew and route odometer. | Truth source for municipal performance, cost and audit trail. These records may need to be created by the application. |
+| **Municipal case and dispatch records** | Case ID, detection, eligibility decision, assignment, arrival, pickup evidence, route changes and outcomes. Depot custody and release records are separate. | Truth source for municipal recovery performance and audit trail; the operational app must create case and pickup records. |
 | **Contract and finance records** | Service-level rules, notification method, allowed cure period, exclusions, penalty amounts, cost rates, issued notices, disputes and paid amounts. | Determine when intervention and a penalty are valid; separate estimated costs from actual charges and collections. Obtain from municipal contract management. |
 | **Road network and restrictions** | Drivable links, turn rules, vehicle restrictions, current closures and legal stopping points. | Road travel times and safe pickup access. OpenStreetMap extracts are a useful starting point, subject to local verification; municipal closure notices can supplement them. [W1] |
 | **Public-transport network** | Bus and rail stops, routes, scheduled times, calendars, transfers and ideally disruption/real-time records; GTFS Schedule/Realtime if published or shared. | Door-to-door comparisons and intermodal station planning. The Cascais portal publishes bus-stop and rail-station geography; geography alone does not supply timetables. Confirm usable schedules with the transport authority/operators. [W2, W3, W4] |
@@ -53,59 +53,41 @@ The attached files are a historical sample and two GBFS snapshots. Counts below 
 
 A dataset's listing establishes an opportunity to investigate it, not that its endpoint, license, historical depth or update cadence meets production needs. Record the source, owner, license, retrieval time, coverage, schema version and quality checks for every input.
 
-## 3. Objective A — municipal recovery operations
+## 3. Objective A — agreed municipal recovery requirements
 
-### 3.1 Roles and boundaries
+These requirements record project-team decisions. The Cascais Próxima operations lead approves the first real-use requirements and pilot. Municipal bike-service administration owns the collection policy; the system executes the approved rules automatically, while staff handle exceptions. The initial scope is bicycles operating in Cascais. The contracted company remains responsible for ordinary recovery and redistribution.
 
-| Actor | Decision or action | Record needed |
-|---|---|---|
-| Contracted company | Operates, maintains, balances and ordinarily recovers its bicycles. Responds to municipal notice and identifies its own recoveries. | Timestamped actions, vehicle ID, acknowledgement and recovery proof. |
-| Municipality, dispatch/oversight | Reviews evidence, checks contract conditions, authorizes municipal intervention and assigns work. | Eligibility decision, notices, reasons and audit history. |
-| Municipal collection operator | Starts at the Complexo Multisserviços; picks up eligible unresolved bicycles; returns all collected bicycles there. | Actual departure, stops, photos/condition as required, load, arrival and exceptions. |
-| Depot/custody team | Checks bicycles in, stores them and documents transfer or collection by the company. | Inventory, chain of custody and release receipt. |
+### 3.1 Detection and eligibility
 
-The challenge's phrase “removals by the operator's maintenance team” describes a disappearance that should trigger route recalculation. For this municipal operating model, a **company recovery before the municipal pickup cancels or closes the municipal task** once verified. Municipal operators do not rebalance station stock.
+- **OP-01 — Permitted area.** Use the station_area polygon valid at the observation time, plus a 30-metre buffer. A bicycle on the boundary is inside. Other geofencing rules do not alter this test for the first release.
+- **OP-02 — Location uncertainty.** Count a bicycle as outside only when its reported position is beyond the buffered area by more than the reported location error. Keep boundary cases with insufficient accuracy uncertain until better location or field evidence arrives.
+- **OP-03 — Time threshold.** Start the parking interval at a credible trip end. The challenge condition is strictly more than 120 minutes outside. A cancelled trip resets the clock only if reliable evidence shows the bicycle moved. Keep one case for the bicycle if it moves between outside locations, while starting a new dwell interval after confirmed movement.
+- **OP-04 — Evidence before dispatch.** A trip-end position without a later observation creates a candidate case, not an automatically dispatchable pickup. Require a fresh observation at the same location or field confirmation that the bicycle remains there. A field verification stop may be added to an existing mission, but do not create a mission solely for uncertain cases.
+- **OP-05 — Live-data dependency.** Stable bicycle identity, timely status events, provider recovery proof, event meanings, and location accuracy require verification against the provider's authorized API. The supplied public GBFS bike_id changes between calls and cannot alone prove continuous dwell. Do not present historical replay as live detection.
+- **OP-06 — Eligibility and overrides.** Automatically dispatch cases meeting the approved spatial, time, evidence, and company-recovery rules. Staff may correct or override faulty locations or other exceptions; retain the actor, time, original evidence, and reason. The exact provider recovery signals and any policy exceptions remain open.
 
-### 3.2 Case lifecycle and detection rules
+### 3.2 Cases and company interaction
 
-**Proposed states:** `observed` → `outside_area_unverified` → `abandonment_supported` → `company_notified` → `municipal_eligible` → `assigned` → `on_route` → `picked_up` → `at_depot` → `released_to_company` → `closed`. Branches include `company_recovered`, `new_trip`, `inside_station`, `location_uncertain`, `duplicate`, `cancelled` and `disputed`. Record every transition with actor, source event, event time and system time; do not silently overwrite earlier decisions.
+- **OP-07 — Case record.** Preserve bicycle ID, observation and pickup positions, timestamps, evidence, eligibility decision, route assignment, outcomes, edits, and cancellation reasons. Staff can inspect the observations supporting each decision and add field evidence.
+- **OP-08 — No notice workflow.** The product does not send company warnings or notices. It records cases and exports evidence for the municipality's existing enforcement process; that process decides and issues penalties. A triggered case may remain in that process even if the company later recovers the bicycle.
+- **OP-09 — Recovery during dispatch.** When a new trip or company pickup is reported, remove the stop and recalculate the route. Keep the case history and any separate penalty record.
+- **OP-10 — Unassigned bicycles.** An operator may create a case for another bicycle found outside a permitted area, but needs approval before collecting it. If the assigned bicycle is found elsewhere, confirm its ID, record its actual location, and continue only if it is still eligible.
 
-1. **Normalize observations.** Parse latitude/longitude in WGS84, event and ingestion timestamps, provider and vehicle type; de-duplicate event IDs and validate coordinates, chronology and clock/time-zone conventions. Maintain both the provider event time and time received by the system.
-2. **Check legal parking geometry.** For the station geometry valid at the observation time, project polygons to an appropriate metric CRS, buffer each `station_area` by 30 metres and test whether the point lies within the union of permitted areas. Handle multipolygons, boundaries and location uncertainty. Resolve whether separate geofencing restrictions alter the rule with the municipality.
-3. **Open a candidate interval.** After a credible `trip_end` or provider drop-off outside the permitted area, store the vehicle's stable historical ID, coordinates, first outside timestamp and evidence. A failed unlock/zero-distance trip must not create a false travel sequence. A single point is a location observation, not proof of continued parking.
-4. **Advance or invalidate the interval.** Later trusted observations of the same vehicle at the same place may support continued parking. A `trip_start`, verified company pickup, municipal pickup, move inside a station or credible relocation ends or changes the interval. Reservations, lost communications and apparent GPS jumps require explicit treatment. Avoid treating silence as continuous location proof.
-5. **Evaluate the challenge threshold.** A case satisfies the spatial and temporal definition only with evidence supporting continuous outside-area parking for **strictly more than 120 minutes**. Retrospective event reconstruction can identify candidates and bounded intervals; confirmation quality depends on observation frequency and event completeness. Label evidence `verified`, `supported` or `needs field check`, with explicit criteria agreed by the municipality. Do not equate a long gap between events with certain continuous dwell.
-6. **Check responsibility and escalation.** Query the company's recovery status and any notification/cure period. Compute `municipal_eligible_at` only after the contractual and operational prerequisites are satisfied. The two-hour challenge definition is distinct from any additional company response deadline or penalty trigger. A dispatcher approves or rejects a case if the evidence is incomplete.
-7. **Dispatch and resolve.** Reconfirm the bike is still present shortly before dispatch and again before arrival where possible. Record actual municipal collection, depot check-in, company handover and final disposition. Preserve cancellations and false positives for quality analysis.
+### 3.3 Missions and field app
 
-**Live-data constraint:** the supplied GBFS public IDs rotate. A reliable live detector needs an authorized stable ID/event feed, or a documented alternative such as verified field observations. Matching anonymous successive points by proximity may suggest a candidate but can conflate adjacent bicycles; it must not be the sole basis for formal action or a penalty. A historical replay can demonstrate the logic while this dependency is unresolved.
+- **OP-11 — Automatic missions.** Create and update missions automatically for eligible bicycles. A mission starts at the operator's current position and ends at the Complexo Multisserviços depot; an operator may make several depot trips in one shift. The operator may choose a manual stop order.
+- **OP-12 — Route updates.** Suggest an efficient driving route by distance, subject to capacity and safe access. Recalculate when cases are added or removed and when a wrong turn or material traffic change affects the route. Tell the operator why it changed and show the new target. Exclude unsafe or inaccessible stops and show the reason for staff review. If capacity is exhausted, queue remaining cases by priority for another mission or shift; the priority rule is still open.
+- **OP-13 — Capacity.** The first release uses one estimated bicycle capacity for every van. Validate that estimate against the vehicles used before real collections. Operator count, shifts, breaks, depot entrance, and service times remain to be confirmed.
+- **OP-14 — Field view.** Target a municipality-issued smartphone with Portuguese and English interfaces. Show abandoned bicycles, the current route, stop details, bicycle ID, last known position, access notes, and company status. Route changes and new assignments need timely notifications.
+- **OP-15 — Offline use.** Keep the current route visible when connectivity is lost. Save pickup records locally and synchronize them when connectivity returns; identify records still awaiting synchronization.
+- **OP-16 — Stop outcomes.** Support at least picked up, not found, in use, company recovered, unsafe, inaccessible, and unable to load. Every successful pickup records bicycle ID, time, actual location, and a photo. The operator may add notes and other evidence.
+- **OP-17 — Depot boundary.** The route ends at the depot. This product does not perform depot check-in, manifest reconciliation, company handover, or company messaging. Municipal custody remains the municipality's responsibility outside this application.
 
-### 3.3 Municipal operator workflow and interface
+### 3.4 Access, pilot, and unresolved policy
 
-- **Dispatch view:** map and queue with case ID, last known position, evidence timeline, eligible time, last update, company status, photo if available, safety/access notes and estimated service time. Filter out uncertain and resolved cases from automatic dispatch.
-- **Mission creation:** depot = verified vehicle entrance at the Complexo Multisserviços; choose shift, operator, vehicle and bike-carrying capacity. Assign only eligible cases. Make late or high-impact cases more urgent without inventing a statutory priority rule.
-- **Departure and stop execution:** operator checks in, follows a road-legal route, confirms a vehicle identifier at each stop, records `found/picked up`, `not found`, `company already recovered`, `in use`, `unsafe access` or `unable to load`, and adds timestamp/location/photo as appropriate. “Not found” closes no abandonment finding automatically; it opens a reconciliation task.
-- **On-route changes:** remove a case verified recovered by the company or started on a new trip; add newly eligible cases if capacity and shift permit. Keep the stop the operator is already approaching fixed unless safety or dispatcher intervention requires a change. Show the reason and ETA changes to the operator.
-- **Return and custody:** finish at the Complexo Multisserviços, register each bicycle and condition, reconcile manifest against pickups, log storage location and later transfer to the company. If capacity fills or the shift ends, return to depot and create another mission for remaining cases.
-- **Exceptions:** lost signal, no safe stopping, inaccessible private land, incorrect coordinate, duplicate case, damaged battery, accident and operator safety. Specify escalation and whether a second person or specialist is required before operational use.
+The first operational app serves municipal staff; the company has no account. The project team expects a small group of municipal staff who can all view and update cases. Review queues, exception ownership, and the final permission policy still need operational sign-off. Case evidence retention was requested as indefinite; a formal retention rule must be confirmed before real use.
 
-**Minimal case fields:** `case_id`, `provider_id`, stable `device_id` where authorized, vehicle type, observed coordinates and accuracy, `station_area_version`, first/last observed timestamps, evidence references, detector status, company notice/acknowledgement/recovery timestamps, response-rule version, municipal eligibility/approval, assignment, stop attempts, collection and depot timestamps, custody status, actor IDs, photos/notes and cancellation reason. Limit personal information and role-based access. Keep route history and source payload references for audit.
-
-### 3.4 Routing and optimization
-
-The municipality solves a **capacity-constrained pickup route**: one or more municipal vehicles depart from the Complexo Multisserviços, collect eligible bicycles, and return to the same depot. There are no station deliveries. Inputs include a road-network time/distance matrix, safe roadside access points, service minutes per pickup, carrying capacity, current load, shift window, case urgency and any route/vehicle restrictions. Distance between GPS points is not road travel time.
-
-An initial objective can minimize `travel_minutes + pickup_minutes + weighted_overdue_minutes + missed_case_penalty`, subject to depot start/end, capacity and shift constraints. Weights and missed-case policy require municipal approval. If several operators are available, solve a multi-vehicle pickup VRP; with one operator, solve a depot-return tour with capacity and possible multiple depot trips. Use a simple nearest-feasible baseline and an optimizer under **identical** travel-time and service assumptions. Report both estimated and actual routes separately.
-
-Recalculate at case creation, company recovery, new trip, municipal completion and material road disruption; avoid continuously redirecting a driver for negligible gains. Store route version, trigger, planned stops, rejected cases and reason. Verify no route exceeds load or shift constraints, and manually review unsafe or implausible access points. OR-Tools or another VRP solver can implement the planner; a routing engine using a validated drivable road network supplies the travel matrix.
-
-### 3.5 What to validate before deployment
-
-- Replay several days without using future events at decision time; later events can validate whether a predicted case persisted or was recovered. Prevent hindsight leakage.
-- Compare candidate and confirmed cases with a manually checked sample and provider logs. Measure false alerts, missed cases and detection delay by vehicle type and geography.
-- Check 30-metre boundaries, midnight/time-zone transitions, duplicate events, late arrivals, missing IDs, adjacent vehicles, failed trips and lost communications.
-- Test route capacity, depot return, cancellation immediately before arrival, safety exceptions and condition/custody reconciliation in a supervised field trial.
-- Agree evidence retention, operator safety, notification and dispute handling with municipal staff before formal enforcement.
+The first pilot measures detection accuracy, failed visits, and time to pickup. It must also demonstrate that an unsupported observation cannot trigger dispatch, recovered bicycles leave active routes, unsafe stops are excluded, successful pickups retain evidence, and offline records synchronize. Numerical targets are to be agreed with the Cascais Próxima operations lead.
 
 ## 4. Objective B — analytics and municipal oversight
 
@@ -123,9 +105,9 @@ Keep **observed data**, **inferred cases**, **forecasts** and **scenarios** visu
 | Municipal cost per bicycle | Direct labor, vehicle and handling costs ÷ verified municipal pickups. | Show full/variable-cost methods and assumptions. |
 | Route productivity | Pickups per crew-hour, km per pickup, capacity use, return trips and plan-versus-actual travel. | Compare routes of similar geography, shift and case difficulty. |
 | Failed visit / false dispatch | No-bike or wrong-bike visits ÷ attempted stops; reasons recorded. | Monitors detection and data-latency quality. |
-| Custody and return | Bikes checked into depot, bikes awaiting company collection, time in custody and reconciled releases. | Prevents loss and clarifies responsibility after pickup. |
+| Custody and return | Depot and transfer records, if a separate municipal source becomes available. | Future analytics input; depot check-in is outside the operational app. |
 
-**Penalties and recovery costs.** Build a rule table for the actual contract: triggering event, eligible vehicle, grace/response period, notice requirements, exclusions, evidence standard, calculation, cap, dispute window and effective dates. Only then classify `potentially qualifying`, `notified`, `issued`, `contested`, `upheld`, `paid` or `waived`. Show counts and euro values at each stage. Historical trip/event files do not identify users or contain a penalty ledger. A modelled municipal collection cost is not an actual invoice, and an abandonment case does not automatically create a fine. No individual-user attribution is possible from these attachments.
+**Penalties and recovery costs.** The operational product records and exports case evidence. The municipality's existing process decides whether a penalty is due and issues it; the product does not issue fines or send company notices. Future analytics may show penalty outcomes only if the municipality supplies authoritative records and definitions. Historical trip/event files do not contain a penalty ledger or user identifiers. A modelled collection cost is not an actual invoice, and an abandonment case does not automatically create a fine.
 
 ### 4.2 Company station balancing and service quality
 
@@ -149,71 +131,32 @@ For an **illustrative mathematical starting point only**, set `T_m(d) = A_m + 60
 
 For a usable model, build a time-dependent multimodal graph from pedestrian/cycling streets and transport stops, schedules and transfers. For each origin–destination–time pair, compare generalized door-to-door costs and identify the distance or circumstances where the preferred option changes. Estimate uncertainty and different user/accessibility profiles. Trip data from shared bicycles alone cannot estimate actual switching to walking, bus or rail; seek transport counts, survey or aggregated multimodal observations for calibration. Use the results to evaluate whether a proposed bicycle station improves access to public transport and underserved destinations.
 
-## 5. Proposed system and delivery sequence
+## 5. Product views and delivery sequence
 
-**Shared data layer:** versioned source ingests → validated vehicle events and station geometries → case/evidence store → company/municipal action log → route plans and depot custody → analytics marts. A single case ID and event timeline link the operational action to the oversight calculation. Distinct identifiers mark operator versus municipal action; retain both event time and ingestion time. Show provenance and the last successful refresh on every dashboard.
+The first real-use product needs a **municipal case view** for evidence, uncertainty, exception handling and export; a **field smartphone view** for assigned route, stop details, outcomes, photo capture and offline work; and a **simple operational review view** for detection accuracy, failed visits and pickup time. Company staff do not access the app. The company-notice, penalty-issuance, depot check-in and custody workflows remain in existing municipal processes.
 
-**Demonstration sequence:** (1) select a historical day and replay only observations known up to a simulated clock; (2) display a bicycle outside the buffered station area and evidence of its dwell; (3) show company status and an explicit, simulated municipal eligibility rule if the real contract is unavailable; (4) route a municipal vehicle from the Complexo Multisserviços through eligible pickups and back; (5) simulate a company recovery/new trip and replan; (6) record depot intake; (7) inspect separate company/municipal KPIs and a geographically supported station candidate. Mark every simulated event and contractual assumption.
+A separate **demonstration mode** may replay historical events using only information available at each simulated time. It must clearly label simulated events and must not imply that the public GBFS feed supports stable live bicycle tracking.
 
-**Suggested implementation order:**
+**Recommended product sequence:**
 
-1. Reconcile schema, time zones, failed trips and station geometry; build a historical case detector with evidence levels.
-2. Obtain or simulate the company status and municipal eligibility rule; build the case review and audit trail.
-3. Verify the depot entrance, road matrix, safe access and capacity; build and compare a depot-return route planner.
-4. Add a simple operator stop workflow and depot manifest; calculate observed versus modelled operational metrics.
-5. Add station demand and candidate-area views; extend to multimodal routing when transport schedules and behavior data are available.
-6. Replace simulated links with authorized live feeds and contract rules only after field verification.
+1. Validate the historical data fields, time zones, station geometry and event meanings; demonstrate candidate detection and evidence quality.
+2. Confirm authorized live identity and status data with the provider, then define the approved eligibility and exception rules with Cascais Próxima.
+3. Build automatic case and mission creation, safe route updates, manual route ordering, and the field smartphone workflow.
+4. Verify the depot entrance, actual van capacity, operator schedule and road access. Run a supervised pilot with pickup evidence and offline synchronization.
+5. Review measured pilot results with the Cascais Próxima operations lead and agree numerical acceptance targets. Define the analytics product in a separate requirements review.
 
-**Pilot acceptance criteria to agree:** spatial classification accuracy on manually reviewed locations; detection precision/recall and delay; percentage of company recoveries that cancel dispatch before a wasted visit; capacity and depot-return compliance; manifest reconciliation; route time against the agreed baseline; measured municipal cost and staff feedback. Set numeric targets only after establishing baseline data.
+Infrastructure, service selection and technology stack are intentionally deferred to a later planning iteration.
 
-## 6. Questions for the project team and municipal partners
+## 6. Open decisions and external verification
 
-The following questions determine the operating rules and implementation. **Questions 1–12 are the highest-priority decisions for a trustworthy municipal prototype.**
+The full interview and project-team answers are in [start_questions.md](start_questions.md) and [responses.md](responses.md). The following items must be resolved before claiming a production-ready live detector or finalizing operating rules:
 
-### Authority, ownership and escalation
-
-1. Does Challenge #9 cover bicycles only in this project, or scooters and other vehicle types too? Do types have different parking or collection rules?
-2. What exact contract clause permits municipal collection, and what events trigger it? Is abandonment at >120 minutes itself sufficient, or is there a separate provider response period?
-3. Who sends the company a notice, through what channel, and at what timestamp does its response clock start? What counts as proof of receipt?
-4. Which recovery or service-level exclusions apply (in-use, maintenance, communications outage, unsafe/inaccessible location, emergency, weather, weekends)?
-5. Who has authority to approve collection and resolve disputed or ambiguous cases? Is a human review always required?
-6. Does the company regain physical custody at the depot, and what receipt, storage deadline and transport arrangements apply? Who is liable for damage while in municipal custody?
-
-### Identity, observations and location evidence
-
-7. Can the company provide a stable authorized vehicle ID and timestamped position/status history in near real time, with documented location accuracy and retention?
-8. Can the municipality receive real-time `trip_start`, `trip_end`, provider pickup and drop-off events? What is their worst-case delivery delay and expected completeness?
-9. Is the authoritative permitted area precisely each `station_area` polygon plus 30 metres? How are geofencing exclusions, overlapping stations and revisions dated?
-10. What observation sequence and location tolerance are sufficient to assert that **the same bicycle** stayed outside for more than 120 minutes? How should GPS drift and adjacent bicycles be handled?
-11. What do `maintenance_pick_up`, `provider_drop_off`, `removed`, `missing` and `non_contactable` mean operationally? Which events prove actual company recovery?
-12. How are failed unlocks/trips identified conclusively? Are the supplied historical timestamps UTC or local time, and what is the exact extract period?
-
-### Municipal route, safety and depot
-
-13. What are the coordinates of the Complexo Multisserviços **collection-vehicle entrance**, operating hours, loading point and vehicle restrictions?
-14. How many municipal operators and vehicles are available, and what is each vehicle's safe capacity by bicycle/vehicle type?
-15. What are the shift lengths, breaks, pickup service times and any priority or maximum-wait rules?
-16. May an operator take multiple depot trips in one shift? Can a mission cross municipal boundaries?
-17. Which locations prohibit stopping or require special access, a second person or a specialist for a damaged battery/vehicle?
-18. Which operator device, navigation app, offline mode and evidence capture are acceptable? What is the escalation path for an inaccurate location or unsafe pickup?
-19. How are bicycle ID, condition, photos, seals, storage position and company collection receipt recorded at the depot?
-
-### Company oversight, costs and analytics
-
-20. Which company redistribution and recovery logs can be shared, with actor, times, station, vehicle count and reason?
-21. Are station capacity, historical stock, current availability and out-of-service counts available? How are virtual stations and full/empty conditions represented?
-22. What contractual penalty schedule applies, from which date, and where are notices, disputes, waivers, invoices and payments recorded?
-23. What labor, vehicle, fuel/energy, storage and administration cost rates should be included in municipal recovery costs?
-24. Which comparison periods and service targets does the municipality already use to evaluate the contracted company?
-25. Can the municipality obtain more than three weeks of trips and events, including school terms, holidays, summer peaks and exceptional events?
-
-### Station planning and multimodal journeys
-
-26. Which parcels/public-space sites may host stations, and what accessibility, safety, heritage and environmental restrictions apply?
-27. Is there a budget, preferred station size, minimum spacing and required service-equity objective?
-28. Can bus and rail operators provide current timetables/GTFS, service changes, validations or aggregate origin–destination and transfer information?
-29. Which traveler groups and journey purposes should the mode hierarchy represent? Should monetary cost, hills, personal safety and mobility impairments affect the generalized cost?
-30. What decision will the first demonstration support: dispatch today, contract compliance, annual station planning, or all three in separate views?
+1. **Provider API:** availability of a stable live bicycle ID; event and position endpoints; update delay; location accuracy; timestamp semantics; and which event proves company recovery. The supplied public GBFS ID is volatile.
+2. **Eligibility policy:** contractual authority and exceptions; precise evidence criteria for movement and continued parking; and how company disputes are handled by existing municipal processes.
+3. **Municipal operations:** actual operator and van counts, shifts, depot entrance, safe van capacity, pickup time, stopping restrictions, and staff response to unsafe or inaccessible locations.
+4. **Product governance:** exception ownership, exact staff permissions, evidence-retention policy, and sign-off criteria. Requested indefinite evidence retention is not yet an approved policy.
+5. **Real-use fallback:** if the provider cannot supply the required live feed, decide whether staff-confirmed cases can be used or real-use launch must wait. Historical replay alone does not meet the real-use objective.
+6. **Analytics scope:** product users, required decisions, definitions and data access for contract oversight, station balancing, site planning and multimodal analysis remain for the next review.
 
 ## 7. Sources and provenance
 
