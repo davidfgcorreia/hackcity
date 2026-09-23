@@ -1,0 +1,2 @@
+feed_type,feed_publisher_name,feed_publisher_url,feed_lang,default_lang,feed_start_date,feed_end_date,feed_version,feed_desc,feed_remarks,feed_contact_email,feed_contact_url
+3,Alsa Todi,http://www.autocarrosalsa.pt,pt,,20251001,20251031,04.20.00.01,Plan de operación anual v04.20.00.01,,,

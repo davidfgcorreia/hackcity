@@ -1,0 +1,2 @@
+agency_id,agency_name,agency_url,agency_timezone,agency_lang,agency_phone,agency_fare_url,agency_email
+42,"Rodoviária de Lisboa",https://www.rodoviariadelisboa.pt/,Europe/Lisbon,PT,+351210410400,https://www.rodoviariadelisboa.pt/images/tarifa%CC%81rio_imprimirvinilA5.png,drh@rodoviariadelisboa.pt

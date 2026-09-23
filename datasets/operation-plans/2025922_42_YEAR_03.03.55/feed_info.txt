@@ -1,0 +1,2 @@
+feed_type,feed_publisher_name,feed_publisher_url,feed_lang,default_lang,feed_start_date,feed_end_date,feed_version,feed_desc,feed_remarks,feed_contact_email,feed_contact_url
+1,Rodoviária de Lisboa,https://www.rodoviariadelisboa.pt/,PT,,20251001,20251020,02.02.55,Plano oferta Rodoviária de Lisboa v02.02,,,

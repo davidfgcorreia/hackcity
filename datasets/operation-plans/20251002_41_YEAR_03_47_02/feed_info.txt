@@ -1,0 +1,2 @@
+feed_type,feed_publisher_name,feed_publisher_url,feed_lang,feed_start_date,feed_end_date,feed_version,feed_desc,feed_remarks,feed_contact_email,feed_contact_url
+1,Viacao Alvorada,https://www.carrismetropolitana.pt/,pt,20251013,20251031,03.47.02,Plano operação VA v03.47.02,,geral@viacaoalvorada.pt,https://viacaoalvorada.pt/

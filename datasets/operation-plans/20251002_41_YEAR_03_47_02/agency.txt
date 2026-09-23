@@ -1,0 +1,2 @@
+agency_id,agency_name,agency_url,agency_timezone,agency_phone,agency_lang
+41,"Viação alvorada","http://www.viacaoalvorada.pt",Europe/Lisbon,+351210410400,pt

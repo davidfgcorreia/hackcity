@@ -1,0 +1,187 @@
+line_id,line_short_name,line_long_name,line_type,route_id,agency_id,route_origin,route_destination,route_short_name,route_long_name,route_desc,route_remarks,route_type,contract,path_type,circular,school,route_url,route_color,route_text_color,route_sort_order,continuous_pickup,continuous_drop_off
+4001,4001,Alcochete | Circular,0,4001_0,44,Alcochete,Alcochete,4001,Alcochete | Circular,,,3,,1,1,0,,3D85C6,FFFFFF,,1,1
+4002,4002,São Francisco | Circular,0,4002_0,44,São Francisco,São Francisco,4002,São Francisco | Circular,,,3,,1,1,0,,3D85C6,FFFFFF,,1,1
+4101,4101,Alhos Vedros (Escola José Afonso) - Arroteias,0,4101_0,44,Alhos Vedros (Escola José Afonso),Arroteias,4101,Alhos Vedros (Escola José Afonso) - Arroteias,,,3,,1,0,0,,C61D23,FFFFFF,,1,1
+4102,4102,Moita (Estação) - Sarilhos Pequenos via Gaio-Rosário,0,4102_0,44,Moita (Estação),Sarilhos Pequenos,4102,Moita (Estação) - Sarilhos Pequenos via Gaio-Rosário,,,3,,1,0,0,,C61D23,FFFFFF,,1,1
+4103,4103,Moita (Estação) - Sarilhos Pequenos,0,4103_0,44,Moita (Estação),Sarilhos Pequenos,4103,Moita (Estação) - Sarilhos Pequenos,,,3,,1,0,0,,3D85C6,FFFFFF,,1,1
+4104,4104,Moita | Circular via Centro,0,4104_0,44,Moita,Moita,4104,Moita | Circular via centro,,,3,,1,1,0,,3D85C6,FFFFFF,,1,1
+4105,4105,Moita | Circular via Carvalhinho,0,4105_0,44,Moita (Estação CP),Moita (Estação CP),4105,Moita | Circular via Carvalhinho,,,3,,1,1,0,,3D85C6,FFFFFF,,1,1
+4106,4106,Alhos Vedros | Circular via Centro de Saúde,0,4106_0,44,Alhos Vedros | Circular,Alhos Vedros | Circular,4106,Alhos Vedros | Circular via Centro de Saúde,,,3,,1,1,0,,3D85C6,FFFFFF,,1,1
+4107,4107,Alhos Vedros | Circular via Arroteias,0,4107_0,44,Alhos Vedros | Circular,Alhos Vedros | Circular,4107,Alhos Vedros | Circular via Arroteias,,,3,,1,1,0,,3D85C6,FFFFFF,,1,1
+4202,4202,Afonsoeiro - Bairro do Saldanha via Bairro da Calçada,0,4202_0,44,Afonsoeiro,Bairro do Saldanha,4202,Afonsoeiro - Bairro do Saldanha via Bairro da Calçada,,,3,,1,0,0,,C61D23,FFFFFF,,1,1
+4203,4203,Afonsoeiro - Montijo (Terminal Fluvial) via Bairro da Liberdade,0,4203_0,44,Afonsoeiro,Montijo (Terminal Fluvial),4203,Afonsoeiro - Montijo (Terminal Fluvial) via Bairro da Liberdade,,,3,,1,0,0,,3D85C6,FFFFFF,,1,1
+4204,4204,Bairro do Charqueirão - Montijo (Terminal Fluvial),0,4204_0,44,Bairro do Charqueirão,Montijo (Terminal Fluvial),4204,Bairro do Charqueirão - Montijo (Terminal Fluvial),,,3,,1,0,0,,3D85C6,FFFFFF,,1,1
+4205,4205,Montijo (Terminal Fluvial) - Vale Porrim via Bairro do Charqueirão,0,4205_0,44,Vale Porrim,Montijo (Terminal Fluvial),4205,Montijo (Terminal Fluvial) - Vale Porrim via Bairro do Charqueirão,,,3,,1,0,0,,C61D23,FFFFFF,,1,1
+4206,4206,Bairro Esteval - Montijo (Terminal Fluvial),0,4206_0,44,Bairro Esteval,Montijo (Terminal Fluvial),4206,Bairro Esteval - Montijo (Terminal Fluvial),,,3,,1,0,0,,3D85C6,FFFFFF,,1,1
+4207,4207,Montijo (Área Comercial) - Montijo (Terminal Fluvial),0,4207_0,44,Montijo (Área Comercial),Montijo (Terminal Fluvial),4207,Montijo (Área Comercial) - Montijo (Terminal Fluvial),,,3,,1,0,0,,3D85C6,FFFFFF,,1,1
+4207,4207,Montijo (Área Comercial) - Montijo (Terminal Fluvial),0,4207_1,44,Montijo (Escola Joaquim Serra),Montijo (Terminal Fluvial),4207,Montijo (Escola Joaquim Serra) - Montijo (Terminal Fluvial),,,3,,3,0,0,,3D85C6,FFFFFF,,1,1
+4207,4207,Montijo (Área Comercial) - Montijo (Terminal Fluvial),0,4207_2,44,Montijo (Terminal Fluvial),Bela Vista,4207,Bela Vista - Montijo (Terminal Fluvial),,,3,,3,0,0,,3D85C6,FFFFFF,,1,1
+4208,4208,Montijo (Terminal Fluvial) - Sarilhos Grandes (Estr. 4 Marcos),0,4208_0,44,Montijo (Terminal Fluvial),Sarilhos Grandes (Estr. 4 Marcos),4208,Montijo (Terminal Fluvial) - Sarilhos Grandes (Estr. 4 Marcos),,,3,,1,0,0,,C61D23,FFFFFF,,1,1
+4211,4211,Craveiras - Pegões | Circular,0,4211_0,44,Craveiras - Pegões,Craveiras - Pegões,4211,Craveiras - Pegões | Circular,,,3,,1,0,0,,3D85C6,FFFFFF,,1,1
+4212,4212,Foros Boavista - Pegões,0,4212_0,44,Foros Boavista,Pegões,4212,Foros Boavista - Pegões,,,3,,1,0,0,,C61D23,FFFFFF,,1,1
+4301,4301,Palmela (Centro) - Palmela (Terminal),0,4301_0,44,Palmela (Terminal),Palmela (Terminal),4301,Palmela (Terminal) | Circular Escolas,,,3,,1,1,0,,3D85C6,FFFFFF,,1,1
+4302,4302,Palmela (Estação) - Palmela (Terminal),0,4302_0,44,Palmela (Estação),Palmela (Terminal),4302,Palmela (Estação) - Palmela (Terminal),,,3,,1,0,0,,C61D23,FFFFFF,,1,1
+4303,4303,Palmela | Circular,0,4303_0,44,Palmela,Palmela,4303,Palmela | Circular via Castelo,,,3,,1,0,0,,3D85C6,FFFFFF,,1,1
+4303,4303,Palmela | Circular,0,4303_1,44,Palmela,Palmela via Castelo,4303,Palmela | Circular,,,3,,3,0,0,,3D85C6,FFFFFF,,1,1
+4304,4304,Palmela (Terminal) - Penalva,0,4304_0,44,Palmela (Terminal),Penalva,4304,Palmela (Terminal) - Penalva,,,3,,1,0,0,,C61D23,FFFFFF,,1,1
+4305,4305,Brejos do Assa - Palmela (Terminal),0,4305_0,44,Brejos do Assa,Palmela (Terminal),4305,Brejos do Assa - Palmela (Terminal),,,3,,1,0,0,,C61D23,FFFFFF,,1,1
+4307,4307,Loja Nova - Palmela (Terminal),0,4307_0,44,Loja Nova,Palmela (Terminal),4307,Loja Nova - Palmela (Terminal),,,3,,1,0,0,,C61D23,FFFFFF,,1,1
+4307,4307,Loja Nova - Palmela (Terminal),0,4307_1,44,Palmela (Terminal),Loja Nova,4307,Loja Nova - Palmela (Terminal) via Forninho,,,3,,3,0,0,,C61D23,FFFFFF,,1,1
+4308,4308,Palmela (Terminal) - Pinhal Novo (Estação),0,4308_0,44,Palmela (Terminal),Pinhal Novo (Estação),4308,Palmela (Terminal) - Pinhal Novo (Estação),,,3,,1,0,0,,C61D23,FFFFFF,,1,1
+4310,4310,Águas de Moura - Poceirão,0,4310_0,44,Águas de Moura,Poceirão,4310,Águas de Moura - Poceirão,,,3,,1,0,0,,C61D23,FFFFFF,,1,1
+4311,4311,Asseiceira - Poceirão,0,4311_0,44,Asseiceira,Poceirão,4311,Asseiceira - Poceirão,,,3,,1,0,0,,C61D23,FFFFFF,,1,1
+4312,4312,Poceirão - Vale Abrunheira (X) via Fernando Pó,0,4312_0,44,Poceirão,Vale Abrunheira (X),4312,Poceirão - Vale Abrunheira (X) via Fernando Pó,,,3,,1,0,0,,C61D23,FFFFFF,,1,1
+4312,4312,Poceirão - Vale Abrunheira (X) via Fernando Pó,0,4312_1,44,Poceirão,Vale Abrunheira (X),4312,Poceirão - Vale Abrunheira (X),,,3,,3,0,0,,C61D23,FFFFFF,,1,1
+4312,4312,Poceirão - Vale Abrunheira (X) via Fernando Pó,0,4312_2,44,Lagameças,Poceirão via Fernando Pó,4312,Lagameças - Poceirão via Fernando Pó,,,3,,3,0,0,,C61D23,FFFFFF,,1,1
+4313,4313,São Gonçalo - Penalva,0,4313_0,44,Cabanas,Penalva,4313,São Gonçalo - Penalva,,,3,,1,0,0,,C61D23,FFFFFF,,1,1
+4320,4320,Pinhal Novo | Circular,0,4320_0,44,Pinhal Novo,Pinhal Novo,4320,Pinhal Novo | Circular,,,3,,1,1,0,,3D85C6,FFFFFF,,1,1
+4321,4321,Pinhal Novo - Qta do Anjo,0,4321_0,44,Pinhal Novo,Quinta do Anjo,4321,Pinhal Novo - Quinta do Anjo,,,3,,1,0,0,,C61D23,FFFFFF,,1,1
+4322,4322,Pinhal Novo - Rio Frio,0,4322_0,44,Pinhal Novo,Rio Frio,4322,Pinhal Novo - Rio Frio,,,3,,1,0,0,,C61D23,FFFFFF,,1,1
+4322,4322,Pinhal Novo - Rio Frio,0,4322_1,44,Pinhal Novo,Rio Frio,4322,Pinhal Novo - Rio Frio via Colégio A Palmeira,,,3,,3,0,0,,C61D23,FFFFFF,,1,1
+4401,4401,Cachofarra - Setúbal (Hospital),0,4401_0,44,Cachofarra,Setúbal (Hospital),4401,Cachofarra - Setúbal (Hospital),,,3,,1,0,0,,C61D23,FFFFFF,,1,1
+4402,4402,Complexo Desportivo Vale Rosa - Setúbal (ITS),0,4402_0,44,Complexo Desportivo Vale Rosa,Setúbal (ITS),4402,Complexo Desportivo Vale Rosa - Setúbal (ITS),,,3,,1,0,0,,C61D23,FFFFFF,,1,1
+4403,4403,Ferro Engomar (Terminal) - Setúbal (Av. Luísa Todi) via ITS,0,4403_0,44,Fonte da Talha,Setúbal (Av. Luísa Todi),4403,Ferro Engomar (Terminal) - Setúbal (Av. Luísa Todi) via ITS,,,3,,1,0,0,,3D85C6,FFFFFF,,1,1
+4404,4404,Interfaces Setúbal | Circular via Rodrigues Manito,0,4404_0,44,Interfaces Setúbal | Circular via Rodrigues Manito,Interfaces Setúbal | Circular via Rodrigues Manito,4404,Interfaces Setúbal | Circular via Rodrigues Manito,,,3,,1,1,0,,3D85C6,FFFFFF,,1,1
+4405,4405,Interfaces Setúbal | Circular via Av Ciprestes,0,4405_0,44,Interfaces Setúbal | Circular via Av Ciprestes,Interfaces Setúbal | Circular via Av Ciprestes,4405,Interfaces Setúbal | Circular via Av Ciprestes,,,3,,1,1,0,,3D85C6,FFFFFF,,1,1
+4406,4406,Manteigadas - Setúbal (Mercado),0,4406_0,44,Manteigadas,Setúbal (Mercado),4406,Manteigadas - Setúbal (Mercado),,,3,,1,0,0,,3D85C6,FFFFFF,,1,1
+4406,4406,Manteigadas - Setúbal (Mercado),0,4406_1,44,Setúbal (Politécnico),Setúbal (Mercado),4406,Setúbal (Politécnico) - Setúbal (Mercado),,,3,,3,0,0,,3D85C6,FFFFFF,,1,1
+4406,4406,Manteigadas - Setúbal (Mercado),0,4406_2,44,Manteigadas (Feira de Santiago),Setúbal (Mercado),4406,Manteigadas (Feira de Santiago) - Setúbal (Mercado),,,3,,3,0,0,,3D85C6,FFFFFF,,1,1
+4407,4407,Manteigadas - Setúbal (Mercado) via Bairro 25 de Abril,0,4407_0,44,Manteigadas,Setúbal (Mercado),4407,Manteigadas - Setúbal (Mercado) via Bairro 25 de Abril,,,3,,1,0,0,,C61D23,FFFFFF,,1,1
+4407,4407,Manteigadas - Setúbal (Mercado) via Bairro 25 de Abril,0,4407_1,44,Setúbal (Av. Pinheiro),Setúbal (Mercado),4407,Setúbal (Av. Pinheiro) - Setúbal (Mercado) via Bairro 25 de Abril,,,3,,3,0,0,,C61D23,FFFFFF,,1,1
+4408,4408,Manteigadas - Setúbal (Mercado) via Bela Vista,0,4408_0,44,Setúbal (Mercado),Manteigadas,4408,Manteigadas - Setúbal (Mercado) via Bela Vista,,,3,,1,0,0,,C61D23,FFFFFF,,1,1
+4409,4409,Setúbal (Bº Quinta Santo António) - Setúbal (Bº Viso) via Montebelo,0,4409_0,44,Setúbal (Bº Quinta Santo António),Setúbal (Bº Viso),4409,Setúbal (Bº Quinta Santo António) - Setúbal (Bº Viso) via Montebelo,,,3,,1,0,0,,C61D23,FFFFFF,,1,1
+4410,4410,Manteigadas (Esc. Profissional) - Poço Mouro via Centro Comercial,0,4410_0,44,Manteigadas (Esc. Profissional),Poço Mouro,4410,Manteigadas (Esc. Profissional) - Poço Mouro via Centro Comercial,,,3,,1,0,0,,C61D23,FFFFFF,,1,1
+4410,4410,Manteigadas (Esc. Profissional) - Poço Mouro via Centro Comercial,0,4410_1,44,Manteigadas (Feira de Santiago),Setúbal (Av. Lima de Freitas,4410,Manteigadas (Feira de Santiago) - Setúbal (Av. Lima de Freitas),,,3,,3,0,0,,C61D23,FFFFFF,,1,1
+4410,4410,Manteigadas (Esc. Profissional) - Poço Mouro via Centro Comercial,0,4410_2,44,Manteigadas (Feira de Santiago),Poço Mouro via Centro Comercial,4410,Manteigadas (Feira de Santiago) - Poço Mouro via Centro Comercial,,,3,,3,0,0,,C61D23,FFFFFF,,1,1
+4412,4412,Morgada - Setúbal (Mercado),0,4412_0,44,Morgada,Setúbal (Mercado),4412,Morgada - Setúbal (Mercado),,,3,,1,0,0,,C61D23,FFFFFF,,1,1
+4414,4414,Outão (Hospital) - Setúbal (ITS),0,4414_0,44,Outão (Hospital),Setúbal (ITS),4414,Outão (Hospital) - Setúbal (ITS),,,3,,1,0,0,,C61D23,FFFFFF,,1,1
+4415,4415,Outão (Hospital) - Setúbal (ITS) via Aldeia Grande,0,4415_0,44,Outão (Hospital),Setúbal (ITS),4415,Outão (Hospital) - Setúbal (ITS) via Aldeia Grande,,,3,,1,0,0,,C61D23,FFFFFF,,1,1
+4416,4416,Poço Mouro - Setúbal (ITS),0,4416_0,44,Poço Mouro,Setúbal (ITS),4416,Poço Mouro - Setúbal (ITS),,,3,,1,0,0,,C61D23,FFFFFF,,1,1
+4417,4417,Poço Mouro - Setúbal (ITS) via Manteigadas,0,4417_0,44,Poço Mouro,Setúbal (ITS),4417,Poço Mouro - Setúbal (ITS) via Manteigadas,,,3,,1,0,0,,C61D23,FFFFFF,,1,1
+4901,4901,Landeira - Setúbal (ITS),0,4901_0,44,Landeira,Setúbal (ITS),4901,Landeira - Setúbal (ITS),,,3,,1,0,0,,C61D23,FFFFFF,,1,1
+4901,4901,Landeira - Setúbal (ITS),0,4901_1,44,Landeira,Setúbal (ITS),4901,Landeira - Setúbal (ITS) via Gâmbia,,,3,,3,0,0,,C61D23,FFFFFF,,1,1
+4902,4902,Landeira - Pegões,0,4902_0,44,Pegões,Ladeira,4902,Pegões - Landeira,,,3,,1,0,0,,C61D23,FFFFFF,,1,1
+0000,TESTE,Teste,0,0000_0,44,Teste,Teste,TESTE,Teste,,,3,,1,0,0,,C61D23,FFFFFF,,1,1
+4418,4418,Setúbal (Alegro) - Setúbal (Av. 5 Outubro),0,4418_0,44,Setúbal (Alegro),Setúbal (Av. 5 Outubro),4418,Setúbal (Centro Comercial) - Setúbal (Av. 5 Outubro),,,3,,1,0,0,,C61D23,FFFFFF,,1,1
+4419,4419,Brejos Canes - Setúbal (Saboaria),0,4419_0,44,Brejos Canes,Setúbal (Saboaria),4419,Brejos Canes - Setúbal (Saboaria),,,3,,1,0,0,,C61D23,FFFFFF,,1,1
+4420,4420,Setúbal (Centro Comercial) - Setúbal (ITS),0,4420_0,44,Setúbal (Alegro),Setúbal (ITS),4420,Setúbal (Centro Comercial) - Setúbal (ITS),,,3,,1,0,0,,3D85C6,FFFFFF,,1,1
+4422,4422,Setúbal (Bairro Camolas) - Setúbal (Casal Figueiras) via Bairro do Viso,0,4422_0,44,Setúbal (Bairro Camolas),Setúbal (Casal Figueiras),4422,Setúbal (Bairro Camolas) - Setúbal (Casal Figueiras) via Bairro do Viso,,,3,,1,0,0,,C61D23,FFFFFF,,1,1
+4422,4422,Setúbal (Bairro Camolas) - Setúbal (Casal Figueiras) via Bairro do Viso,0,4422_3,44,Setúbal (Poçoilos),Setúbal (Casal Figueiras),4422,Setúbal (Poçoilos) - Setúbal (Casal Figueiras) via Bairro do Viso,,,3,,3,0,0,,C61D23,FFFFFF,,1,1
+4424,4424,Setúbal (Bairro Viso) - Manteigadas (Piscinas),0,4424_0,44,Setúbal (Bairro Viso),Manteigadas (Piscinas),4424,Setúbal (Bairro Viso) - Manteigadas (Piscinas),,,3,,1,0,0,,C61D23,FFFFFF,,1,1
+4425,4425,Setúbal (Escola Viso) - Mitrena,0,4425_0,44,Setúbal (Escola Viso),Mitrena,4425,Setúbal (Escola Viso) - Mitrena,,,3,,1,0,0,,C61D23,FFFFFF,,1,1
+4425,4425,Setúbal (Escola Viso) - Mitrena,0,4425_1,44,Setúbal (Bairro Viso),Mitrena,4425,Setúbal (Bairro Viso) - Mitrena,,,3,,3,0,0,,C61D23,FFFFFF,,1,1
+4426,4426,Setúbal (Bairro do Viso) - Setúbal (Bairro Quinta Santo António),0,4426_0,44,Setúbal (Bairro do Viso),Setúbal (Bairro Quinta Santo António),4426,Setúbal (Bairro do Viso) - Setúbal (Bairro Quinta Santo António),,,3,,1,0,0,,3D85C6,FFFFFF,,1,1
+4426,4426,Setúbal (Bairro do Viso) - Setúbal (Bairro Quinta Santo António),0,4426_1,44,Setúbal (Escola Viso),Setúbal (Bairro Quinta Santo António),4426,Setúbal (Escola Viso) - Setúbal (Bairro Quinta Santo António) via São Francisco Xavier,,,3,,3,0,0,,3D85C6,FFFFFF,,1,1
+4426,4426,Setúbal (Bairro do Viso) - Setúbal (Bairro Quinta Santo António),0,4426_2,44,Setúbal (Escola Viso),Setúbal (ITS),4426,Setúbal (Escola Viso) - Setúbal (ITS),,,3,,3,0,0,,3D85C6,FFFFFF,,1,1
+4426,4426,Setúbal (Bairro do Viso) - Setúbal (Bairro Quinta Santo António),0,4426_3,44,Setúbal (Bonfim),Setúbal (Escola Viso),4426,Setúbal (Escola Viso) - Setúbal (Bonfim),,,3,,3,0,0,,3D85C6,FFFFFF,,1,1
+4426,4426,Setúbal (Bairro do Viso) - Setúbal (Bairro Quinta Santo António),0,4426_4,44,Setúbal (Mercado 2 de Abril),Setúbal (Escola Viso),4426,Setúbal (Escola Viso) - Setúbal (Mercado 2 de Abril),,,3,,3,0,0,,3D85C6,FFFFFF,,1,1
+4427,4427,Setúbal (Bela Vista) - Setúbal (Mercado),0,4427_0,44,Setúbal (Mercado),Setúbal (Bela Vista),4427,Setúbal (Bela Vista) - Setúbal (Mercado),,,3,,1,0,0,,3D85C6,FFFFFF,,1,1
+4428,4428,Setúbal (Casal Figueiras) - Vale Ana Gomes,0,4428_0,44,Setúbal (Casal Figueiras),Vale Ana Gomes,4428,Setúbal (Casal Figueiras) - Vale Ana Gomes,,,3,,1,0,0,,C61D23,FFFFFF,,1,1
+4429,4429,Setúbal (Centro Saúde) - Setúbal (Mercado),0,4429_0,44,Setúbal (Centro Saúde),Setúbal (Mercado),4429,Setúbal (Centro Saúde) - Setúbal (Mercado),,,3,,1,0,0,,C61D23,FFFFFF,,1,1
+4431,4431,Setúbal (ITS) - Setúbal (Quinta Varzinha),0,4431_0,44,Setúbal (ITS),Setúbal (Quinta Varzinha),4431,Setúbal (ITS) - Setúbal (Quinta Varzinha),,,3,,1,0,0,,3D85C6,FFFFFF,,1,1
+4432,4432,Setúbal (ITS) - Vale de Choupo,0,4432_0,44,Setúbal (ITS),Vale de Choupo,4432,Setúbal (ITS) - Vale de Choupo,,,3,,1,0,0,,C61D23,FFFFFF,,1,1
+4433,4433,Alto Guerra - Setúbal (Casal Figueiras),0,4433_0,44,Alto Guerra,Setúbal (Casal Figueiras),4433,Alto Guerra - Setúbal (Casal Figueiras),,,3,,1,0,0,,C61D23,FFFFFF,,1,1
+4434,4434,Setúbal (Mercado 2 de Abril) - Setúbal (R. Timor),0,4434_0,44,Setúbal (Mercado 2 de Abril),Setúbal (R. Timor),4434,Setúbal (Mercado 2 de Abril) - Setúbal (R. Timor),,,3,,1,0,0,,3D85C6,FFFFFF,,1,1
+4434,4434,Setúbal (Mercado 2 de Abril) - Setúbal (R. Timor),0,4434_1,44,Manteigadas,Setúbal (R. Timor),4434,Manteigadas - Setúbal (R. Timor),,,3,,3,0,0,,3D85C6,FFFFFF,,1,1
+4435,4435,Biscainho - Faralhão,0,4435_0,44,Biscainho,Faralhão,4435,Biscainho - Faralhão,,,3,,1,0,0,,C61D23,FFFFFF,,1,1
+4436,4436,Setúbal (Mercado) - Setúbal (Terroa),0,4436_0,44,Setúbal (Mercado),Setúbal (Terroa),4436,Setúbal (Mercado) - Setúbal (Terroa),,,3,,1,0,0,,3D85C6,FFFFFF,,1,1
+4437,4437,Faralhão - Setúbal (ITS),0,4437_0,44,Faralhão,Setúbal (ITS),4437,Faralhão - Setúbal (ITS),,,3,,1,0,0,,C61D23,FFFFFF,,1,1
+4438,4438,Setúbal (Monte Belo Norte) - Setúbal (Saboaria),0,4438_0,44,Setúbal (Monte Belo Norte),Setúbal (Saboaria),4438,Setúbal (Monte Belo Norte) - Setúbal (Saboaria),,,3,,1,0,0,,C61D23,FFFFFF,,1,1
+4438,4438,Setúbal (Monte Belo Norte) - Setúbal (Saboaria),0,4438_1,44,Setúbal (Monte Belo Norte),Setúbal (Saboaria),4438,Setúbal (Monte Belo Norte) - Setúbal (Saboaria) via Centro Saúde São Sebastião,,,3,,3,0,0,,C61D23,FFFFFF,,1,1
+4439,4439,Praias do Sado - Setúbal (ITS),0,4439_0,44,Praias do Sado,Setúbal (ITS),4439,Praias do Sado - Setúbal (ITS),,,3,,1,0,0,,C61D23,FFFFFF,,1,1
+4440,4440,Setúbal (Monte Belo Norte) - Setúbal (Saboaria) via Centro Comercial,0,4440_0,44,Setúbal (Monte Belo Norte),Setúbal (Saboaria),4440,Setúbal (Monte Belo Norte) - Setúbal (Saboaria) via Centro Comercial,,,3,,1,0,0,,C61D23,FFFFFF,,1,1
+4441,4441,Setúbal (Saboaria) - Setúbal (Vale Cobro),0,4441_0,44,Setúbal (Saboaria),Setúbal (Vale Cobro),4441,Setúbal (Saboaria) - Setúbal (Vale Cobro),,,3,,1,0,0,,C61D23,FFFFFF,,1,1
+4442,4442,Praias do Sado (Estação) - Setúbal (Bela Vista),0,4442_0,44,Praias do Sado (Estação),Setúbal (Bela Vista),4442,Praias do Sado (Estação) - Setúbal (Bela Vista),,,3,,1,0,0,,C61D23,FFFFFF,,1,1
+4442,4442,Praias do Sado (Estação) - Setúbal (Bela Vista),0,4442_1,44,Praias do Sado (Estação),Setúbal (Escola Luisa Todi),4442,Praias do Sado (Estação) - Setúbal (Escola Luisa Todi),,,3,,3,0,0,,C61D23,FFFFFF,,1,1
+4443,4443,Setúbal (Politécnico) - Praias do Sado,0,4443_0,44,Praias do Sado,Setúbal (Politécnico),4443,Setúbal (Politécnico) - Praias do Sado,,,3,,1,0,0,,C61D23,FFFFFF,,1,1
+4451,4451,Mitrena (Lisnave) - Setúbal (ITS),0,4451_0,44,Mitrena (Lisnave),Setúbal (ITS),4451,Mitrena (Lisnave) - Setúbal (ITS),,,3,,1,0,0,,C61D23,FFFFFF,,1,1
+4452,4452,Mitrena (Portucel) - Setúbal (ITS),0,4452_0,44,Mitrena (Portucel),Setúbal (ITS),4452,Mitrena (Portucel) - Setúbal (ITS),,,3,,1,0,0,,C61D23,FFFFFF,,1,1
+4452,4452,Mitrena (Portucel) - Setúbal (ITS),0,4452_1,44,Mitrena (Lisnave),Setúbal (ITS),4452,Mitrena (Lisnave) - Setúbal (ITS),,,3,,3,0,0,,C61D23,FFFFFF,,1,1
+4453,4453,Mitrena (Portucel) - Setúbal (ITS) via Estrada Graça,0,4453_0,44,Mitrena (Portucel),Setúbal (ITS),4453,Mitrena (Portucel) - Setúbal (ITS) via Estrada Graça,,,3,,1,0,0,,C61D23,FFFFFF,,1,1
+4463,4463,Azeitão | Circular via R. José Augusto Coelho,0,4463_0,44,Azeitão | Circular,Azeitão | Circular,4463,Azeitão | Circular via R. José Augusto Coelho,,,3,,1,1,0,,3D85C6,FFFFFF,,1,1
+4464,4464,Azeitão | Circular via R. Dr. Francisco Gonçalves de Oliveira,0,4464_0,44,Azeitão | Circular,Azeitão | Circular,4464,Azeitão | Circular via R. Dr. Francisco Gonçalves de Oliveira,,,3,,1,1,0,,3D85C6,FFFFFF,,1,1
+4465,4465,Escolas Azeitão | Trajeto 1,0,4465_0,44,Escola Básica da Brejoeira,Escola Básica 2 3 de Azeitão,4465,Escolas Azeitão | Trajeto 1,,,3,,1,0,1,,3D85C6,FFFFFF,,1,1
+4466,4466,Escolas Azeitão | Trajeto 2,0,4466_0,44,Escola Básica 2 3 de Azeitão,Escola Básica da Brejoeira,4466,Escolas Azeitão | Trajeto 2,,,3,,1,0,1,,3D85C6,FFFFFF,,1,1
+4467,4467,Escolas Azeitão | Trajeto 3,0,4467_0,44,Escola Básica da Brejoeira,Escola Básica 2 3 de Azeitão,4467,Escolas Azeitão | Trajeto 3,,,3,,1,0,1,,3D85C6,FFFFFF,,1,1
+4468,4468,Escolas Azeitão | Trajeto 4,0,4468_0,44,Escola Básica 2 3 de Azeitão,Escola Básica da Brejoeira,4468,Escolas Azeitão | Trajeto 4,,,3,,1,0,1,,3D85C6,FFFFFF,,1,1
+4470,4470,Setúbal (ITS) - Praia do Creiro via Vila Nogueira de Azeitão,0,4470_0,44,Setúbal (ITS),Praia do Creiro,4470,Setúbal (ITS) - Praia do Creiro via Vila Nogueira de Azeitão,,,3,,1,0,0,,C61D23,FFFFFF,,1,1
+4471,4471,Praia Albarquel | Circular,0,4471_0,44,Praia Albarquel,Praia Albarquel,4471,Praia Albarquel | Circular,,,3,,1,0,0,,C61D23,FFFFFF,,1,1
+4474,4474,Praia da Figueirinha - Setúbal (Centro Comercial),0,4474_0,44,Praia da Figueirinha,Setúbal (Centro Comercial),4474,Praia da Figueirinha - Setúbal (Centro Comercial),,,3,,1,0,0,,C61D23,FFFFFF,,1,1
+4474,4474,Praia da Figueirinha - Setúbal (Centro Comercial),0,4474_1,44,Setúbal (ITS),Praia da Figueirinha,4474,Praia da Figueirinha - Setúbal (Centro Comercial),,,3,,3,0,0,,C61D23,FFFFFF,,1,1
+4474,4474,Praia da Figueirinha - Setúbal (Centro Comercial),0,4474_2,44,Setúbal (Várzea),Praia da Figueirinha via ITS,4474,Praia da Figueirinha - Setúbal (Várzea),,,3,,3,0,0,,C61D23,FFFFFF,,1,1
+4477,4477,Creiro - Galapos,0,4477_0,44,Praia do Creiro,Praia do Creiro,4477,Creiro - Galapos,,,3,,1,1,0,,3D85C6,FFFFFF,,1,1
+4481,4481,ITS | Circular via Luísa Todi e Av D Manuel,0,4481_0,44,ITS | Circular via Luísa Todi e Av D Manuel,ITS | Circular via Luísa Todi e Av D Manuel,4481,ITS | Circular via Luísa Todi e Av D Manuel,,,3,,1,1,0,,C61D23,FFFFFF,,1,1
+4482,4482,ITS | Circular via Várzea e Pinheirinhos,0,4482_0,44,ITS | Circular via Várzea e Pinheirinhos,ITS | Circular via Várzea e Pinheirinhos,4482,ITS | Circular via Várzea e Pinheirinhos,,,3,,1,1,0,,C61D23,FFFFFF,,1,1
+4501,4501,Alcochete (Freeport) - Montijo (Terminal Fluvial),0,4501_0,44,Alcochete (Freeport),Montijo (Terminal Fluvial),4501,Alcochete (Freeport) - Montijo (Terminal Fluvial),,,3,,1,0,0,,C61D23,FFFFFF,,1,1
+4501,4501,Alcochete (Freeport) - Montijo (Terminal Fluvial),0,4501_1,44,Alcochete (Freeport),Montijo (Terminal Rodoviário),4501,Alcochete (Freeport) - Montijo (Terminal Rodoviário),,,3,,3,0,0,,C61D23,FFFFFF,,1,1
+4503,4503,Atalaia (Bairro Charqueirão) - Montijo (Bairro Areias),0,4503_0,44,Atalaia (Bairro do Chiqueirão),Montijo (Bairro Areias),4503,Atalaia (Bairro Charqueirão) - Montijo (Bairro Areias),,,3,,1,0,0,,C61D23,FFFFFF,,1,1
+4504,4504,Alcochete (Freeport) - Montijo (Terminal Fluvial) via Atalaia e Passil,0,4504_0,44,Montijo (Terminal Fluvial),Alcochete (Freeport) via Atalaia e Passil,4504,Alcochete (Freeport) - Montijo (Terminal Fluvial) via Atalaia e Passil,,,3,,1,0,0,,C61D23,FFFFFF,,1,1
+4512,4512,Alcochete (Freeport) - Setúbal (ITS),0,4512_0,44,Alcochete (Freeport),Setúbal (ITS),4512,Alcochete (Freeport) - Setúbal (ITS),,,3,,1,0,0,,C61D23,FFFFFF,,1,1
+4512,4512,Alcochete (Freeport) - Setúbal (ITS),0,4512_1,44,Alcochete (Freeport),Setúbal (ITS),4512,Alcochete (Freeport) - Setúbal (ITS) via St. Peter's School,,,3,,3,0,0,,C61D23,FFFFFF,,1,1
+4514,4514,Canha - Montijo (Terminal Rodoviário) via Pegões,0,4514_0,44,Canha,Montijo (Terminal Rodoviário),4514,Canha - Montijo (Terminal Rodoviário) via Pegões,,,3,,1,0,0,,C61D23,FFFFFF,,1,1
+4514,4514,Canha - Montijo (Terminal Rodoviário) via Pegões,0,4514_1,44,Canha,Montijo (Terminal Rodoviário),4514,Canha - Montijo (Terminal Rodoviário),,,3,,3,0,0,,C61D23,FFFFFF,,1,1
+4514,4514,Canha - Montijo (Terminal Rodoviário) via Pegões,0,4514_3,44,Canha,Montijo (Terminal Rodoviário),4514,Canha - Montijo (Terminal Rodoviário) via Pegões e Afonsos,,,3,,3,0,0,,C61D23,FFFFFF,,1,1
+4515,4515,Montijo (Terminal Rodoviário) - Pegões,0,4515_0,44,Montijo (Terminal Rodoviário),Pegões,4515,Montijo (Terminal Rodoviário) - Pegões,,,3,,1,0,0,,C61D23,FFFFFF,,1,1
+4516,4516,Montijo (Terminal Rodoviário) - Rio Frio,0,4516_0,44,Montijo (Terminal Rodoviário),Rio Frio,4516,Montijo (Terminal Rodoviário) - Rio Frio,,,3,,1,0,0,,C61D23,FFFFFF,,1,1
+4516,4516,Montijo (Terminal Rodoviário) - Rio Frio,0,4516_1,44,Montijo (Terminal Rodoviário),Charnequinha,4516,Montijo (Terminal Rodoviário) - Charnequinha,,,3,,3,0,0,,C61D23,FFFFFF,,1,1
+4520,4520,Faias - Pegões,0,4520_0,44,Faias,Pegões,4520,Faias - Pegões,,,3,,1,0,0,,C61D23,FFFFFF,,1,1
+4521,4521,Faias - Pinhal Novo via Lagameças,0,4521_0,44,Faias,Pinhal Novo,4521,Faias - Pinhal Novo via Lagameças,,,3,,1,0,0,,C61D23,FFFFFF,,1,1
+4522,4522,Faias - Poceirão,0,4522_0,44,Faias,Poceirão,4522,Faias - Poceirão,,,3,,1,0,0,,C61D23,FFFFFF,,1,1
+4524,4524,Palmela (Terminal) - Pegões,0,4524_0,44,Palmela (Terminal),Pegões,4524,Palmela (Terminal) - Pegões,,,3,,1,0,0,,C61D23,FFFFFF,,1,1
+4525,4525,Faias - Pinhal Novo Via N5,0,4525_0,44,Faias,Pinhal Novo,4525,Faias - Pinhal Novo Via N5,,,3,,1,0,0,,C61D23,FFFFFF,,1,1
+4530,4530,Bairro Vila Morena - Pinhal Novo,0,4530_0,44,Bairro Vila Morena,Pinhal Novo,4530,Bairro Vila Morena - Pinhal Novo,,,3,,1,0,0,,C61D23,FFFFFF,,1,1
+4531,4531,Moita (Esc. Secundária) - Palmela (Terminal),0,4531_0,44,Moita (Esc. Secundária),Palmela (Terminal),4531,Moita (Esc. Secundária) - Palmela (Terminal),,,3,,1,0,0,,C61D23,FFFFFF,,1,1
+4532,4532,Moita (Estação) - Moita (Bairro 1º Maio),0,4532_0,44,Moita (Estação),Moita (Bairro 1º Maio),4532,Moita (Estação) - Moita (Bairro 1º Maio),,,3,,1,0,0,,C61D23,FFFFFF,,1,1
+4540,4540,Águas de Moura - Setúbal (ITS),0,4540_0,44,Águas de Moura,Setúbal (ITS),4540,Águas de Moura - Setúbal (ITS),,,3,,1,0,0,,C61D23,FFFFFF,,1,1
+4540,4540,Águas de Moura - Setúbal (ITS),0,4540_1,44,Águas de Moura,Setúbal (ITS),4540,Águas de Moura - Setúbal (ITS) via Gâmbia,,,3,,3,0,0,,C61D23,FFFFFF,,1,1
+4541,4541,Algeruz - Setúbal (Av. Luísa Todi),0,4541_0,44,Algeruz,Setúbal (Av. Luísa Todi),4541,Algeruz - Setúbal (Av. Luísa Todi),,,3,,1,0,0,,C61D23,FFFFFF,,1,1
+4542,4542,Algeruz - Setúbal (ITS),0,4542_0,44,Algeruz,Setúbal (ITS),4542,Algeruz - Setúbal (ITS),,,3,,1,0,0,,C61D23,FFFFFF,,1,1
+4543,4543,Algeruz - Setúbal (ITS) via Poçoilos,0,4543_0,44,Algeruz,Setúbal (ITS),4543,Algeruz - Setúbal (ITS) via Poçoilos,,,3,,1,0,0,,C61D23,FFFFFF,,1,1
+4544,4544,Bairro Margaça - Setúbal (ITS),0,4544_0,44,Bairro Margaça,Setúbal (ITS),4544,Bairro Margaça - Setúbal (ITS),,,3,,1,0,0,,C61D23,FFFFFF,,1,1
+4544,4544,Bairro Margaça - Setúbal (ITS),0,4544_1,44,Bairro Margaça,Setúbal (ITS),4544,Bairro Margaça - Setúbal (ITS) via Gâmbia,,,3,,3,0,0,,C61D23,FFFFFF,,1,1
+4544,4544,Bairro Margaça - Setúbal (ITS),0,4544_2,44,Setúbal (Av. 5 de Outubro),Bairro Margaça,4544,Bairro Margaça - Setúbal (Av. 5 de Outubro) via Gâmbia,,,3,,3,0,0,,C61D23,FFFFFF,,1,1
+4545,4545,Biscainho - Setúbal (Bela Vista),0,4545_0,44,Biscainho,Setúbal (Bela Vista),4545,Biscainho - Setúbal (Bela Vista),,,3,,1,0,0,,C61D23,FFFFFF,,1,1
+4546,4546,Biscainho - Setúbal (ITS),0,4546_0,44,Biscainho,Setúbal (ITS),4546,Biscainho - Setúbal (ITS),,,3,,1,0,0,,C61D23,FFFFFF,,1,1
+4548,4548,Lagameças - Setúbal (ITS),0,4548_0,44,Lagameças,Setúbal (ITS),4548,Lagameças - Setúbal (ITS),,,3,,1,0,0,,C61D23,FFFFFF,,1,1
+4549,4549,Palmela (Terminal) - Setúbal (ITS),0,4549_0,44,Palmela (Terminal),Setúbal (ITS),4549,Palmela (Terminal) - Setúbal (ITS),,,3,,1,0,0,,C61D23,FFFFFF,,1,1
+4550,4550,Palmela (Terminal) - Vila Nogueira de Azeitão,0,4550_0,44,Palmela (Terminal),Vila Nogueira de Azeitão,4550,Palmela (Terminal) - Vila Nogueira de Azeitão,,,3,,1,0,0,,C61D23,FFFFFF,,1,1
+4551,4551,Palmela (Alameda Nun'Álvares Pereira) - Setúbal (Av. Luísa Todi),0,4551_0,44,Palmela (Alameda Nun'Álvares Pereira),Setúbal (Av. Luísa Todi),4551,Palmela (Alameda Nun'Álvares Pereira) - Setúbal (Av. Luísa Todi),,,3,,1,0,0,,C61D23,FFFFFF,,1,1
+4552,4552,Brejos de Azeitão (Parque do Morango) - Palmela (Terminal),0,4552_0,44,Brejos de Azeitão (Parque do Morango),Palmela (Terminal),4552,Brejos de Azeitão (Parque do Morango) - Palmela (Terminal),,,3,,1,0,0,,C61D23,FFFFFF,,1,1
+4560,4560,São Gonçalo - Vila Nogueira de Azeitão (Escola Básica 2 3),0,4560_0,44,São Gonçalo,Vila Nogueira de Azeitão (Escola Básica 2 3),4560,São Gonçalo - Vila Nogueira de Azeitão (Escola Básica 2 3),,,3,,1,0,0,,C61D23,FFFFFF,,1,1
+4562,4562,Setúbal (ITS) - Vila Nogueira de Azeitão (Escola) via Palmela (Estação),0,4562_0,44,Setúbal (ITS),VN Azeitão (Esc),4562,Setúbal (ITS) - Vila Nogueira de Azeitão (Escola) via Palmela (Estação),,,3,,1,0,0,,C61D23,FFFFFF,,1,1
+4600,4600,Alcochete (Freeport) - Barreiro (Terminal) via Samouco,0,4600_0,44,Alcochete (Freeport),Barreiro (Terminal),4600,Alcochete (Freeport) - Barreiro (Terminal) via Samouco,,,3,,1,0,0,,C61D23,FFFFFF,,1,1
+4600,4600,Alcochete (Freeport) - Barreiro (Terminal) via Samouco,0,4600_2,44,Chão Duro,Barreiro (Terminal),4600,Barreiro (Terminal) - Chão Duro,,,3,,3,0,0,,C61D23,FFFFFF,,1,1
+4602,4602,Alhos Vedros (Estação) - Barreiro (Terminal),0,4602_0,44,Alhos Vedros (Estação),Barreiro (Terminal),4602,Alhos Vedros (Estação) - Barreiro (Terminal),,,3,,1,0,0,,C61D23,FFFFFF,,1,1
+4604,4604,Barreiro (Terminal) - Moita (Esc Secundária),0,4604_0,44,Barreiro (Terminal),Moita (Esc. Secundária),4604,Barreiro (Terminal) - Moita (Escola Secundária),,,3,,1,0,0,,C61D23,FFFFFF,,1,1
+4605,4605,Lavradio - Pinhal do Forno,0,4605_0,44,Lavradio,Pinhal do Forno,4605,Lavradio - Pinhal do Forno,,,3,,1,0,0,,C61D23,FFFFFF,,1,1
+4610,4610,Bairro dos Marinheiros - Barreiro (Terminal),0,4610_0,44,Bairro dos Marinheiros,Barreiro (Terminal),4610,Bairro dos Marinheiros - Barreiro (Terminal),,,3,,1,0,0,,C61D23,FFFFFF,,1,1
+4611,4611,Penalva - Moita (Esc. Secundária),0,4611_0,44,Penalva (Estação),Moita (Esc. Secundária),4611,Penalva (Estação) - Moita (Esc. Secundária),,,3,,1,0,0,,C61D23,FFFFFF,,1,1
+4612,4612,Bairro dos Marinheiros - Palmela (Terminal),0,4612_0,44,Bairro dos Marinheiros,Palmela (Terminal),4612,Bairro dos Marinheiros - Palmela (Terminal),,,3,,1,0,0,,C61D23,FFFFFF,,1,1
+4620,4620,Moita (Esc. Secundária) - Paio Pires,0,4620_0,44,Moita (Esc. Secundária),Paio Pires,4620,Moita (Esc. Secundária) - Paio Pires,,,3,,1,0,0,,C61D23,FFFFFF,,1,1
+4620,4620,Moita (Esc. Secundária) - Paio Pires,0,4620_1,44,Moita,Seixal (Atalaia - Festa do Avante),4620,Moita (Esc. Secundária) - Seixal (Atalaia - Festa Avante),,,3,,3,0,0,,C61D23,FFFFFF,,1,1
+4621,4621,Moita (Esc. Secundária) - Seixal (Terminal Fluvial),0,4621_0,44,Moita,Seixal (Terminal Fluvial),4621,Moita (Esc. Secundária) - Seixal (Terminal Fluvial),,,3,,1,0,0,,C61D23,FFFFFF,,1,1
+4632,4632,Coina (Estação) - Quinta do Anjo via Vendas de Azeitão,0,4632_0,44,Coina (Estação),Quinta do Anjo,4632,Coina (Estação) - Quinta do Anjo via Vendas de Azeitão,,,3,,1,0,0,,C61D23,FFFFFF,,1,1
+4641,4641,Quinta do Conde - Setúbal (ITS),0,4641_0,44,Quinta do Conde,Setúbal (ITS),4641,Quinta do Conde - Setúbal (ITS),,,3,,1,0,0,,C61D23,FFFFFF,,1,1
+4641,4641,Quinta do Conde - Setúbal (ITS),0,4641_1,44,Quinta do Conde,Setúbal (Escola Lima Freitas),4641,Quinta do Conde - Setúbal (Escola Lima Freitas),,,3,,3,0,0,,C61D23,FFFFFF,,1,1
+4643,4643,Montijo (Av. Inf. D. Henrique) - Sesimbra (Terminal),0,4643_0,44,Montijo (Av. Inf. D. Henrique),Sesimbra (Terminal),4643,Montijo (Av. Inf. D. Henrique) - Sesimbra (Terminal),,,3,,1,0,0,,0C807E,FFFFFF,,1,1
+4701,4701,Lisboa (Oriente) - Vale da Amoreira,0,4701_0,44,Lisboa (Oriente),Vale da Amoreira,4701,Lisboa (Oriente) - Vale da Amoreira,,,3,,1,0,0,,FDB71A,FFFFFF,,1,1
+4701,4701,Lisboa (Oriente) - Vale da Amoreira,0,4701_1,44,Moita,Lisboa (Oriente),4701,Lisboa (Oriente) - Moita,,,3,,3,0,0,,FDB71A,FFFFFF,,1,1
+4701,4701,Lisboa (Oriente) - Vale da Amoreira,0,4701_3,44,Alhos Vedros,Lisboa (Oriente),4701,Alhos Vedros - Lisboa (Oriente),,,3,,3,0,0,,FDB71A,FFFFFF,,1,1
+4702,4702,Lisboa (Oriente) - São Francisco,0,4702_0,44,Lisboa (Oriente),São Francisco,4702,Lisboa (Oriente) - São Francisco,,,3,,1,0,0,,FDB71A,FFFFFF,,1,1
+4704,4704,Atalaia - Lisboa (Oriente) via B. Areias e B. Esteval,0,4704_0,44,Atalaia,Lisboa (Oriente),4704,Atalaia - Lisboa (Oriente) via B. Areias e B. Esteval,,,3,,1,0,0,,FDB71A,FFFFFF,,1,1
+4705,4705,Lisboa (Oriente) - Samouco,0,4705_0,44,Lisboa (Oriente),Samouco,4705,Lisboa (Oriente) - Samouco,,,3,,1,0,0,,FDB71A,FFFFFF,,1,1
+4706,4706,Montijo (Urb. Alto dos Moinhos) - Lisboa (Oriente),0,4706_0,44,Montijo (Urb. Alto dos Moinhos),Lisboa (Oriente),4706,Montijo (Urb. Alto dos Moinhos) - Lisboa (Oriente),,,3,,1,0,0,,FDB71A,FFFFFF,,1,1
+4707,4707,Lisboa (Oriente) - Montijo (Terminal Rodoviário),0,4707_0,44,Lisboa (Oriente),Montijo (Terminal Rodoviário),4707,Lisboa (Oriente) - Montijo (Terminal Rodoviário),,,3,,1,0,0,,FDB71A,FFFFFF,,1,1
+4708,4708,Alcochete (Freeport) - Lisboa (Oriente) via Montijo,0,4708_0,44,Alcochete (Freeport),Lisboa (Oriente) via Montijo,4708,Alcochete (Freeport) - Lisboa (Oriente) via Montijo,,,3,,1,0,0,,FDB71A,FFFFFF,,1,1
+4710,4710,Lisboa (Oriente) - Palmela (Terminal),0,4710_0,44,Lisboa (Oriente),Palmela (Terminal),4710,Lisboa (Oriente) - Palmela (Terminal),,,3,,1,0,0,,FDB71A,FFFFFF,,1,1
+4710,4710,Lisboa (Oriente) - Palmela (Terminal),0,4710_1,44,Pinhal Novo,Lisboa (Oriente),4710,Lisboa (Oriente) - Pinhal Novo,,,3,,3,0,0,,FDB71A,FFFFFF,,1,1
+4715,4715,Lisboa (Oriente) - Setúbal (ITS) via Palmela,0,4715_0,44,Lisboa (Oriente),Setúbal (ITS) via Palmela,4715,Lisboa (Oriente) - Setúbal (ITS) via Palmela,,,3,,1,0,0,,FDB71A,FFFFFF,,1,1
+4720,4720,Lisboa (Oriente) - Setúbal (Terminal Várzea),0,4720_0,44,Lisboa (Oriente),Setúbal (Terminal Várzea),4720,Lisboa (Oriente) - Setúbal (Terminal Várzea),,,3,,1,0,0,,FDB71A,FFFFFF,,1,1
+4721,4721,Lisboa (Oriente) - Setúbal (ITS) | Expresso,0,4721_0,44,Lisboa (Oriente),Setúbal (ITS) | Expresso,4721,Lisboa (Oriente) - Setúbal (ITS) | Expresso,,,3,,1,0,0,,FDB71A,FFFFFF,,1,1
+4725,4725,Lisboa (Sete Rios) - Setúbal (Terminal Várzea),0,4725_0,44,Lisboa (Sete Rios),Setúbal (Terminal Várzea),4725,Lisboa (Sete Rios) - Setúbal (Terminal Várzea),,,3,,1,0,0,,FDB71A,FFFFFF,,1,1
+4730,4730,Lisboa (Sete Rios) - Setúbal (ITS) via Azeitão,0,4730_0,44,Lisboa (Sete Rios),Setúbal (ITS) via Azeitão,4730,Lisboa (Sete Rios) - Setúbal (ITS) via Azeitão,,,3,,1,0,0,,C61D23,FFFFFF,,1,1
+4741,4741,Lisboa (Oriente) - Vale da Amoreira | Expresso,0,4741_0,44,Lisboa (Oriente),Vale da Amoreira,4741,Lisboa (Oriente) - Vale da Amoreira | Expresso,,,3,,1,0,0,,FDB71A,FFFFFF,,1,1
+4905,4905,Faias - Vendas Novas,0,4905_0,44,Faias,Vendas Novas,4905,Faias - Vendas Novas,,,3,,1,0,0,,BB3E96,FFFFFF,,1,1
+4905,4905,Faias - Vendas Novas,0,4905_1,44,Pegões,Vendas Novas,4905,Pegões - Vendas Novas,,,3,,1,0,0,,BB3E96,FFFFFF,,1,1
+4906,4906,Setúbal (ITS) - Vendas Novas via Landeira,0,4906_0,44,Setúbal (ITS),Vendas Novas,4906,Setúbal (ITS) - Vendas Novas via Landeira,,,3,,1,0,0,,BB3E96,FFFFFF,,1,1
+4906,4906,Setúbal (ITS) - Vendas Novas via Landeira,0,4906_1,44,Vendas Novas,Setúbal (ITS),4906,Setúbal (ITS) - Vendas Novas,,,3,,3,0,0,,BB3E96,FFFFFF,,1,1

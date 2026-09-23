@@ -1,0 +1,2 @@
+agency_id,agency_name,agency_url,agency_timezone,agency_lang,agency_phone,agency_fare_url,agency_email
+44,Alsa Todi,http://www.alsatodi.pt,Europe/Lisbon,pt,210410400,https://www.carrismetropolitana.pt/tarifarios,passageiros@alsa.com
