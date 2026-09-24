@@ -22,9 +22,25 @@ export interface Case {
 export interface CaseEvent { id: number; kind: string; detail: Record<string, unknown>; actor: string; event_time: string | null; recorded_at: string }
 export interface CaseDetail extends Case { timeline: CaseEvent[] }
 
-export interface Stop { id: number; case_id: number | null; seq: number; kind: 'pickup' | 'verify' | 'depot'; status: string; lat: number; lng: number; outcome: Outcome | null; photo_path: string | null }
+export interface Stop { id: number; case_id: number | null; seq: number; kind: 'pickup' | 'verify' | 'depot'; status: string; lat: number; lng: number; outcome: Outcome | null; photo_path: string | null; eta_s?: number | null }
 
-export interface Mission { id: number; operator_id: string; status: string; version: number; last_change: string | null; total_km: number | null; capacity: number; stops: Stop[] }
+/** One OSRM turn-by-turn step (backend/app/services/road.py keeps these fields). */
+export interface RouteStep {
+  maneuver: { type: string; modifier?: string; location: [number, number]; bearing_after?: number; exit?: number }
+  name?: string; ref?: string; destinations?: string; exits?: string; rotary_name?: string; mode?: string
+  driving_side?: string; distance: number; duration: number
+}
+export interface RouteLeg { distance_m: number; duration_s: number; steps: RouteStep[] }
+
+export interface Mission {
+  id: number; operator_id: string; status: string; version: number; last_change: string | null; total_km: number | null
+  capacity: number; stops: Stop[]
+  /** Road route van -> stops -> depot (OSRM); `straight-line` when the road engine is unavailable. */
+  route_geojson?: { type: 'LineString'; coordinates: [number, number][] } | null
+  route_waypoints?: [number, number][] | null
+  route_legs?: RouteLeg[] | null; duration_s?: number | null; distance_m?: number | null
+  routing_engine?: 'osrm' | 'straight-line' | null
+}
 
 export interface LiveState { running: boolean; last_poll: string | null; last_error: string | null; vehicles_in_feed: number; tracked: number; form_factors: string; last_changes: string[] }
 

@@ -1,8 +1,10 @@
 """Single-van collection route: current position -> up to `capacity` stops -> depot.
 
-Greedy nearest neighbour + 2-opt on haversine x detour factor. Tens of stops solve in ms.
-Upgrade path: OR-Tools CVRP and OSRM road distances (see docs/operations_architecture.md).
+Greedy nearest neighbour + 2-opt. The cost between two nodes is a callable: real driving
+seconds from the OSRM table in production (services/road.py), haversine x detour factor by
+default. Tens of stops solve in ms. Upgrade path for several vans: VROOM on the same OSRM.
 """
+from collections.abc import Callable
 from dataclasses import dataclass
 
 from app.core.geo import haversine_m
@@ -20,15 +22,19 @@ class Node:
 class Plan:
     order: list[int]    # case ids in visiting order
     queued: list[int]   # eligible but over capacity -> next mission
-    total_km: float
+    total_km: float     # straight-line estimate x detour; the road route replaces it when available
+    total_cost: float = 0.0  # in the units of `cost` (seconds with OSRM, metres by default)
 
 
-def plan_mission(start: Node, stops: list[Node], depot: Node, capacity: int, detour: float = 1.3) -> Plan:
+def plan_mission(start: Node, stops: list[Node], depot: Node, capacity: int, detour: float = 1.3,
+                 cost: Callable[[Node, Node], float] | None = None) -> Plan:
     chosen = sorted(stops, key=lambda n: -n.priority)[:capacity]
     queued = [n.id for n in stops if n not in chosen]
 
-    def dist(a: Node, b: Node) -> float:
+    def crow(a: Node, b: Node) -> float:
         return haversine_m(a.lat, a.lng, b.lat, b.lng) * detour
+
+    dist = cost or crow
 
     route, left = [], list(chosen)
     here = start
@@ -48,5 +54,6 @@ def plan_mission(start: Node, stops: list[Node], depot: Node, capacity: int, det
                     path[i : j + 1] = reversed(path[i : j + 1])
                     improved = True
 
-    total = sum(dist(path[k], path[k + 1]) for k in range(len(path) - 1)) / 1000
-    return Plan([n.id for n in path[1:-1]], queued, round(total, 2))
+    km = sum(crow(path[k], path[k + 1]) for k in range(len(path) - 1)) / 1000
+    total = sum(dist(path[k], path[k + 1]) for k in range(len(path) - 1))
+    return Plan([n.id for n in path[1:-1]], queued, round(km, 2), round(total, 1))

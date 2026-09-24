@@ -2,8 +2,8 @@
 
 A mission belongs to one operator and lives for the shift. Every replan starts from the van's
 last known position, fills the remaining van capacity with the oldest eligible cases and ends at
-the depot. `version` changes only when the stop order changes, so the field app shows a banner
-("what changed, why, next target") only for real changes.
+the depot. `version` changes when the stop order or road route changes, so field clients see
+new directions even when the same bikes remain on the mission.
 """
 import threading
 from pathlib import Path
@@ -17,7 +17,7 @@ from app.config import settings
 from app.core.routing import Node, plan_mission
 from app.models import Case, CaseEvent, Mission, Stop
 from app.schemas import Outcome
-from app.services import clock
+from app.services import clock, road
 from app.services.cases import set_status, short
 
 _lock = threading.RLock()  # replay thread and HTTP handlers both replan
@@ -75,6 +75,7 @@ def _plan(db: Session, m: Mission, reason: str) -> None:
     planned = [s for s in m.stops if s.status == "planned"]
     stop_by_case = {s.case_id: s for s in planned if s.kind != "depot"}
     old_order = [s.case_id for s in sorted(planned, key=lambda s: s.seq) if s.kind != "depot"]
+    old_geometry, old_engine = m.route_geojson, m.routing_engine
 
     cases = db.scalars(select(Case).where(
         Case.blocked_reason.is_(None), Case.needs_approval.is_(False),
@@ -82,13 +83,15 @@ def _plan(db: Session, m: Mission, reason: str) -> None:
     )).all()
     by_id = {c.id: c for c in cases}
     nodes = [Node(c.id, c.lat, c.lng, priority=-(c.rest_since or c.created_at).timestamp()) for c in cases]
-    plan = plan_mission(Node(None, m.start_lat, m.start_lng), nodes, depot(),
-                        max(m.capacity - onboard(m), 0), settings.detour_factor)
+    start = Node(None, m.start_lat, m.start_lng)
+    plan = plan_mission(start, nodes, depot(), max(m.capacity - onboard(m), 0), settings.detour_factor,
+                        cost=_driving_time([start, *nodes, depot()]))
 
     for s in planned:
         if s.kind != "depot" and s.case_id not in plan.order:
             s.status = "removed"
     base = max((s.seq for s in m.stops if s.status == "done"), default=0)
+    ordered: list[Stop] = []
     for i, cid in enumerate(plan.order, 1):
         c = by_id[cid]
         s = stop_by_case.get(cid)
@@ -96,6 +99,7 @@ def _plan(db: Session, m: Mission, reason: str) -> None:
             s = Stop(case_id=cid, kind="pickup", lat=c.lat, lng=c.lng, seq=0)
             m.stops.append(s)
         s.seq, s.lat, s.lng = base + i, c.lat, c.lng
+        ordered.append(s)
         if c.status != "assigned":
             set_status(db, c, "assigned", f"stop {i} of mission {m.id}", now, actor="router")
     for cid in plan.queued:
@@ -108,15 +112,38 @@ def _plan(db: Session, m: Mission, reason: str) -> None:
         dep = Stop(case_id=None, kind="depot", lat=d.lat, lng=d.lng, seq=0)
         m.stops.append(dep)
     dep.seq = base + len(plan.order) + 1
-    m.total_km = plan.total_km
+    _store_route(m, start, ordered + [dep])
 
-    if plan.order != old_order or m.version == 0:
+    route_changed = m.route_geojson != old_geometry or m.routing_engine != old_engine
+    if plan.order != old_order or route_changed or m.version == 0 or reason.startswith("Off route"):
         added = len(set(plan.order) - set(old_order))
         removed = len(set(old_order) - set(plan.order))
         target = f"bike {short(by_id[plan.order[0]].device_id)}" if plan.order else "depot"
         queued = f", {len(plan.queued)} queued" if plan.queued else ""
         m.version += 1
         m.last_change = f"{reason} (+{added}/−{removed} stops{queued}) — next: {target}"
+
+
+def _driving_time(nodes: list[Node]):
+    """OSRM driving seconds between nodes, or None (plan_mission then uses crow-flies metres)."""
+    points = [(n.lat, n.lng) for n in nodes]
+    durations = road.matrix(points)
+    if durations is None:
+        return None
+    index = {(n.lat, n.lng): i for i, n in enumerate(nodes)}
+    return lambda a, b: durations[index[(a.lat, a.lng)]][index[(b.lat, b.lng)]] or 0.0
+
+
+def _store_route(m: Mission, start: Node, ordered_stops: list[Stop]) -> None:
+    """Road route van -> stops -> depot, with per-stop ETAs (straight line if OSRM is down)."""
+    r = road.route([(start.lat, start.lng)] + [(s.lat, s.lng) for s in ordered_stops])
+    m.route_geojson, m.route_legs, m.route_waypoints = r["geometry"], r["legs"], r["waypoints"]
+    m.duration_s, m.distance_m, m.routing_engine = r["duration_s"], r["distance_m"], r["engine"]
+    m.total_km = round(r["distance_m"] / 1000, 2)
+    elapsed = 0.0
+    for stop, leg in zip(ordered_stops, r["legs"]):
+        elapsed += leg["duration_s"]
+        stop.eta_s = round(elapsed)
 
 
 def record_outcome(db: Session, stop_id: int, outcome: Outcome, actor: str, lat: float, lng: float,

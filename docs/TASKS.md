@@ -4,7 +4,7 @@
 
 **Now: Thu 24 Sep, 12:30 · Devpost deadline: Fri 25 Sep, 10:00 (about 21 h)**
 
-Priority order: **operational MVP first**, then the data-analysis MVP, then polish and the pitch. Design is in [operations_architecture.md](operations_architecture.md).
+Priority order: **operational MVP first**, then the data-analysis MVP, then polish and the pitch. Design is in [operations_architecture.md](operations_architecture.md). Current follow-up analysis and pitch findings are in [NEXT_STEPS.md](NEXT_STEPS.md); [frontend links](FRONTEND_LINKS.md) are available for review.
 
 ## How to run in parallel without collisions
 

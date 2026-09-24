@@ -87,8 +87,8 @@ export const api = {
     MOCKS ? Promise.resolve(mockMissionNow()) : get<Mission | null>(`/missions/current?operator_id=${operator}`),
 
   /** T-C1/T-C2: the mission starts from where the operator actually is. */
-  replan: (operator_id: string, lat: number, lng: number) =>
-    MOCKS ? Promise.resolve(mockReplan(operator_id)) : post<Mission>('/missions/replan', { operator_id, lat, lng }),
+  replan: (operator_id: string, lat: number, lng: number, reason?: 'off_route') =>
+    MOCKS ? Promise.resolve(mockReplan(operator_id)) : post<Mission>('/missions/replan', { operator_id, lat, lng, reason }),
 
   recordOutcome: async (stopId: number, data: OutcomeInput): Promise<SubmitResult> => {
     if (MOCKS) return { queued: false, mission: mockRecordOutcome(stopId, data.outcome) }

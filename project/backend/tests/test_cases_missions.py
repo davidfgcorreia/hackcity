@@ -1,12 +1,14 @@
 import io
 from datetime import timedelta
 
+import pytest
 from fastapi import UploadFile
 from sqlalchemy import func, select
 
 from app.core.detector import Rules
 from app.core.vehicle_state import Event, apply_event
 from app.models import Case, Stop
+from app.schemas import MissionOut
 from app.schemas import Outcome
 from app.services import cases, missions
 from tests.conftest import T0
@@ -36,6 +38,27 @@ def eligible_case(db, device, lat, lng, minutes_ago=200):
     db.add(c)
     db.commit()
     return c
+
+
+def test_route_waypoints_persist_and_old_mission_is_viewable(db, monkeypatch):
+    from app.services import road
+
+    eligible_case(db, "bike-waypoint", 38.70, -9.42)
+    original = road.straight_line
+
+    def snapped(points):
+        result = original(points)
+        result["engine"] = "osrm"
+        result["waypoints"] = [[lng + .0001, lat + .0001] for lat, lng in points]
+        return result
+
+    monkeypatch.setattr(road, "route", snapped)
+    mission = missions.replan(db, "waypoint-op", 38.71, -9.41, "test")
+    assert mission.route_waypoints[0] == pytest.approx([-9.4099, 38.7101])
+    assert len(MissionOut.model_validate(mission).route_waypoints) == len(mission.stops) + 1
+    mission.route_waypoints = None
+    db.commit()
+    assert MissionOut.model_validate(missions.current_mission(db, "waypoint-op")).route_waypoints is None
 
 
 def test_case_lifecycle_candidate_to_resolved(db):
@@ -73,6 +96,26 @@ def test_replan_creates_mission_ending_at_depot(db):
     assert [s.kind for s in planned] == ["pickup", "pickup", "depot"]
     assert m.version == 1 and "next: bike near0000" in m.last_change
     assert {c.status for c in db.scalars(select(Case))} == {"assigned"}
+
+
+def test_new_road_route_notifies_operator_when_stops_stay_the_same(db):
+    eligible_case(db, "bike0001", 38.701, -9.42)
+    first = missions.replan(db, "op1", 38.700, -9.42, "initial route")
+    old_version, old_geometry = first.version, first.route_geojson
+    updated = missions.replan(db, "op1", 38.7005, -9.42, "Off route — new route calculated")
+    assert updated.version == old_version + 1
+    assert updated.route_geojson != old_geometry
+    assert "Off route" in updated.last_change
+    assert "next: bike bike0001" in updated.last_change
+
+
+def test_unchanged_route_does_not_repeat_the_notice(db):
+    eligible_case(db, "bike0001", 38.701, -9.42)
+    first = missions.replan(db, "op1", 38.700, -9.42, "initial route")
+    old_version, old_change = first.version, first.last_change
+    updated = missions.replan(db, "op1", 38.700, -9.42, "routine refresh")
+    assert updated.version == old_version
+    assert updated.last_change == old_change
 
 
 def test_capacity_queues_extra_cases(db, monkeypatch):
@@ -161,3 +204,13 @@ def test_picked_up_bike_is_not_recreated_while_feed_still_shows_it_parked(db):
     moved = state(REST, SEEN, (300, "available", ("trip_end",), (38.71, -9.42)))
     cases.sync_all(db, {"b": moved}, OUTSIDE, at(310), RULES, source="replay")
     assert db.scalar(select(func.count()).select_from(Case)) == 2  # new parking interval = new case
+
+
+def test_replan_stores_road_route_and_etas(db):
+    eligible_case(db, "near0000", 38.701, -9.42)
+    eligible_case(db, "far00000", 38.710, -9.42)
+    m = missions.replan(db, "op1", 38.700, -9.42, "test")
+    assert m.routing_engine == "straight-line"  # OSRM mocked away in tests
+    assert m.route_geojson["type"] == "LineString" and len(m.route_legs) == 3  # 2 stops + depot
+    etas = [s.eta_s for s in sorted(m.stops, key=lambda s: s.seq) if s.status == "planned"]
+    assert etas == sorted(etas) and etas[0] > 0

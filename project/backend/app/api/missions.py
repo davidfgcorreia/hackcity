@@ -17,7 +17,8 @@ def current_mission(operator_id: str, db: Session = Depends(get_db)):
 @router.post("/missions/replan", response_model=MissionOut)
 def replan(body: ReplanIn, db: Session = Depends(get_db)):
     """Creates the operator's mission on first call; start = the operator's current position."""
-    return svc.replan(db, body.operator_id, body.lat, body.lng, reason="route requested by operator")
+    reason = "Off route — new route calculated" if body.reason == "off_route" else "route requested by operator"
+    return svc.replan(db, body.operator_id, body.lat, body.lng, reason=reason)
 
 
 @router.post("/missions/{mission_id}/depot", response_model=MissionOut)

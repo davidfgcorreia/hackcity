@@ -10,10 +10,20 @@ export interface FieldPosition {
   lat: number
   lng: number
   accuracy: number | null
+  /** Degrees clockwise from north while moving; null when stationary or unknown. */
+  heading?: number | null
+  /** m/s */
+  speed?: number | null
   at: string
 }
 
 const KEY = 'field:position'
+export const FRESH_FIX_MS = 15_000
+
+export function freshFix(position: FieldPosition | null, live: boolean): boolean {
+  return Boolean(live && position && Number.isFinite(Date.parse(position.at)) &&
+    Date.now() - Date.parse(position.at) >= 0 && Date.now() - Date.parse(position.at) < FRESH_FIX_MS)
+}
 
 function lastKnown(): FieldPosition | null {
   try {
@@ -40,6 +50,8 @@ export function useGeolocation() {
           lat: p.coords.latitude,
           lng: p.coords.longitude,
           accuracy: Number.isFinite(p.coords.accuracy) ? p.coords.accuracy : null,
+          heading: p.coords.heading != null && Number.isFinite(p.coords.heading) ? p.coords.heading : null,
+          speed: p.coords.speed != null && Number.isFinite(p.coords.speed) ? p.coords.speed : null,
           at: new Date(p.timestamp).toISOString(),
         }
         setPosition(next)
@@ -53,7 +65,7 @@ export function useGeolocation() {
         setLive(false)
         setError(e.message || 'denied')
       },
-      { enableHighAccuracy: true, maximumAge: 15_000, timeout: 20_000 },
+      { enableHighAccuracy: true, maximumAge: 2_000, timeout: 20_000 },
     )
     return () => navigator.geolocation.clearWatch(id)
   }, [])

@@ -2,6 +2,11 @@ import { createContext, useContext } from 'react'
 
 /** Shared by /field (D) and /review (E). `en` is typed against `pt`, so both stay in sync. */
 const pt = {
+  // field · navigation
+  arrived: 'Cheguei', arrival: 'chegada', offRoute: 'Fora da rota — a recalcular', rerouted: 'Nova rota calculada',
+  straightLine: 'Rota aproximada — sem motor de estradas', overview: 'Visão geral', recentre: 'Seguir',
+  simulated: 'Simulação', directions: 'Indicações', upNext: 'A seguir', toDepot: 'Regressar ao armazém',
+  settings: 'Definições', language: 'Idioma',
   // shell
   route: 'Rota', next: 'Próxima paragem', depot: 'Armazém', noMission: 'Sem missão ativa',
   cases: 'Casos', routeChanged: 'Rota alterada', offline: 'Sem ligação — registos guardados localmente',
@@ -88,6 +93,11 @@ const pt = {
 }
 
 const en: typeof pt = {
+  // field · navigation
+  arrived: 'Arrived', arrival: 'arrival', offRoute: 'Off route — recalculating', rerouted: 'New route calculated',
+  straightLine: 'Approximate route — road engine unavailable', overview: 'Overview', recentre: 'Follow',
+  simulated: 'Simulation', directions: 'Directions', upNext: 'Up next', toDepot: 'Return to depot',
+  settings: 'Settings', language: 'Language',
   route: 'Route', next: 'Next stop', depot: 'Depot', noMission: 'No active mission',
   cases: 'Cases', routeChanged: 'Route changed', offline: 'Offline — records saved locally',
   close: 'Close', cancel: 'Cancel', save: 'Save', loading: 'Loading…', none: '—',
@@ -166,4 +176,6 @@ const en: typeof pt = {
 const dict = { pt, en }
 export type Lang = keyof typeof dict
 export const LangContext = createContext<Lang>('pt')
+export const SetLangContext = createContext<(lang: Lang) => void>(() => {})
+export const useLang = () => useContext(LangContext)
 export const useT = () => dict[useContext(LangContext)]

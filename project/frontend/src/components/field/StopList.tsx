@@ -2,7 +2,7 @@
  *  (ops req §7). */
 import { useT } from '../../i18n'
 import type { Case, Stop } from '../../types'
-import { Badge, colors, fmtTime } from './ui'
+import { Badge, colors, fmtClock, fmtDuration, fmtTime } from './ui'
 
 export function StopList({ stops, cases, onSelect }: {
   stops: Stop[]
@@ -10,33 +10,40 @@ export function StopList({ stops, cases, onSelect }: {
   onSelect: (stop: Stop) => void
 }) {
   const t = useT()
-  // A stop that has an outcome is off the route; the count of finished ones lives in the
-  // summary bar instead, so the list only ever shows work still to do (ops req §5).
+  // A recorded stop leaves the route (ops req §5); the map and this list show what is left
+  // to do. Found on a phone: completed stops used to stay on screen.
   const visible = stops.filter((s) => s.status === 'planned')
+  const plannedBikes = visible.filter(s => s.kind !== 'depot' && s.status === 'planned')
 
   return (
-    <ul style={{ listStyle: 'none', margin: 0, padding: 0, fontFamily: 'system-ui' }}>
+    <ul style={{ listStyle: 'none', margin: 0, padding: 0, background: colors.card, borderRadius: 14, overflow: 'hidden' }}>
       {visible.map((s) => {
         const c = cases.find((x) => x.id === s.case_id)
         return (
           <li key={s.id}>
             <button onClick={() => onSelect(s)} style={{
               display: 'flex', gap: 12, alignItems: 'center', width: '100%', textAlign: 'left',
-              background: '#fff', border: 'none',
-              borderBottom: `1px solid ${colors.line}`, padding: 12, cursor: 'pointer',
+              background: 'transparent', border: 'none', color: 'inherit',
+              borderBottom: `0.5px solid ${colors.line}`, padding: '12px 14px', cursor: 'pointer',
+              minHeight: 56,
             }}>
               <span style={{
                 width: 30, height: 30, flexShrink: 0, borderRadius: s.kind === 'depot' ? 6 : '50%',
-                background: s.kind === 'depot' ? '#333' : colors.danger,
+                background: s.kind === 'depot' ? '#1c1c1e' : colors.danger,
                 color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center',
                 font: '700 14px system-ui',
               }}>{s.kind === 'depot' ? '■' : s.seq}</span>
               <span style={{ flex: 1, minWidth: 0 }}>
-                <span style={{ fontWeight: 600 }}>
-                  {s.kind === 'depot' ? t.depot : c?.device_id ?? `${t.caseRef} ${s.case_id}`}
+                <span style={{ fontWeight: 600, fontSize: 16 }}>
+                  {s.kind === 'depot' ? 'Complexo Multisserviços' : `${t.bike} ${s.status === 'planned' ? plannedBikes.findIndex(b => b.id === s.id) + 1 : s.seq}`}
                 </span>
+                {s.eta_s != null && s.status === 'planned' && (
+                  <span style={{ display: 'block', fontSize: 13, color: colors.primary, fontWeight: 600 }}>
+                    {fmtDuration(s.eta_s)} · {fmtClock(s.eta_s)}
+                  </span>
+                )}
                 {c && (
-                  <span style={{ display: 'block', fontSize: 13, color: colors.grey, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                  <span style={{ display: 'block', fontSize: 13, color: colors.secondary, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                     {t.caseRef} #{c.id} · {fmtTime(c.rest_since)}
                   </span>
                 )}

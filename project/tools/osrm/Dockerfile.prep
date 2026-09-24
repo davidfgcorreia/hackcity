@@ -1,0 +1,7 @@
+# Step 1 of the OSRM build: download the OSM extract and clip it to the operating area.
+# (Step 2, the graph build, runs in the OSRM image itself — see Makefile target `osrm`.)
+FROM debian:bookworm-slim
+RUN apt-get update && apt-get install -y --no-install-recommends osmium-tool curl ca-certificates \
+    && rm -rf /var/lib/apt/lists/*
+COPY prepare.sh /prepare.sh
+ENTRYPOINT ["sh", "/prepare.sh"]

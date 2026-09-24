@@ -98,6 +98,7 @@ class StopOut(ORM):
     lng: float
     outcome: Outcome | None
     photo_path: str | None  # served at /api/uploads/<photo_path>
+    eta_s: float | None = None
 
 
 class MissionOut(ORM):
@@ -109,6 +110,12 @@ class MissionOut(ORM):
     total_km: float | None
     capacity: int
     stops: list[StopOut]
+    route_geojson: dict | None = None   # GeoJSON LineString, van -> stops -> depot, on roads
+    route_waypoints: list[list[float]] | None = None  # OSRM snapped [lng, lat], start then each stop
+    route_legs: list | None = None      # [{distance_m, duration_s, steps: [OSRM step]}] one per stop + depot
+    duration_s: float | None = None
+    distance_m: float | None = None
+    routing_engine: str | None = None   # "osrm" or "straight-line" (road engine unavailable)
 
 
 class PositionIn(BaseModel):
@@ -118,6 +125,7 @@ class PositionIn(BaseModel):
 
 class ReplanIn(PositionIn):
     operator_id: str
+    reason: str | None = None  # e.g. "off_route" when the app detects the van left the route
 
 
 class LiveState(BaseModel):
