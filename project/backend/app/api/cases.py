@@ -17,6 +17,7 @@ from app.schemas import (
     KpiOut,
     Outcome,
 )
+from app.services import cases as cases_svc
 from app.services import missions
 
 router = APIRouter(tags=["cases"])
@@ -158,7 +159,7 @@ def export_case(case_id: int, actor: str | None = None, db: Session = Depends(ge
             "metric_crs": settings.metric_crs,
             "move_tolerance_m": settings.move_tolerance_m,
             "fresh_max_age_min": settings.fresh_max_age_min,
-            "require_fresh_observation": settings.require_fresh_observation,
+            "require_fresh_observation": cases_svc.rules(case.source).require_fresh_observation,
             "default_location_error_m": settings.default_location_error_m,
         },
         "inferred": {
