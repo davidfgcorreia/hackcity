@@ -48,7 +48,9 @@ services:
       POSTGRES_USER: analytics
       POSTGRES_PASSWORD: analytics
       POSTGRES_DB: analytics
-    ports: ["5433:5432"]
+    # Host port only. Keep it distinct from DB_PORT: on a machine that already runs
+    # Postgres, both databases get remapped and they must not land on the same port.
+    ports: ["${ANALYTICS_DB_PORT:-5433}:5432"]
     volumes: [analytics_pgdata:/var/lib/postgresql/data]
     command: postgres -c shared_buffers=512MB -c work_mem=64MB -c maintenance_work_mem=512MB
     healthcheck:

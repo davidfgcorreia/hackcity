@@ -35,8 +35,8 @@ The three things that stop a fresh clone there, in the order you hit them:
    docker compose exec api pytest -q                   # make test
    ```
 3. **Port 5432 is often taken** by a locally installed Postgres, and the db container then fails
-   to start. Put `DB_PORT=5433` in `.env`; nothing else changes, because the api reaches the
-   database as `db:5432` inside the compose network.
+   to start. Put `DB_PORT=5434` in `.env` — **not 5433, which `analytics-db` uses**. Nothing
+   else changes, because the api reaches the database as `db:5432` inside the compose network.
 
 ## Layout
 
