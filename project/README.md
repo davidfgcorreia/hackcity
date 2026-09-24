@@ -22,7 +22,7 @@ make test                # backend unit tests (detector, geo, routing)
 
 ## Road routing
 
-Run `make osrm` once to download the Portugal OSM extract, clip it to the Cascais area, and build the driving graph. The graph stays in the `osrm_data` Docker volume. `make up` then starts OSRM on port 5000 along with the other services. The API uses road routes when OSRM is ready and labels its straight-line fallback if it cannot reach the routing service. The field page uses MapLibre vector tiles from OpenFreeMap; map tiles need an internet connection.
+Run `make osrm` once to download the Portugal OSM extract, clip it from Cascais through central Lisbon, and build the driving graph. Run it again after changing the graph extent. The graph stays in the `osrm_data` Docker volume. `make up` then starts OSRM on port 5000 along with the other services. The API uses road routes when OSRM is ready and labels its straight-line fallback if it cannot reach the routing service or a GPS start lies outside the graph. The field page uses MapLibre vector tiles from OpenFreeMap; map tiles need an internet connection.
 
 ## Get the analytics data without `finalset`
 

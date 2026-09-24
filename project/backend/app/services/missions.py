@@ -137,7 +137,7 @@ def _driving_time(nodes: list[Node]):
 def _store_route(m: Mission, start: Node, ordered_stops: list[Stop]) -> None:
     """Road route van -> stops -> depot, with per-stop ETAs (straight line if OSRM is down)."""
     r = road.route([(start.lat, start.lng)] + [(s.lat, s.lng) for s in ordered_stops])
-    m.route_geojson, m.route_legs = r["geometry"], r["legs"]
+    m.route_geojson, m.route_legs, m.route_waypoints = r["geometry"], r["legs"], r["waypoints"]
     m.duration_s, m.distance_m, m.routing_engine = r["duration_s"], r["distance_m"], r["engine"]
     m.total_km = round(r["distance_m"] / 1000, 2)
     elapsed = 0.0

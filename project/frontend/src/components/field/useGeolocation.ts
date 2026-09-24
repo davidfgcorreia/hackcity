@@ -18,6 +18,12 @@ export interface FieldPosition {
 }
 
 const KEY = 'field:position'
+export const FRESH_FIX_MS = 15_000
+
+export function freshFix(position: FieldPosition | null, live: boolean): boolean {
+  return Boolean(live && position && Number.isFinite(Date.parse(position.at)) &&
+    Date.now() - Date.parse(position.at) >= 0 && Date.now() - Date.parse(position.at) < FRESH_FIX_MS)
+}
 
 function lastKnown(): FieldPosition | null {
   try {

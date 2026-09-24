@@ -5,13 +5,14 @@ import { LangContext, SetLangContext, type Lang } from './i18n'
 import { FieldPage } from './pages/FieldPage'
 import { InsightsPage } from './pages/InsightsPage'
 import { ReviewPage } from './pages/ReviewPage'
+import { HomePage } from './pages/HomePage'
 
 /** Desktop switcher. Hidden on /field: the phone app has its own language toggle in the sheet. */
 function GlobalNav({ lang, setLang }: { lang: Lang; setLang: (l: Lang) => void }) {
-  if (useLocation().pathname.startsWith('/field')) return null
+  if (['/', '/field'].includes(useLocation().pathname)) return null
   return (
     <nav style={{ position: 'fixed', top: 8, right: 8, zIndex: 1000, background: '#fff', padding: '4px 8px', borderRadius: 6, fontFamily: 'system-ui' }}>
-      <Link to="/field">field</Link> · <Link to="/review">review</Link> · <Link to="/insights">insights</Link> ·{' '}
+      <Link to="/">home</Link> · <Link to="/field">field</Link> · <Link to="/review">review</Link> · <Link to="/insights">insights</Link> ·{' '}
       <button onClick={() => setLang(lang === 'pt' ? 'en' : 'pt')}>{lang.toUpperCase()}</button>
     </nav>
   )
@@ -25,10 +26,11 @@ function App() {
         <BrowserRouter>
           <GlobalNav lang={lang} setLang={setLang} />
           <Routes>
+            <Route path="/" element={<HomePage />} />
             <Route path="/field" element={<FieldPage />} />
             <Route path="/review" element={<ReviewPage />} />
             <Route path="/insights" element={<InsightsPage />} />
-            <Route path="*" element={<Navigate to="/review" />} />
+            <Route path="*" element={<Navigate to="/" />} />
           </Routes>
         </BrowserRouter>
       </SetLangContext.Provider>

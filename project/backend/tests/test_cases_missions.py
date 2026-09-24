@@ -1,12 +1,14 @@
 import io
 from datetime import timedelta
 
+import pytest
 from fastapi import UploadFile
 from sqlalchemy import func, select
 
 from app.core.detector import Rules
 from app.core.vehicle_state import Event, apply_event
 from app.models import Case, Stop
+from app.schemas import MissionOut
 from app.schemas import Outcome
 from app.services import cases, missions
 from tests.conftest import T0
@@ -36,6 +38,27 @@ def eligible_case(db, device, lat, lng, minutes_ago=200):
     db.add(c)
     db.commit()
     return c
+
+
+def test_route_waypoints_persist_and_old_mission_is_viewable(db, monkeypatch):
+    from app.services import road
+
+    eligible_case(db, "bike-waypoint", 38.70, -9.42)
+    original = road.straight_line
+
+    def snapped(points):
+        result = original(points)
+        result["engine"] = "osrm"
+        result["waypoints"] = [[lng + .0001, lat + .0001] for lat, lng in points]
+        return result
+
+    monkeypatch.setattr(road, "route", snapped)
+    mission = missions.replan(db, "waypoint-op", 38.71, -9.41, "test")
+    assert mission.route_waypoints[0] == pytest.approx([-9.4099, 38.7101])
+    assert len(MissionOut.model_validate(mission).route_waypoints) == len(mission.stops) + 1
+    mission.route_waypoints = None
+    db.commit()
+    assert MissionOut.model_validate(missions.current_mission(db, "waypoint-op")).route_waypoints is None
 
 
 def test_case_lifecycle_candidate_to_resolved(db):

@@ -1,8 +1,10 @@
 import { useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react'
+import { Link } from 'react-router-dom'
 import { api, type SubmitResult } from '../api'
 import { FoundBikeForm } from '../components/field/FoundBikeForm'
 import { BottomSheet, type Detent } from '../components/field/BottomSheet'
 import { ManeuverBanner, ManeuverIcon, instruction } from '../components/field/ManeuverBanner'
+import { MissionSidebar } from '../components/field/MissionSidebar'
 import { NavMap, type CameraMode } from '../components/field/NavMap'
 import { StopList } from '../components/field/StopList'
 import { StopSheet } from '../components/field/StopSheet'
@@ -10,7 +12,7 @@ import {
   cacheCases, cacheMission, cachedCases, cachedMission, onQueueChange, queuedCount,
 } from '../components/field/offline'
 import { Badge, Button, FIELD_CSS, colors, fmtClock, fmtDistance, fmtDuration } from '../components/field/ui'
-import { useGeolocation, type FieldPosition } from '../components/field/useGeolocation'
+import { freshFix, useGeolocation, type FieldPosition } from '../components/field/useGeolocation'
 import { useNavigation, useSimulatedDrive } from '../components/field/useNavigation'
 import { SetLangContext, useLang, useT } from '../i18n'
 import type { Case, Mission, Outcome, Stop } from '../types'
@@ -46,6 +48,7 @@ export function FieldPage() {
   const [showFound, setShowFound] = useState(false)
   const [toast, setToast] = useState<string | null>(null)
   const [pending, setPending] = useState(0)
+  const [clockNow, setClockNow] = useState(Date.now())
 
   const simPosition = useSimulatedDrive(mission, SIMULATE)
   const position = SIMULATE ? simPosition ?? gpsPosition ?? DEPOT_POSITION : gpsPosition
@@ -54,12 +57,14 @@ export function FieldPage() {
   const positionRef = useRef(position)
   const pendingRef = useRef(0)
   const lastReplan = useRef(0)
+  const initialRouteChecked = useRef(false)
   positionRef.current = position
   pendingRef.current = pending
 
   useEffect(() => {
     try { localStorage.setItem(OPERATOR_KEY, operator) } catch { /* storage blocked */ }
   }, [operator])
+  useEffect(() => { const id = setInterval(() => setClockNow(Date.now()), 1000); return () => clearInterval(id) }, [])
 
   useEffect(() => {
     if (!toast) return
@@ -86,6 +91,7 @@ export function FieldPage() {
   // Poll the mission and its cases. A failed request must never blank the route (ER-8).
   useEffect(() => {
     version.current = 0
+    initialRouteChecked.current = false
     setMission(cachedMission(operator))
     setCases(cachedCases(operator))
 
@@ -110,7 +116,7 @@ export function FieldPage() {
           const { sent } = await api.flushQueue()
           if (alive && sent > 0) setToast(`${t.synced} (${sent})`)
         }
-        if (!nextMission && positionRef.current && Date.now() - lastReplan.current > REPLAN_COOLDOWN_MS) {
+        if (SIMULATE && !nextMission && positionRef.current && Date.now() - lastReplan.current > REPLAN_COOLDOWN_MS) {
           await replanNow()
         }
       } catch {
@@ -138,7 +144,8 @@ export function FieldPage() {
   const planned = useMemo(() => stops.filter((s) => s.status === 'planned').sort((a, b) => a.seq - b.seq), [stops])
   const subjectFor = (stop: Stop | null) => cases.find((c) => c.id === stop?.case_id)
   const stopLabel = (stop?: Stop) =>
-    !stop ? t.none : stop.kind === 'depot' ? t.depot : subjectFor(stop)?.device_id ?? `${t.caseRef} ${stop.case_id}`
+    !stop ? t.none : stop.kind === 'depot' ? 'Complexo Multisserviços'
+      : `${t.bike} ${Math.max(1, planned.findIndex(s => s.id === stop.id) + 1)}`
 
   const onOffRoute = useCallback(() => {
     const cooldownLeft = OFF_ROUTE_COOLDOWN_MS - (Date.now() - lastReplan.current)
@@ -148,6 +155,12 @@ export function FieldPage() {
     return 0
   }, [replanNow, t.offRoute])
   const nav = useNavigation(mission, position, onOffRoute)
+  useEffect(() => {
+    if (SIMULATE || !mission || !freshFix(gpsPosition, live) || nav.offRouteM == null || initialRouteChecked.current) return
+    initialRouteChecked.current = true
+    // A saved mission may have been planned on a previous shift or GPS location.
+    if ((nav.offRouteM > 80 || mission.routing_engine === 'straight-line') && Date.now() - lastReplan.current > REPLAN_COOLDOWN_MS) replanNow()
+  }, [mission, gpsPosition, live, nav.offRouteM, replanNow])
   const next = planned[nav.legIndex] ?? planned[0]
   const straightLine = mission?.routing_engine === 'straight-line'
   const heading = position?.heading ?? (nav.step?.maneuver.bearing_after ?? null)
@@ -186,15 +199,17 @@ export function FieldPage() {
   }
 
   const offline = stale || pending > 0
+  const positionFresh = SIMULATE || (freshFix(gpsPosition, live) && Boolean(gpsPosition && clockNow - Date.parse(gpsPosition.at) < 15_000))
   const navigating = Boolean(mission && position && (mission.route_legs?.length ?? 0) > 0)
   const nearStop = nav.toStopM != null && nav.toStopM < 60
 
   return (
     <div className="field-root" style={{ position: 'fixed', inset: 0, overflow: 'hidden', background: 'var(--f-bg)' }}>
       <style>{FIELD_CSS}</style>
-      <NavMap mission={mission} position={position} heading={heading} travelled={nav.travelled} ahead={nav.ahead}
+      <NavMap mission={mission} position={position} snapped={nav.snapped} heading={heading} travelled={nav.travelled} ahead={nav.ahead}
         cases={cases} activeStopId={selected?.id ?? next?.id ?? null} mode={camera}
         onUserMove={() => setCamera('free')} onSelect={setSelected} />
+      {mission && <MissionSidebar mission={mission} nav={nav} lang={lang} statusVisible={banner !== null} onSelect={setSelected} />}
 
       {navigating ? (
         <ManeuverBanner next={nav.next} distanceM={nav.next ? nav.toNextM : nav.toStopM} lang={lang}
@@ -202,9 +217,10 @@ export function FieldPage() {
       ) : (
         <div className="glass" style={{ position: 'absolute', top: 'calc(10px + env(safe-area-inset-top))', left: 10, right: 10, zIndex: 20,
           borderRadius: 20, padding: '14px 16px', fontSize: 17, fontWeight: 600 }}>
-          {mission ? t.route : t.noMission}
+          {mission ? t.route : <>{t.noMission} · <Link to="/">{lang === 'en' ? 'Start on home' : 'Iniciar na página inicial'}</Link></>}
           <div style={{ fontSize: 14, fontWeight: 400, color: colors.secondary }}>
             {position ? `${position.lat.toFixed(4)}, ${position.lng.toFixed(4)}` : geoError ? t.locationDenied : t.locating}
+            {position && <> · ±{Math.round(position.accuracy ?? 0)} m · {positionFresh ? (lang === 'en' ? 'GPS current' : 'GPS atual') : (lang === 'en' ? 'GPS stale' : 'GPS desatualizado')}</>}
           </div>
         </div>
       )}
@@ -222,14 +238,15 @@ export function FieldPage() {
       </div>
 
       {/* floating controls (right) */}
-      <div style={{ position: 'absolute', right: 10, top: `calc(${banner !== null ? 196 : 124}px + env(safe-area-inset-top))`, zIndex: 22,
+      <div style={{ position: 'absolute', right: 10, top: `calc(${banner !== null ? 196 : 160}px + env(safe-area-inset-top))`, zIndex: 22,
         display: 'flex', flexDirection: 'column', gap: 8, transition: 'top .3s' }}>
         <div className="glass" style={{ borderRadius: 14, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
-          <RoundButton label={camera === 'follow' ? t.overview : t.recentre}
-            onClick={() => setCamera(camera === 'follow' ? 'overview' : 'follow')}>
-            {camera === 'follow'
-              ? <path d="M4 4h6M4 4v6M20 4h-6M20 4v6M4 20h6M4 20v-6M20 20h-6M20 20v-6" />
-              : <path d="M12 2 4 20l8-4 8 4z" fill={camera === 'free' ? 'none' : colors.primary} />}
+          <RoundButton label={t.recentre} onClick={() => setCamera('follow')}>
+            <path d="M12 2 4 20l8-4 8 4z" fill={camera === 'follow' ? colors.primary : 'none'} />
+          </RoundButton>
+          <div style={{ height: 0.5, background: colors.line }} />
+          <RoundButton label={t.overview} onClick={() => setCamera('overview')}>
+            <path d="M4 4h6M4 4v6M20 4h-6M20 4v6M4 20h6M4 20v-6M20 20h-6M20 20v-6" />
           </RoundButton>
           <div style={{ height: 0.5, background: colors.line }} />
           <RoundButton label={t.foundBike} onClick={() => setShowFound(true)}><path d="M12 5v14M5 12h14" /></RoundButton>
@@ -259,7 +276,7 @@ export function FieldPage() {
                   {next?.kind === 'depot' ? '⌂' : next?.seq}
                 </span>
                 <span style={{ fontSize: 15, fontWeight: 600, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                  {next?.kind === 'depot' ? t.toDepot : stopLabel(next)}
+                  {stopLabel(next)}
                 </span>
               </button>
             </div>
@@ -269,7 +286,6 @@ export function FieldPage() {
           <div style={{ fontSize: 17, fontWeight: 600, padding: '8px 0' }}>{t.noMission}</div>
         )
       }>
-        <SectionTitle>{t.upNext}</SectionTitle>
         <StopList stops={planned.concat(stops.filter((s) => s.status === 'done'))} cases={cases} onSelect={setSelected} />
 
         {upcoming.length > 0 && !straightLine && (
@@ -300,6 +316,7 @@ export function FieldPage() {
           <SettingRow label={t.myPosition}>
             <span style={{ fontSize: 14, color: live || SIMULATE ? colors.ok : colors.secondary }}>
               {position ? `${position.lat.toFixed(4)}, ${position.lng.toFixed(4)}` : geoError ? t.locationDenied : t.locating}
+              {position && ` · ±${Math.round(position.accuracy ?? 0)} m · ${positionFresh ? (lang === 'en' ? 'current' : 'atual') : (lang === 'en' ? 'stale' : 'desatualizado')}`}
             </span>
           </SettingRow>
           <SettingRow label={t.route}>

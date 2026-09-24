@@ -11,6 +11,7 @@ export function StopList({ stops, cases, onSelect }: {
 }) {
   const t = useT()
   const visible = stops.filter((s) => s.status !== 'removed')
+  const plannedBikes = visible.filter(s => s.kind !== 'depot' && s.status === 'planned')
 
   return (
     <ul style={{ listStyle: 'none', margin: 0, padding: 0, background: colors.card, borderRadius: 14, overflow: 'hidden' }}>
@@ -33,7 +34,7 @@ export function StopList({ stops, cases, onSelect }: {
               }}>{s.kind === 'depot' ? '■' : s.seq}</span>
               <span style={{ flex: 1, minWidth: 0 }}>
                 <span style={{ fontWeight: 600, fontSize: 16 }}>
-                  {s.kind === 'depot' ? t.depot : c?.device_id ?? `${t.caseRef} ${s.case_id}`}
+                  {s.kind === 'depot' ? 'Complexo Multisserviços' : `${t.bike} ${s.status === 'planned' ? plannedBikes.findIndex(b => b.id === s.id) + 1 : s.seq}`}
                 </span>
                 {s.eta_s != null && s.status === 'planned' && (
                   <span style={{ display: 'block', fontSize: 13, color: colors.primary, fontWeight: 600 }}>

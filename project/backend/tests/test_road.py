@@ -6,6 +6,7 @@ from app.services import road
 
 OSRM_ROUTE = {
     "code": "Ok",
+    "waypoints": [{"location": [-9.419, 38.701]}, {"location": [-9.409, 38.706]}, {"location": [-9.399, 38.711]}],
     "routes": [{"distance": 1500.0, "duration": 240.0,
                 "geometry": {"type": "LineString", "coordinates": [[-9.42, 38.70], [-9.41, 38.705], [-9.40, 38.71]]},
                 "legs": [{"distance": 900.0, "duration": 150.0, "steps": [
@@ -35,6 +36,7 @@ def osrm(monkeypatch):
 def test_route_keeps_steps_without_heavy_fields(osrm):
     r = road.route([(38.70, -9.42), (38.705, -9.41), (38.71, -9.40)])
     assert r["engine"] == "osrm" and r["duration_s"] == 240
+    assert r["waypoints"] == [[-9.419, 38.701], [-9.409, 38.706], [-9.399, 38.711]]
     step = r["legs"][0]["steps"][1]
     assert step["maneuver"] == {"type": "turn", "modifier": "left", "location": [-9.41, 38.705]}
     assert "geometry" not in r["legs"][0]["steps"][0] and "intersections" not in r["legs"][0]["steps"][0]
@@ -54,6 +56,22 @@ def test_unreachable_osrm_falls_back_to_straight_line(monkeypatch):
     assert road.matrix([(38.7, -9.42), (38.71, -9.4)]) is None
     r = road.route([(38.70, -9.42), (38.71, -9.40)])
     assert r["engine"] == "straight-line" and len(r["legs"]) == 1 and r["legs"][0]["steps"] == []
+    assert r["waypoints"] is None
+
+
+def test_osrm_far_snapped_start_falls_back_to_approximate_route(osrm, monkeypatch):
+    bad = {**OSRM_ROUTE, "waypoints": [{"location": [-9.18, 38.70]}, *OSRM_ROUTE["waypoints"][1:]]}
+    monkeypatch.setattr(road, "_client", httpx.Client(transport=httpx.MockTransport(lambda _: httpx.Response(200, json=bad))))
+    route = road.route([(38.70, -9.42), (38.705, -9.41), (38.71, -9.40)])
+    assert route["engine"] == "straight-line" and route["waypoints"] is None
+
+
+def test_bike_away_from_road_keeps_driving_route_and_access_point(osrm, monkeypatch):
+    response = {**OSRM_ROUTE, "waypoints": [OSRM_ROUTE["waypoints"][0],
+                {"location": [-9.415, 38.705]}, OSRM_ROUTE["waypoints"][2]]}
+    monkeypatch.setattr(road, "_client", httpx.Client(transport=httpx.MockTransport(lambda _: httpx.Response(200, json=response))))
+    route = road.route([(38.70, -9.42), (38.705, -9.41), (38.71, -9.40)])
+    assert route["engine"] == "osrm" and route["waypoints"][1] == [-9.415, 38.705]
 
 
 def test_plan_uses_driving_time_not_distance():

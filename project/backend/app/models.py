@@ -84,6 +84,7 @@ class Mission(Base):
     total_km: Mapped[float | None]
     # road route from the van's position through the planned stops to the depot (services/road.py)
     route_geojson: Mapped[dict | None] = mapped_column(JSON)
+    route_waypoints: Mapped[list | None] = mapped_column(JSON)  # OSRM road points, start then each stop
     route_legs: Mapped[list | None] = mapped_column(JSON)   # per leg: distance, duration, turn-by-turn steps
     duration_s: Mapped[float | None]
     distance_m: Mapped[float | None]

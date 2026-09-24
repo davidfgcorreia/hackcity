@@ -37,6 +37,7 @@ export interface Mission {
   capacity: number; stops: Stop[]
   /** Road route van -> stops -> depot (OSRM); `straight-line` when the road engine is unavailable. */
   route_geojson?: { type: 'LineString'; coordinates: [number, number][] } | null
+  route_waypoints?: [number, number][] | null
   route_legs?: RouteLeg[] | null; duration_s?: number | null; distance_m?: number | null
   routing_engine?: 'osrm' | 'straight-line' | null
 }

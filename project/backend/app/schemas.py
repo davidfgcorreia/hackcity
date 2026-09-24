@@ -111,6 +111,7 @@ class MissionOut(ORM):
     capacity: int
     stops: list[StopOut]
     route_geojson: dict | None = None   # GeoJSON LineString, van -> stops -> depot, on roads
+    route_waypoints: list[list[float]] | None = None  # OSRM snapped [lng, lat], start then each stop
     route_legs: list | None = None      # [{distance_m, duration_s, steps: [OSRM step]}] one per stop + depot
     duration_s: float | None = None
     distance_m: float | None = None

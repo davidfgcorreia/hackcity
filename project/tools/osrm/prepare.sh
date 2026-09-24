@@ -4,7 +4,7 @@
 set -eu
 cd /data
 PBF=portugal-latest.osm.pbf
-BBOX="-9.53,38.63,-9.18,38.83"   # Cascais + Oeiras/Sintra border (depot in Alcabideche)
+BBOX="-9.53,38.63,-9.10,38.83"   # Cascais to central Lisbon, including GPS starts near Campolide
 if [ ! -s "$PBF" ]; then
   echo "downloading $PBF (Geofabrik, ~350 MB)"
   curl -fL --retry 3 -o "$PBF.part" "https://download.geofabrik.de/europe/portugal-latest.osm.pbf"

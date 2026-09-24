@@ -11,6 +11,8 @@ from app.config import settings
 from app.core.geo import haversine_m
 
 FALLBACK_SPEED_MS = 25 / 3.6  # urban average for straight-line ETAs
+MAX_START_SNAP_M = 250  # do not start kilometres away from the operator's GPS fix
+MAX_STOP_SNAP_M = 1500  # longer bike access remains visible as a dashed segment
 STEP_KEYS = ("name", "ref", "destinations", "exits", "rotary_name", "mode", "driving_side", "distance", "duration")
 
 _client = httpx.Client(timeout=3)
@@ -48,7 +50,15 @@ def route(points: list[tuple[float, float]]) -> dict:
                 {"overview": "full", "geometries": "geojson", "steps": "true"})
     if data:
         r = data["routes"][0]
+        waypoints = [w["location"] for w in data.get("waypoints", [])]
+        if len(waypoints) != len(points):
+            waypoints = None
+        if waypoints and any(haversine_m(lat, lng, snapped[1], snapped[0]) >
+                             (MAX_START_SNAP_M if i == 0 else MAX_STOP_SNAP_M)
+                             for i, ((lat, lng), snapped) in enumerate(zip(points, waypoints))):
+            return straight_line(points)
         return {"engine": "osrm", "geometry": r["geometry"], "distance_m": r["distance"], "duration_s": r["duration"],
+                "waypoints": waypoints,
                 "legs": [{"distance_m": leg["distance"], "duration_s": leg["duration"],
                           "steps": [_step(s) for s in leg["steps"]]} for leg in r["legs"]]}
     return straight_line(points)
@@ -60,6 +70,7 @@ def straight_line(points: list[tuple[float, float]]) -> dict:
         d = haversine_m(a_lat, a_lng, b_lat, b_lng) * settings.detour_factor
         legs.append({"distance_m": d, "duration_s": d / FALLBACK_SPEED_MS, "steps": []})
     return {"engine": "straight-line",
+            "waypoints": None,
             "geometry": {"type": "LineString", "coordinates": [[lng, lat] for lat, lng in points]},
             "distance_m": sum(leg["distance_m"] for leg in legs), "duration_s": sum(leg["duration_s"] for leg in legs),
             "legs": legs}
