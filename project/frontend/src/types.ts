@@ -2,8 +2,14 @@
 export type CaseStatus =
   | 'candidate' | 'uncertain' | 'supported' | 'eligible' | 'assigned' | 'picked_up' | 'resolved'
 
+export const CASE_STATUSES: CaseStatus[] =
+  ['candidate', 'uncertain', 'supported', 'eligible', 'assigned', 'picked_up', 'resolved']
+
 export type Outcome =
   | 'picked_up' | 'not_found' | 'in_use' | 'provider_recovered' | 'unsafe' | 'inaccessible' | 'unable_to_load'
+
+export const OUTCOMES: Outcome[] =
+  ['picked_up', 'not_found', 'in_use', 'provider_recovered', 'unsafe', 'inaccessible', 'unable_to_load']
 
 export interface Station { id: string; name: string; lat: number; lng: number; area: { coordinates: number[][][][] } }
 
@@ -19,3 +25,26 @@ export interface CaseDetail extends Case { timeline: CaseEvent[] }
 export interface Stop { id: number; case_id: number | null; seq: number; kind: 'pickup' | 'verify' | 'depot'; status: string; lat: number; lng: number; outcome: Outcome | null }
 
 export interface Mission { id: number; operator_id: string; status: string; version: number; last_change: string | null; total_km: number | null; capacity: number; stops: Stop[] }
+
+/** POST /cases/field — operator-found bicycle; collection waits for approval. */
+export interface FieldCaseIn { device_id: string; lat: number; lng: number; notes?: string; actor: string }
+
+/** PATCH /cases/{id} — a `null` explicitly clears the field (used to unblock). */
+export interface CaseCorrectionIn {
+  actor: string; reason: string
+  lat?: number; lng?: number; status?: CaseStatus; blocked_reason?: string | null
+}
+
+/** GET/POST /replay* — demo mode clock. */
+export interface ReplayState { running: boolean; sim_time: string | null; speed: number }
+
+/** GET /cases/kpis — ops KPI strip (T-E6). */
+export interface Kpis {
+  by_status: Record<CaseStatus, number>
+  open_cases: number
+  visits_completed: number
+  not_found_visits: number
+  not_found_rate: number | null          // not_found_visits / visits_completed
+  picked_up_total: number
+  median_eligible_to_pickup_min: number | null
+}

@@ -75,7 +75,11 @@ class FieldCaseIn(BaseModel):
 
 
 class CaseCorrectionIn(BaseModel):
-    """Staff correction/override. Reason and actor are mandatory (evidence is never erased)."""
+    """Staff correction/override. Reason and actor are mandatory (evidence is never erased).
+
+    Only fields present in the request body are applied, so an explicit `null` clears a
+    value — that is how a reviewer unblocks a case (T-E3).
+    """
     actor: str
     reason: str
     lat: float | None = None
@@ -116,3 +120,18 @@ class ReplayState(BaseModel):
     running: bool
     sim_time: datetime | None
     speed: float
+
+
+class KpiOut(BaseModel):
+    """Operational results for the review KPI strip (T-E6, ops req §10).
+
+    `by_status` always carries every CaseStatus key, zero-filled, so the UI can render a
+    stable set of chips.
+    """
+    by_status: dict[CaseStatus, int]
+    open_cases: int
+    visits_completed: int
+    not_found_visits: int
+    not_found_rate: float | None       # not_found_visits / visits_completed
+    picked_up_total: int
+    median_eligible_to_pickup_min: float | None

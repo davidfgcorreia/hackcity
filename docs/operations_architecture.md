@@ -121,8 +121,9 @@ Swagger UI is at `http://localhost:8000/docs`. The TypeScript mirror is `fronten
 | GET | `/api/cases?status=`, `/api/cases/{id}` (includes timeline) | done |
 | POST | `/api/cases/field` (operator-found bike, needs approval) | done |
 | POST | `/api/cases/{id}/approve?actor=` | done (replan hook T-C3) |
-| PATCH | `/api/cases/{id}` (correction/override with actor and reason) | done |
-| GET | `/api/cases/{id}/export` (evidence JSON) | done (format T-E4) |
+| PATCH | `/api/cases/{id}` (correction/override with actor and reason) | done — only the fields sent are applied, so an explicit `null` unblocks |
+| GET | `/api/cases/{id}/export?actor=` (evidence JSON) | done — rule applied, inference, observations, staff actions, field outcomes; `actor` also records the export in the timeline |
+| GET | `/api/cases/kpis` (open cases, not-found rate, median eligible→pickup) | done (T-E6) |
 | GET | `/api/missions/current?operator_id=` | done (read) |
 | POST | `/api/missions/replan` | **501 → T-C2** |
 | POST | `/api/stops/{id}/outcome` (multipart: outcome, actor, lat, lng, device_id, photo, client_uuid) | **501 → T-C4** |

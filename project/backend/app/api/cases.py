@@ -1,12 +1,28 @@
+from datetime import UTC, datetime
+from statistics import median
+
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy import select
 from sqlalchemy.orm import Session, selectinload
 
+from app.config import settings
 from app.db import get_db
-from app.models import Case, CaseEvent
-from app.schemas import CaseCorrectionIn, CaseDetail, CaseOut, CaseStatus, FieldCaseIn
+from app.models import Case, CaseEvent, Stop
+from app.schemas import (
+    CaseCorrectionIn,
+    CaseDetail,
+    CaseOut,
+    CaseStatus,
+    FieldCaseIn,
+    KpiOut,
+    Outcome,
+)
 
 router = APIRouter(tags=["cases"])
+
+CLOSED_STATUSES = {CaseStatus.picked_up.value, CaseStatus.resolved.value}
+STAFF_EVENT_KINDS = {"correction", "approved", "export", "override"}
+FIELD_EVENT_KINDS = {"field_outcome", "field_report"}
 
 
 @router.get("/cases", response_model=list[CaseOut])
@@ -15,6 +31,44 @@ def list_cases(status: CaseStatus | None = None, db: Session = Depends(get_db)):
     if status:
         q = q.where(Case.status == status)
     return db.scalars(q).all()
+
+
+# Declared before /cases/{case_id} so "kpis" is not parsed as a case id.
+@router.get("/cases/kpis", response_model=KpiOut)
+def case_kpis(db: Session = Depends(get_db)):
+    """Pilot measures from ops req §10: detection volume, failed visits, time to pickup."""
+    cases = db.scalars(select(Case)).all()
+    by_status: dict[str, int] = {s.value: 0 for s in CaseStatus}
+    for case in cases:
+        if case.status in by_status:
+            by_status[case.status] += 1
+    open_cases = sum(1 for c in cases if c.status not in CLOSED_STATUSES)
+
+    visits = db.scalars(select(Stop).where(Stop.outcome.is_not(None))).all()
+    not_found = sum(1 for s in visits if s.outcome == Outcome.not_found)
+
+    events = db.scalars(select(CaseEvent).order_by(CaseEvent.case_id, CaseEvent.id)).all()
+    durations: list[float] = []
+    per_case: dict[int, list[CaseEvent]] = {}
+    for ev in events:
+        per_case.setdefault(ev.case_id, []).append(ev)
+    for entries in per_case.values():
+        eligible_at = _first_time(entries, CaseStatus.eligible)
+        if eligible_at is None:
+            continue
+        picked_at = _first_time(entries, CaseStatus.picked_up, after=eligible_at)
+        if picked_at is not None:
+            durations.append((picked_at - eligible_at).total_seconds() / 60)
+
+    return KpiOut(
+        by_status=by_status,
+        open_cases=open_cases,
+        visits_completed=len(visits),
+        not_found_visits=not_found,
+        not_found_rate=(not_found / len(visits)) if visits else None,
+        picked_up_total=by_status[CaseStatus.picked_up.value],
+        median_eligible_to_pickup_min=round(median(durations), 1) if durations else None,
+    )
 
 
 @router.get("/cases/{case_id}", response_model=CaseDetail)
@@ -50,23 +104,133 @@ def approve_case(case_id: int, actor: str, db: Session = Depends(get_db)):
 
 @router.patch("/cases/{case_id}", response_model=CaseOut)
 def correct_case(case_id: int, body: CaseCorrectionIn, db: Session = Depends(get_db)):
-    """Correction/override. Previous values are kept in the timeline entry."""
+    """Correction/override. Previous values are kept in the timeline entry.
+
+    Only fields the client actually sent are applied, so `{"blocked_reason": null}` unblocks
+    a case while an omitted `blocked_reason` leaves it alone.
+    """
     case = db.get(Case, case_id) or _404()
-    changes = body.model_dump(exclude_none=True, exclude={"actor", "reason"})
+    sent = body.model_fields_set - {"actor", "reason"}
+    changes = {k: getattr(body, k) for k in sent}
     before = {k: getattr(case, k) for k in changes}
     for k, v in changes.items():
         setattr(case, k, v)
     case.timeline.append(CaseEvent(kind="correction", actor=body.actor,
-                                   detail={"reason": body.reason, "before": before, "after": changes}))
+                                   detail={"reason": body.reason,
+                                           "before": _jsonable(before),
+                                           "after": _jsonable(changes)}))
     db.commit()
     return case
 
 
 @router.get("/cases/{case_id}/export")
-def export_case(case_id: int, db: Session = Depends(get_db)):
-    """Evidence record for the municipal enforcement process. Format TO CONFIRM (T-E4)."""
+def export_case(case_id: int, actor: str | None = None, db: Session = Depends(get_db)):
+    """Evidence record for the municipal enforcement process (ops req §8).
+
+    It preserves what was observed and when, what was inferred, which rule was applied, what
+    staff changed and what the operator found. It is evidence, not a penalty decision.
+    Passing `actor` records the export itself in the case timeline.
+    """
     case = get_case(case_id, db)
-    return CaseDetail.model_validate(case).model_dump(mode="json")
+    detail = CaseDetail.model_validate(case).model_dump(mode="json")
+    timeline = detail["timeline"]
+
+    reference = _reference_time(case)
+    rest_since = _aware(case.rest_since)
+    minutes = None
+    if rest_since and reference:
+        minutes = round((reference - rest_since).total_seconds() / 60, 1)
+
+    record = {
+        "export_version": 1,
+        "exported_at": datetime.now(UTC).isoformat(),
+        "exported_by": actor,
+        "case": {k: v for k, v in detail.items() if k != "timeline"},
+        "rule_applied": {
+            "source": "docs/operations_requirements.md §4",
+            "abandon_minutes": settings.abandon_minutes,
+            "comparison": "strictly greater than",
+            "station_area_buffer_m": settings.buffer_m,
+            "boundary_counts_as_inside": True,
+            "metric_crs": settings.metric_crs,
+            "move_tolerance_m": settings.move_tolerance_m,
+            "fresh_max_age_min": settings.fresh_max_age_min,
+            "require_fresh_observation": settings.require_fresh_observation,
+            "default_location_error_m": settings.default_location_error_m,
+        },
+        "inferred": {
+            "status": case.status,
+            "reason": case.reason,
+            "distance_outside_m": case.distance_outside_m,
+            "rest_since": case.rest_since.isoformat() if case.rest_since else None,
+            "reference_time": reference.isoformat() if reference else None,
+            "minutes_at_rest": minutes,
+            "exceeds_threshold": (minutes > settings.abandon_minutes) if minutes is not None else None,
+            "field_confirmed": case.field_confirmed,
+            "needs_approval": case.needs_approval,
+            "blocked_reason": case.blocked_reason,
+        },
+        "observations": [e for e in timeline
+                         if e["kind"] not in STAFF_EVENT_KINDS | FIELD_EVENT_KINDS],
+        "staff_actions": [e for e in timeline if e["kind"] in STAFF_EVENT_KINDS],
+        "field_outcomes": [e for e in timeline if e["kind"] in FIELD_EVENT_KINDS],
+        "timeline": timeline,
+    }
+
+    if actor:
+        # Appended after the record is built, so an export never contains itself.
+        case.timeline.append(CaseEvent(kind="export", actor=actor, detail={"export_version": 1}))
+        db.commit()
+    return record
+
+
+def _first_time(entries: list[CaseEvent], status: CaseStatus,
+                after: datetime | None = None) -> datetime | None:
+    """First moment a case reached `status`, using event time and falling back to arrival time."""
+    for ev in entries:
+        if _status_of(ev) != status:
+            continue
+        when = _aware(ev.event_time or ev.recorded_at)
+        if when is None or (after is not None and when < after):
+            continue
+        return when
+    return None
+
+
+def _aware(value: datetime | None) -> datetime | None:
+    """Tests may run on a backend that hands back naive timestamps; they are UTC by contract."""
+    if value is not None and value.tzinfo is None:
+        return value.replace(tzinfo=UTC)
+    return value
+
+
+def _status_of(ev: CaseEvent) -> str | None:
+    """Read the new status out of a timeline entry.
+
+    T-B4 appends an entry on every status change; both shapes the contract allows are
+    accepted — `kind="status_change"` with `detail={"to": ...}`, or `kind` set to the status
+    itself. A field outcome of `picked_up` also marks the case picked up.
+    """
+    detail = ev.detail or {}
+    for key in ("to", "status", "new_status"):
+        value = detail.get(key)
+        if isinstance(value, str) and value in CaseStatus.__members__:
+            return value
+    if ev.kind in CaseStatus.__members__:
+        return ev.kind
+    if ev.kind == "field_outcome" and detail.get("outcome") == Outcome.picked_up:
+        return CaseStatus.picked_up
+    return None
+
+
+def _reference_time(case: Case) -> datetime | None:
+    """Latest moment the case has evidence for — the clock the duration is measured against."""
+    times = [_aware(e.event_time) for e in case.timeline if e.event_time]
+    return max(times) if times else _aware(case.updated_at)  # type: ignore[type-var]
+
+
+def _jsonable(values: dict) -> dict:
+    return {k: (v.isoformat() if isinstance(v, datetime) else v) for k, v in values.items()}
 
 
 def _404():
