@@ -103,3 +103,4 @@ class Stop(Base):
     completed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     client_uuid: Mapped[str | None] = mapped_column(String, unique=True)  # idempotent offline sync
     mission: Mapped[Mission] = relationship(back_populates="stops")
+    case: Mapped[Case | None] = relationship()

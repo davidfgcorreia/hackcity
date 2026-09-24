@@ -16,6 +16,8 @@ export interface Case {
 export interface CaseEvent { id: number; kind: string; detail: Record<string, unknown>; actor: string; event_time: string | null; recorded_at: string }
 export interface CaseDetail extends Case { timeline: CaseEvent[] }
 
-export interface Stop { id: number; case_id: number | null; seq: number; kind: 'pickup' | 'verify' | 'depot'; status: string; lat: number; lng: number; outcome: Outcome | null }
+export interface Stop { id: number; case_id: number | null; seq: number; kind: 'pickup' | 'verify' | 'depot'; status: string; lat: number; lng: number; outcome: Outcome | null; photo_path: string | null }
 
 export interface Mission { id: number; operator_id: string; status: string; version: number; last_change: string | null; total_km: number | null; capacity: number; stops: Stop[] }
+
+export interface ReplayState { running: boolean; sim_time: string | null; speed: number; last_changes: string[] }

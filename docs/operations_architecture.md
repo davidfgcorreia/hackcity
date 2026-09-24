@@ -54,9 +54,10 @@ flowchart LR
 | `core/vehicle_state.py` | done, tested | `apply_event(prev, Event, move_tolerance_m) -> VehicleState` gives `rest_since` and `last_observed_at_rest`. |
 | `core/detector.py` | done, tested | `evaluate(state, distance_fn, now, Rules, field_confirmed) -> Result(verdict, reason, ...)`. |
 | `core/routing.py` | done, tested | `plan_mission(start, stops, depot, capacity) -> Plan(order, queued, total_km)`. |
-| `services/replay.py` | **stub (T-B3)** | Background tick loop; no look-ahead past `sim_time`. |
-| `services/cases.py` | **stub (T-B4)** | `sync_vehicle(db, state, result, now)`; the docstring holds the rules. |
-| `services/missions.py` | **stub (T-C2, T-C4)** | `replan(...)` and `record_outcome(...)`. |
+| `services/replay.py` | done, tested | `ReplayEngine.tick(to_time)`: folds events ≤ `sim_time`, evaluates all bikes at rest, syncs cases, replans. Runs as an asyncio loop at `REPLAY_SPEED`. |
+| `services/cases.py` | done, tested | `sync_all(db, states, distance_fn, now, rules) -> replan reasons`. One open case per device. A closed interval (pickup, not found) is never re-detected. |
+| `services/missions.py` | done, tested | `replan`, `replan_all`, `record_outcome` (idempotent on `client_uuid`), `depot_arrived`. Stops leave the route when their case stops being routable. |
+| `services/clock.py` | done | `now()` returns replay time in demo mode and wall-clock UTC otherwise. |
 | `scripts/load_data.py` | done | Loads 157 stations and 53,764 events, converting to UTC at ingestion. |
 
 ## 3. Key flow: detection to re-route
@@ -96,7 +97,7 @@ The source is operations_requirements.md §4. Thresholds are defined only in `ap
 | `non_contactable` / `missing` → uncertain, not dropped | Keeps the last position and marks the case uncertain | `test_non_contactable_is_uncertain` |
 | A new trip or provider pickup removes the bike | Non-rest state → `gone` → case resolved and stop removed | `test_trip_start_*`, `test_provider_pickup_*` |
 
-**Assumptions to confirm:** the source timestamps are UTC (`SOURCE_TZ`, check in T-B1); `FRESH_MAX_AGE_MIN=60`; `DEFAULT_LOCATION_ERROR_M=0` because the feed has no accuracy field; the depot coordinates are a **placeholder**; `VAN_CAPACITY=6`. For a demo where the historical data has too few same-position observations, set `REQUIRE_FRESH_OBSERVATION=false`. The UI labels those cases "fresh-evidence rule disabled".
+**Assumptions to confirm:** the source timestamps are UTC (`SOURCE_TZ`). The B1 check found that trip starts are lowest at 04 UTC and highest at 16–17 UTC. That fits UTC but does not rule out local time, so confirm with the data partner. Only display is affected, because the rule uses time differences; `FRESH_MAX_AGE_MIN=60`; `DEFAULT_LOCATION_ERROR_M=0` because the feed has no accuracy field; the depot coordinates are a **placeholder**; `VAN_CAPACITY=6`. **Measured:** with the strict rule, 7 replayed days produce only 1 eligible bike, so the demo default is `REQUIRE_FRESH_OBSERVATION=false`. Set it to `true` for real use. The UI labels those cases "fresh-evidence rule disabled".
 
 ## 5. Data model
 
@@ -120,13 +121,15 @@ Swagger UI is at `http://localhost:8000/docs`. The TypeScript mirror is `fronten
 | GET | `/api/health`, `/api/stations` | done |
 | GET | `/api/cases?status=`, `/api/cases/{id}` (includes timeline) | done |
 | POST | `/api/cases/field` (operator-found bike, needs approval) | done |
-| POST | `/api/cases/{id}/approve?actor=` | done (replan hook T-C3) |
+| POST | `/api/cases/{id}/approve?actor=` | done (triggers replan) |
 | PATCH | `/api/cases/{id}` (correction/override with actor and reason) | done |
 | GET | `/api/cases/{id}/export` (evidence JSON) | done (format T-E4) |
 | GET | `/api/missions/current?operator_id=` | done (read) |
-| POST | `/api/missions/replan` | **501 → T-C2** |
-| POST | `/api/stops/{id}/outcome` (multipart: outcome, actor, lat, lng, device_id, photo, client_uuid) | **501 → T-C4** |
-| GET/POST | `/api/replay`, `/replay/start`, `/replay/pause`, `/replay/step?minutes=` | **stub → T-B3** |
+| POST | `/api/missions/replan` `{operator_id, lat, lng}` (creates the mission on first call) | done |
+| POST | `/api/missions/{id}/depot` `{lat, lng}` (unloaded; frees capacity) | done |
+| POST | `/api/stops/{id}/outcome` (multipart: outcome, actor, lat, lng, device_id, photo, client_uuid) | done |
+| GET | `/api/uploads/{photo_path}` (pickup photos) | done |
+| GET/POST | `/api/replay`, `/replay/start?from_time=&speed=`, `/replay/pause`, `/replay/step?minutes=`, `/replay/reset` | done |
 
 ## 7. Engineering requirements (MVP acceptance)
 

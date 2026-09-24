@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, File, Form, HTTPException, UploadFile
 from sqlalchemy.orm import Session
 
 from app.db import get_db
-from app.schemas import MissionOut, Outcome, ReplanIn
+from app.schemas import MissionOut, Outcome, PositionIn, ReplanIn
 from app.services import missions as svc
 
 router = APIRouter(tags=["missions"])
@@ -16,7 +16,14 @@ def current_mission(operator_id: str, db: Session = Depends(get_db)):
 
 @router.post("/missions/replan", response_model=MissionOut)
 def replan(body: ReplanIn, db: Session = Depends(get_db)):
-    return svc.replan(db, body.operator_id, body.lat, body.lng, reason="requested by operator")
+    """Creates the operator's mission on first call; start = the operator's current position."""
+    return svc.replan(db, body.operator_id, body.lat, body.lng, reason="route requested by operator")
+
+
+@router.post("/missions/{mission_id}/depot", response_model=MissionOut)
+def depot_arrived(mission_id: int, body: PositionIn, db: Session = Depends(get_db)):
+    """Van unloaded at the depot: capacity is free again, next trip is planned."""
+    return svc.depot_arrived(db, mission_id, body.lat, body.lng)
 
 
 @router.post("/stops/{stop_id}/outcome", response_model=MissionOut)

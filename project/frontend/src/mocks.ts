@@ -11,8 +11,8 @@ export const mockMission: Mission = {
   id: 1, operator_id: 'op1', status: 'active', version: 3, total_km: 4.2, capacity: 6,
   last_change: 'bike-004 started a trip — removed; next: bike-003',
   stops: [
-    { id: 10, case_id: 3, seq: 1, kind: 'pickup', status: 'planned', lat: 38.7050, lng: -9.4000, outcome: null },
-    { id: 11, case_id: 1, seq: 2, kind: 'pickup', status: 'planned', lat: 38.6975, lng: -9.4230, outcome: null },
-    { id: 12, case_id: null, seq: 3, kind: 'depot', status: 'planned', lat: 38.7223, lng: -9.4205, outcome: null },
+    { id: 10, case_id: 3, seq: 1, kind: 'pickup', status: 'planned', lat: 38.7050, lng: -9.4000, outcome: null, photo_path: null },
+    { id: 11, case_id: 1, seq: 2, kind: 'pickup', status: 'planned', lat: 38.6975, lng: -9.4230, outcome: null, photo_path: null },
+    { id: 12, case_id: null, seq: 3, kind: 'depot', status: 'planned', lat: 38.7223, lng: -9.4205, outcome: null, photo_path: null },
   ],
 }

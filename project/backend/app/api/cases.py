@@ -5,6 +5,7 @@ from sqlalchemy.orm import Session, selectinload
 from app.db import get_db
 from app.models import Case, CaseEvent
 from app.schemas import CaseCorrectionIn, CaseDetail, CaseOut, CaseStatus, FieldCaseIn
+from app.services import missions
 
 router = APIRouter(tags=["cases"])
 
@@ -44,7 +45,7 @@ def approve_case(case_id: int, actor: str, db: Session = Depends(get_db)):
     case.status = CaseStatus.eligible
     case.timeline.append(CaseEvent(kind="approved", actor=actor))
     db.commit()
-    # TODO(T-C3): trigger replan for active missions
+    missions.replan_all(db, f"bike {case.device_id[:8]} approved by {actor}")
     return case
 
 
@@ -59,6 +60,8 @@ def correct_case(case_id: int, body: CaseCorrectionIn, db: Session = Depends(get
     case.timeline.append(CaseEvent(kind="correction", actor=body.actor,
                                    detail={"reason": body.reason, "before": before, "after": changes}))
     db.commit()
+    if changes:
+        missions.replan_all(db, f"bike {case.device_id[:8]} corrected: {body.reason}")
     return case
 
 

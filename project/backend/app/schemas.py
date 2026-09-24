@@ -93,6 +93,7 @@ class StopOut(ORM):
     lat: float
     lng: float
     outcome: Outcome | None
+    photo_path: str | None  # served at /api/uploads/<photo_path>
 
 
 class MissionOut(ORM):
@@ -106,13 +107,17 @@ class MissionOut(ORM):
     stops: list[StopOut]
 
 
-class ReplanIn(BaseModel):
-    operator_id: str
+class PositionIn(BaseModel):
     lat: float
     lng: float
+
+
+class ReplanIn(PositionIn):
+    operator_id: str
 
 
 class ReplayState(BaseModel):
     running: bool
     sim_time: datetime | None
     speed: float
+    last_changes: list[str] = []  # newest first: what the detector changed on recent ticks

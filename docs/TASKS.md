@@ -1,5 +1,7 @@
 # Task Timeline — Parallel Workstreams
 
+> **Status (24 Sep, afternoon):** backend workstreams B and C are done except C1's real depot coordinates. ✅ = done, ◐ = partial. `make demo` sets up a replay with a route for op1.
+
 **Now: Thu 24 Sep, 12:30 · Devpost deadline: Fri 25 Sep, 10:00 (about 21 h)**
 
 Priority order: **operational MVP first**, then the data-analysis MVP, then polish and the pitch. Design is in [operations_architecture.md](operations_architecture.md).
@@ -72,13 +74,13 @@ gantt
 
 | ID | Task | Depends on | Done when |
 |---|---|---|---|
-| **B1** | Check the timezone of `viagens.xlsx`: plot trip_start by hour, where the Lisbon peak should appear at 8–9 h local. Set `SOURCE_TZ` accordingly. | — | The decision is noted in `operations_architecture.md` §4. |
-| **B2** | Load events from the DB ordered by `event_time` and fold them into `dict[device_id, VehicleState]`. Build `ZoneIndex` from the `stations` table once at startup. | — | Unit test: fold of 3 synthetic events. |
-| **B3** | Replay loop: an asyncio task that advances `sim_time` by `speed × dt`, folds new events, calls `evaluate()` for all at-rest bikes, and calls `cases.sync_vehicle`. `/replay/step` runs one tick. | B2 | `POST /replay/step?minutes=180` creates cases. |
-| **B4** | `services/cases.sync_vehicle` following its docstring rules: one open case per device, and a `CaseEvent` for each status change. | B3 contract | Test: candidate → supported → eligible → resolved on a trip start. |
-| **C1** | Put the real depot coordinates in `.env`. Create a mission on the operator's first request, starting from their position. | — | `GET /missions/current` returns a mission. |
-| **C2** | `replan()`: eligible, unblocked, approved cases → `plan_mission` → rewrite planned stops plus a final depot stop. Set cases to `assigned`, increase `version`, and set `last_change`. | C1 | `POST /missions/replan` returns ordered stops. |
-| **C4** | `record_outcome()`: idempotent on `client_uuid`, saves the photo to `/uploads`, updates the stop and case status, sets `blocked_reason` for unsafe, inaccessible and unable_to_load, then replans. | C2 | curl multipart pickup → case `picked_up`. |
+| **B1** ✅ | Check the timezone of `viagens.xlsx`: plot trip_start by hour, where the Lisbon peak should appear at 8–9 h local. Set `SOURCE_TZ` accordingly. | — | The decision is noted in `operations_architecture.md` §4. |
+| **B2** ✅ | Load events from the DB ordered by `event_time` and fold them into `dict[device_id, VehicleState]`. Build `ZoneIndex` from the `stations` table once at startup. | — | Unit test: fold of 3 synthetic events. |
+| **B3** ✅ | Replay loop: an asyncio task that advances `sim_time` by `speed × dt`, folds new events, calls `evaluate()` for all at-rest bikes, and calls `cases.sync_vehicle`. `/replay/step` runs one tick. | B2 | `POST /replay/step?minutes=180` creates cases. |
+| **B4** ✅ | `services/cases.sync_vehicle` following its docstring rules: one open case per device, and a `CaseEvent` for each status change. | B3 contract | Test: candidate → supported → eligible → resolved on a trip start. |
+| **C1** ◐ | Put the real depot coordinates in `.env`. Create a mission on the operator's first request, starting from their position. | — | `GET /missions/current` returns a mission. |
+| **C2** ✅ | `replan()`: eligible, unblocked, approved cases → `plan_mission` → rewrite planned stops plus a final depot stop. Set cases to `assigned`, increase `version`, and set `last_change`. | C1 | `POST /missions/replan` returns ordered stops. |
+| **C4** ✅ | `record_outcome()`: idempotent on `client_uuid`, saves the photo to `/uploads`, updates the stop and case status, sets `blocked_reason` for unsafe, inaccessible and unable_to_load, then replans. | C2 | curl multipart pickup → case `picked_up`. |
 | **D1** | Operator picker (op1/op2) and `navigator.geolocation` watch, used as the replan start position. | — | Position dot on the map. |
 | **D2** | Route polyline, numbered stops, map/list toggle, and a "next stop" card. | D1 (mocks) | Works with `VITE_USE_MOCKS=true`. |
 | **D3** | Stop sheet: case ref, bike ID, last position and time, reason, uncertainty badge. Seven outcome buttons. Pickup requires a bike ID and a photo (`<input type=file accept=image/* capture=environment>`). | D2 | Pickup is posted to the API. |
@@ -93,8 +95,8 @@ gantt
 
 | ID | Task | Depends on | Done when |
 |---|---|---|---|
-| **C3** | Replan triggers: a new eligible case, an assigned bike going `gone` (the stop is removed and `last_change="bike X started a trip — removed"`), an approval, and an outcome. | B4, C2 | A banner appears in `/field` during replay. |
-| **C5** | Capacity queue and depot legs: when the van is full, the route ends at the depot and the remaining cases stay `eligible` in a queue. | C2 | Test with capacity 2 and 5 cases. |
+| **C3** ✅ | Replan triggers: a new eligible case, an assigned bike going `gone` (the stop is removed and `last_change="bike X started a trip — removed"`), an approval, and an outcome. | B4, C2 | A banner appears in `/field` during replay. |
+| **C5** ✅ | Capacity queue and depot legs: when the van is full, the route ends at the depot and the remaining cases stay `eligible` in a queue. | C2 | Test with capacity 2 and 5 cases. |
 | **B5** | Validation: the share of `maintenance_pick_up` events that the detector flagged beforehand, and the average lead time. **This number goes in the pitch.** | B3 | Numbers in `docs/`. |
 | **D4** | "Found another bike" form → `POST /cases/field`. Shows "awaiting approval". | — | The case appears in review with `needs_approval`. |
 | **D5** | Offline: keep the last mission in `localStorage`, queue outcomes in IndexedDB, resend with the same `client_uuid`. Show a "pending sync" badge. | D3 | Works with DevTools offline. |
