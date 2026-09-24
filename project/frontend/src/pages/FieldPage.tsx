@@ -118,6 +118,7 @@ export function FieldPage() {
 
   const stops = mission?.stops ?? []
   const planned = stops.filter((s) => s.status === 'planned')
+  const doneCount = stops.filter((s) => s.status === 'done').length
   const next = planned[0]
   const subjectFor = (stop: Stop | null) => cases.find((c) => c.id === stop?.case_id)
   const stopLabel = (stop?: Stop) =>
@@ -184,6 +185,7 @@ export function FieldPage() {
 
       <div style={{ display: 'flex', gap: 8, alignItems: 'center', padding: '6px 12px', fontSize: 13, color: colors.grey, borderBottom: `1px solid ${colors.line}` }}>
         <span>{planned.length} {t.stops}</span>
+        {doneCount > 0 && <span style={{ color: colors.ok, fontWeight: 600 }}>· {doneCount} {t.done}</span>}
         {mission?.total_km != null && <span>· {mission.total_km} {t.km}</span>}
         {mission && <span>· v{mission.version}</span>}
         <span style={{ marginLeft: 'auto', display: 'flex', gap: 6 }}>
