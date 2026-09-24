@@ -17,6 +17,7 @@ from app.schemas import (
     KpiOut,
     Outcome,
 )
+from app.services import missions
 
 router = APIRouter(tags=["cases"])
 
@@ -98,7 +99,7 @@ def approve_case(case_id: int, actor: str, db: Session = Depends(get_db)):
     case.status = CaseStatus.eligible
     case.timeline.append(CaseEvent(kind="approved", actor=actor))
     db.commit()
-    # TODO(T-C3): trigger replan for active missions
+    missions.replan_all(db, f"bike {case.device_id[:8]} approved by {actor}")
     return case
 
 
@@ -120,6 +121,8 @@ def correct_case(case_id: int, body: CaseCorrectionIn, db: Session = Depends(get
                                            "before": _jsonable(before),
                                            "after": _jsonable(changes)}))
     db.commit()
+    if changes:
+        missions.replan_all(db, f"bike {case.device_id[:8]} corrected: {body.reason}")
     return case
 
 

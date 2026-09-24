@@ -97,6 +97,7 @@ class StopOut(ORM):
     lat: float
     lng: float
     outcome: Outcome | None
+    photo_path: str | None  # served at /api/uploads/<photo_path>
 
 
 class MissionOut(ORM):
@@ -110,16 +111,30 @@ class MissionOut(ORM):
     stops: list[StopOut]
 
 
-class ReplanIn(BaseModel):
-    operator_id: str
+class PositionIn(BaseModel):
     lat: float
     lng: float
+
+
+class ReplanIn(PositionIn):
+    operator_id: str
+
+
+class LiveState(BaseModel):
+    running: bool
+    last_poll: datetime | None
+    last_error: str | None
+    vehicles_in_feed: int  # after the form-factor filter
+    tracked: int
+    form_factors: str
+    last_changes: list[str] = []
 
 
 class ReplayState(BaseModel):
     running: bool
     sim_time: datetime | None
     speed: float
+    last_changes: list[str] = []  # newest first: what the detector changed on recent ticks
 
 
 class KpiOut(BaseModel):

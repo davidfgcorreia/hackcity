@@ -49,9 +49,10 @@ def make_case(db, *, status="eligible", **kwargs) -> Case:
 
 
 def status_event(case: Case, status: str, minutes: int) -> CaseEvent:
+    """Same shape services/cases.set_status writes: kind="status", detail carries from/to."""
     when = T0 + timedelta(minutes=minutes)
-    return CaseEvent(case_id=case.id, kind="status_change", detail={"to": status},
-                     actor="system", event_time=when, recorded_at=when)
+    return CaseEvent(case_id=case.id, kind="status", detail={"from": None, "to": status},
+                     actor="detector", event_time=when, recorded_at=when)
 
 
 # --------------------------------------------------------------------- T-E6 KPIs
@@ -165,7 +166,7 @@ def test_export_separates_observations_staff_actions_and_field_outcomes(client, 
     client.patch(f"/api/cases/{case.id}", json={"actor": "rev1", "reason": "bad pin", "lat": 38.71})
 
     record = client.get(f"/api/cases/{case.id}/export").json()
-    assert [e["kind"] for e in record["observations"]] == ["status_change"]
+    assert [e["kind"] for e in record["observations"]] == ["status"]
     assert [e["kind"] for e in record["staff_actions"]] == ["correction"]
     assert [e["kind"] for e in record["field_outcomes"]] == ["field_outcome"]
     assert len(record["timeline"]) == 3
@@ -179,3 +180,15 @@ def test_export_is_audited_only_when_an_actor_is_given(client, db):
     client.get(f"/api/cases/{case.id}/export?actor=rev1")
     entry = client.get(f"/api/cases/{case.id}").json()["timeline"][-1]
     assert entry["kind"] == "export" and entry["actor"] == "rev1"
+
+
+def test_a_status_named_event_kind_is_also_understood(client, db):
+    """Tolerated alternative shape: the kind itself names the new status."""
+    case = make_case(db)
+    db.add_all([
+        CaseEvent(case_id=case.id, kind="eligible", detail={}, actor="detector", event_time=T0),
+        CaseEvent(case_id=case.id, kind="picked_up", detail={}, actor="op1",
+                  event_time=T0 + timedelta(minutes=20)),
+    ])
+    db.commit()
+    assert client.get("/api/cases/kpis").json()["median_eligible_to_pickup_min"] == 20.0

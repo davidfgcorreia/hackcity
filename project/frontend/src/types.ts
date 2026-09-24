@@ -22,9 +22,11 @@ export interface Case {
 export interface CaseEvent { id: number; kind: string; detail: Record<string, unknown>; actor: string; event_time: string | null; recorded_at: string }
 export interface CaseDetail extends Case { timeline: CaseEvent[] }
 
-export interface Stop { id: number; case_id: number | null; seq: number; kind: 'pickup' | 'verify' | 'depot'; status: string; lat: number; lng: number; outcome: Outcome | null }
+export interface Stop { id: number; case_id: number | null; seq: number; kind: 'pickup' | 'verify' | 'depot'; status: string; lat: number; lng: number; outcome: Outcome | null; photo_path: string | null }
 
 export interface Mission { id: number; operator_id: string; status: string; version: number; last_change: string | null; total_km: number | null; capacity: number; stops: Stop[] }
+
+export interface LiveState { running: boolean; last_poll: string | null; last_error: string | null; vehicles_in_feed: number; tracked: number; form_factors: string; last_changes: string[] }
 
 /** POST /cases/field — operator-found bicycle; collection waits for approval. */
 export interface FieldCaseIn { device_id: string; lat: number; lng: number; notes?: string; actor: string }
@@ -35,8 +37,8 @@ export interface CaseCorrectionIn {
   lat?: number; lng?: number; status?: CaseStatus; blocked_reason?: string | null
 }
 
-/** GET/POST /replay* — demo mode clock. */
-export interface ReplayState { running: boolean; sim_time: string | null; speed: number }
+/** GET/POST /replay* — demo mode clock. `last_changes` is newest first. */
+export interface ReplayState { running: boolean; sim_time: string | null; speed: number; last_changes: string[] }
 
 /** GET /cases/kpis — ops KPI strip (T-E6). */
 export interface Kpis {

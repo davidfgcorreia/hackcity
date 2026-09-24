@@ -17,16 +17,19 @@ export const mockMission: Mission = {
   id: 1, operator_id: 'op1', status: 'active', version: 3, total_km: 4.2, capacity: 6,
   last_change: 'bike-004 started a trip — removed; next: bike-003',
   stops: [
-    { id: 10, case_id: 3, seq: 1, kind: 'pickup', status: 'planned', lat: 38.7050, lng: -9.4000, outcome: null },
-    { id: 11, case_id: 1, seq: 2, kind: 'pickup', status: 'planned', lat: 38.6975, lng: -9.4230, outcome: null },
-    { id: 12, case_id: null, seq: 3, kind: 'depot', status: 'planned', lat: 38.7223, lng: -9.4205, outcome: null },
+    { id: 10, case_id: 3, seq: 1, kind: 'pickup', status: 'planned', lat: 38.7050, lng: -9.4000, outcome: null, photo_path: null },
+    { id: 11, case_id: 1, seq: 2, kind: 'pickup', status: 'planned', lat: 38.6975, lng: -9.4230, outcome: null, photo_path: null },
+    { id: 12, case_id: null, seq: 3, kind: 'depot', status: 'planned', lat: 38.736686, lng: -9.386868, outcome: null, photo_path: null },
   ],
 }
 
 let mission: Mission = structuredClone(mockMission)
 let cases: Case[] = structuredClone(mockCases)
 let nextCaseId = 8
-let replay: ReplayState = { running: false, sim_time: '2026-09-01T11:10:00Z', speed: 360 }
+let replay: ReplayState = {
+  running: false, sim_time: '2026-09-01T11:10:00Z', speed: 360,
+  last_changes: ['new eligible bike bike-001', 'bike bike-004 started a trip — stop removed'],
+}
 
 export const mockMissionNow = (): Mission => structuredClone(mission)
 export const mockCasesNow = (): Case[] => structuredClone(cases)
@@ -37,14 +40,14 @@ export function mockCaseDetail(id: number): CaseDetail {
     new Date(Date.parse(base.rest_since ?? base.updated_at) + minutes * 60_000).toISOString()
   const timeline: CaseEvent[] = [
     { id: 1, kind: 'trip_end', detail: { lat: base.lat, lng: base.lng, source: 'provider feed' }, actor: 'system', event_time: at(0), recorded_at: at(2) },
-    { id: 2, kind: 'candidate', detail: { to: 'candidate', distance_outside_m: base.distance_outside_m }, actor: 'system', event_time: at(0), recorded_at: at(2) },
+    { id: 2, kind: 'status', detail: { from: null, to: 'candidate', distance_outside_m: base.distance_outside_m }, actor: 'system', event_time: at(0), recorded_at: at(2) },
     { id: 3, kind: 'observation', detail: { same_position: true, age_min: 35 }, actor: 'system', event_time: at(150), recorded_at: at(151) },
   ]
   if (base.status !== 'candidate') {
-    timeline.push({ id: 4, kind: 'status_change', detail: { from: 'candidate', to: 'supported', minutes_at_rest: 150 }, actor: 'system', event_time: at(150), recorded_at: at(151) })
+    timeline.push({ id: 4, kind: 'status', detail: { from: 'candidate', to: 'supported', minutes_at_rest: 150 }, actor: 'system', event_time: at(150), recorded_at: at(151) })
   }
   if (['eligible', 'assigned', 'picked_up', 'resolved'].includes(base.status)) {
-    timeline.push({ id: 5, kind: 'status_change', detail: { from: 'supported', to: 'eligible' }, actor: 'system', event_time: at(155), recorded_at: at(155) })
+    timeline.push({ id: 5, kind: 'status', detail: { from: 'supported', to: 'eligible' }, actor: 'system', event_time: at(155), recorded_at: at(155) })
   }
   if (base.status === 'picked_up') {
     timeline.push({ id: 6, kind: 'field_outcome', detail: { outcome: 'picked_up', device_id: base.device_id, photo: 'uploads/mock.jpg' }, actor: 'op1', event_time: at(200), recorded_at: at(201) })

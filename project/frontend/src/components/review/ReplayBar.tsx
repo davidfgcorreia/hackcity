@@ -105,6 +105,18 @@ export function ReplayBar({ onChange }: { onChange?: (state: ReplayState) => voi
       </span>
 
       {error && <span style={{ color: ui.danger, fontSize: 13 }}>/api/replay ✕</span>}
+
+      {/* What the detector changed on the last ticks — the story the demo is telling. */}
+      {state?.last_changes?.length ? (
+        <div style={{ flexBasis: '100%', display: 'flex', gap: 6, flexWrap: 'wrap', fontSize: 13 }}>
+          {state.last_changes.slice(0, 4).map((change, i) => (
+            <span key={`${change}-${i}`} style={{
+              background: i === 0 ? '#fff4d6' : '#fff', border: `1px solid ${ui.line}`,
+              borderRadius: 6, padding: '2px 8px',
+            }}>{change}</span>
+          ))}
+        </div>
+      ) : null}
     </div>
   )
 }

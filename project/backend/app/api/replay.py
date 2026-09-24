@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from fastapi import APIRouter
+from fastapi import APIRouter, HTTPException
 
 from app.schemas import ReplayState
 from app.services.replay import engine
@@ -14,8 +14,12 @@ def state():
 
 
 @router.post("/replay/start", response_model=ReplayState)
-def start(from_time: datetime | None = None, speed: float | None = None):
-    return engine.start(from_time, speed)
+async def start(from_time: datetime | None = None, speed: float | None = None):
+    """Start or resume. `from_time` jumps forward (history before it is folded); `speed` = sim s per real s."""
+    try:
+        return await engine.start(from_time, speed)
+    except ValueError as e:
+        raise HTTPException(409, str(e))
 
 
 @router.post("/replay/pause", response_model=ReplayState)
@@ -24,6 +28,12 @@ def pause():
 
 
 @router.post("/replay/step", response_model=ReplayState)
-def step(minutes: float = 10):
+async def step(minutes: float = 10):
     """Advance simulated time manually — handy for the scripted demo and debugging."""
-    return engine.step(minutes)
+    return await engine.step(minutes)
+
+
+@router.post("/replay/reset", response_model=ReplayState)
+def reset():
+    """Demo only: deletes all cases and missions and rewinds the clock."""
+    return engine.reset()
