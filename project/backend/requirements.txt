@@ -1,0 +1,10 @@
+fastapi[standard]==0.115.*
+sqlalchemy==2.0.*
+psycopg[binary]==3.2.*
+pydantic-settings==2.*
+shapely==2.*
+pyproj==3.*
+pandas==2.*
+openpyxl==3.*
+python-multipart
+pytest==8.*

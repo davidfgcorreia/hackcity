@@ -1,0 +1,1 @@
+{"root":["./src/api.ts","./src/i18n.ts","./src/main.tsx","./src/mocks.ts","./src/types.ts","./src/vite-env.d.ts","./src/components/BaseMap.tsx","./src/pages/FieldPage.tsx","./src/pages/ReviewPage.tsx"],"version":"5.8.3"}

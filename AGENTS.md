@@ -2,11 +2,11 @@
 
 ## Project Structure & Module Organization
 
-This repository is a planning and data workspace for the Cascais micromobility challenge. `docs/initial.md` contains the detailed proposal; `chalange.md` contains the short challenge brief. Source material lives in `datasets/`: bicycle trips and events, station and GBFS JSON, Waze traffic data, vehicle CSVs, and dated transit operation plans. `project/` is currently empty. There is no application source or test directory yet. Put new implementation code and its tests in clearly named subdirectories under `project/`; keep supplied data in `datasets/` and design notes in `docs/`.
+This repository is a planning and data workspace for the Cascais micromobility challenge. `docs/initial.md` contains the detailed proposal; `chalange.md` contains the short challenge brief. Source material lives in `datasets/`: bicycle trips and events, station and GBFS JSON, Waze traffic data, vehicle CSVs, and dated transit operation plans. The operations MVP lives in `project/` (`backend/` FastAPI, `frontend/` React, `docker-compose.yml`); see `docs/operations_architecture.md` and the parallel task plan in `docs/TASKS.md`. Put new implementation code and its tests in clearly named subdirectories under `project/`; keep supplied data in `datasets/` and design notes in `docs/`.
 
 ## Build, Test, and Development Commands
 
-There is no build system, dependency manifest, or automated test command in the repository. Before adding one, document its setup and commands here and in a project README. For now, use `git status --short` to review changed files and `git diff --check` to catch whitespace errors. Use `rg --files docs project` to locate working files without listing the large dataset tree.
+From `project/`: `cp .env.example .env`, `make up` (Postgres :5432, API :8000, web :5173), `make seed` (loads stations and bicycle events from `datasets/`, which is mounted read-only), `make test` (backend pytest in the api container), and `make psql`. Use `VITE_USE_MOCKS=true docker compose up web` for frontend work without a backend. Use `git diff --check` before committing and `rg --files docs project` to list working files.
 
 ## Coding Style & Naming Conventions
 
@@ -14,7 +14,7 @@ Follow the conventions of the language and formatter chosen for new code, and co
 
 ## Testing Guidelines
 
-No test framework or coverage threshold is established. When code is added, include tests for data parsing, missing or duplicate identifiers, time-zone handling, and the station-area-plus-30-metre / 120-minute detection rule. Name tests to describe the behavior they verify and document the command that runs them. Treat historical sample data and simulated operational events as distinct inputs.
+Backend tests use pytest (`make test`); pure logic in `backend/app/core` must stay unit-tested. Include tests for data parsing, missing or duplicate identifiers, time-zone handling, and the station-area-plus-30-metre / 120-minute detection rule. Name tests to describe the behavior they verify and document the command that runs them. Treat historical sample data and simulated operational events as distinct inputs.
 
 ## Commit & Pull Request Guidelines
 
