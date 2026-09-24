@@ -39,6 +39,19 @@ services:
       - /app/node_modules
     command: npm run dev -- --host 0.0.0.0
 
+  # --- road routing (OpenStreetMap + OSRM); build the graph once with `make osrm` ---
+  osrm-prep:
+    build: { context: ./tools/osrm, dockerfile: Dockerfile.prep }
+    profiles: ["tools"]
+    volumes: [osrm_data:/data]
+
+  osrm:
+    image: ghcr.io/project-osrm/osrm-backend:v5.27.1
+    command: osrm-routed --algorithm mld --max-table-size 1000 /data/cascais.osrm
+    ports: ["5000:5000"]
+    volumes: [osrm_data:/data]
+    restart: unless-stopped
+
   # --- data analysis (separate, persistent, PostGIS) ---
   analytics-db:
     image: postgis/postgis:16-3.4
@@ -71,3 +84,4 @@ volumes:
   uploads:
   analytics_pgdata:
   analytics_cache:
+  osrm_data:

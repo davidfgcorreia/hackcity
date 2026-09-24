@@ -82,6 +82,12 @@ class Mission(Base):
     version: Mapped[int] = mapped_column(default=1)  # bumped on every replan; clients poll it
     last_change: Mapped[str | None] = mapped_column(Text)  # "what changed, why, new target"
     total_km: Mapped[float | None]
+    # road route from the van's position through the planned stops to the depot (services/road.py)
+    route_geojson: Mapped[dict | None] = mapped_column(JSON)
+    route_legs: Mapped[list | None] = mapped_column(JSON)   # per leg: distance, duration, turn-by-turn steps
+    duration_s: Mapped[float | None]
+    distance_m: Mapped[float | None]
+    routing_engine: Mapped[str | None]  # osrm | straight-line
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
     stops: Mapped[list["Stop"]] = relationship(order_by="Stop.seq", back_populates="mission")
 
@@ -96,6 +102,7 @@ class Stop(Base):
     status: Mapped[str] = mapped_column(String, default="planned")  # planned | done | removed
     lat: Mapped[float]
     lng: Mapped[float]
+    eta_s: Mapped[float | None]  # driving seconds from the van's position when the route was planned
     outcome: Mapped[str | None]
     notes: Mapped[str | None] = mapped_column(Text)
     photo_path: Mapped[str | None]

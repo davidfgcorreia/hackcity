@@ -9,6 +9,8 @@
   },
   "dependencies": {
     "leaflet": "^1.9.4",
+    "maplibre-gl": "^5.24.0",
+    "osrm-text-instructions": "^0.14.0",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
     "react-leaflet": "^5.0.0",

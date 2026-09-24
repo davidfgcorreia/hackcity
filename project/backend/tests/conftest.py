@@ -26,6 +26,14 @@ def engine():
     eng.dispose()
 
 
+@pytest.fixture(autouse=True)
+def no_real_osrm(monkeypatch):
+    """Tests never call the running OSRM container; routing tests mock it explicitly."""
+    from app.services import road
+
+    monkeypatch.setattr(road.settings, "routing_engine", "straight-line")
+
+
 @pytest.fixture
 def session_factory(engine):
     Base.metadata.drop_all(engine)

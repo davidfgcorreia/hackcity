@@ -25,6 +25,8 @@ class Settings(BaseSettings):
     depot_lng: float = -9.386868
     van_capacity: int = 6        # TO CONFIRM
     detour_factor: float = 1.3
+    routing_engine: str = "osrm"             # "osrm" | "straight-line"
+    osrm_url: str = "http://osrm:5000"       # OpenStreetMap road graph, built with `make osrm`
 
     replay_speed: float = 360.0
 

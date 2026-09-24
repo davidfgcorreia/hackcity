@@ -78,7 +78,15 @@ Every ingest and derive step writes a row to `meta.ingest_log` (rows read and ke
 
 ## 6. Not built yet
 
+The prioritized list, methods, effort and pitch findings are in [NEXT_STEPS.md](NEXT_STEPS.md).
+
 - **The three next-day experimental forecast layers**, with a chronological holdout and a comparison against baselines.
 - **First-month demand ranges** for each candidate, based on comparable stations.
 - **Five-minute walking catchments** on OpenStreetMap paths (the transport gap is currently measured in a straight line).
 - **INE population**, CSV/PDF export, a Portuguese version of the page, stop-level bus delay joined from vehicle positions (with the 75 % / 10-services / 3-days gates), and the 2025 bundle analysis.
+
+## 7. Get the data without `finalset`
+
+The private [data-2026-09-24 release](https://github.com/davidfgcorreia/hackcity/releases/tag/data-2026-09-24) contains a 122 MB Cascais-filtered database dump. It includes the source tables needed by `analytics.derive` and all current `derived` tables, but excludes rows from the two large raw vehicle-position/event tables. It contains salted transit card hashes and must stay within the hackathon team. From `project/`, run `docker compose up -d analytics-db analytics web` followed by `make analytics-restore` to download and restore the dump. See [project/README.md](../project/README.md#get-the-analytics-data-without-finalset) for prerequisites and the overwrite warning.
+
+**Restore check (24 September 2026):** the release asset SHA-256 matched the local dump. A strict restore into a scratch database completed successfully. All 30 `derived` tables had exactly the same row counts as the source. `transit26.vehicle_positions` and `transit25.vehicle_events` had zero rows in the scratch database, as intended. Running `python -m analytics.derive` in a container with only the source-code mount and no `datasets` mount rebuilt all 30 tables with matching row counts. The scratch database was removed afterward.
