@@ -155,6 +155,8 @@ def transit():
                    ON b.agency_id = s.agency_id AND b.stop_id = s.stop_id
             WHERE ST_Intersects(s.geom, ST_MakeEnvelope(-9.50, 38.665, -9.295, 38.78, 4326))"""),
         "bus_delay": rows("""SELECT * FROM derived.bus_delay_routes ORDER BY route, time_window"""),
+        "transfer_proxy": {"summary": rows("SELECT * FROM derived.transfer_proxy_summary ORDER BY kind DESC"),
+                           "placebo": one("SELECT * FROM derived.transfer_proxy_placebo")},
         "boardings_by_hour": rows("""SELECT is_weekend, hour_local, sum(validations) validations
                                      FROM derived.stop_boardings GROUP BY 1, 2 ORDER BY 1, 2"""),
         "meta": {"source": TRANSIT + "; realised MobiCascais services M01–M36",

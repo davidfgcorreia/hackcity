@@ -6,7 +6,7 @@ This repository is a planning and data workspace for the Cascais micromobility c
 
 ## Build, Test, and Development Commands
 
-From `project/`: `cp .env.example .env`, `make up` (Postgres :5432, API :8000, web :5173), `make seed` (loads stations and bicycle events from `datasets/`, which is mounted read-only), `make test` (backend pytest in the api container), and `make psql`. Use `VITE_USE_MOCKS=true docker compose up web` for frontend work without a backend. Use `git diff --check` before committing and `rg --files docs project` to list working files.
+From `project/`: `cp .env.example .env`, `make up` (Postgres :5432, API :8000, web :5173), `make seed` (loads stations and bicycle events from `datasets/`, which is mounted read-only), `make test` (backend pytest in the api container), and `make psql`. Use `VITE_USE_MOCKS=true docker compose up web` for frontend work without a backend. Data analysis: `docker compose exec analytics python -m analytics.ingest`, then `python -m analytics.derive`; tests with `docker compose exec analytics pytest -q` (see `docs/analytics_architecture.md`). Use `git diff --check` before committing and `rg --files docs project` to list working files.
 
 ## Coding Style & Naming Conventions
 

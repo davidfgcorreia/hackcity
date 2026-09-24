@@ -97,7 +97,7 @@ gantt
 |---|---|---|---|
 | **C3** ✅ | Replan triggers: a new eligible case, an assigned bike going `gone` (the stop is removed and `last_change="bike X started a trip — removed"`), an approval, and an outcome. | B4, C2 | A banner appears in `/field` during replay. |
 | **C5** ✅ | Capacity queue and depot legs: when the van is full, the route ends at the depot and the remaining cases stay `eligible` in a queue. | C2 | Test with capacity 2 and 5 cases. |
-| **B5** | Validation: the share of `maintenance_pick_up` events that the detector flagged beforehand, and the average lead time. **This number goes in the pitch.** | B3 | Numbers in `docs/`. |
+| **B5** ✅ | Validation: the share of `maintenance_pick_up` events that the detector flagged beforehand, and the average lead time. **This number goes in the pitch.** | B3 | Numbers in `docs/`. |
 | **D4** ✅ | "Found another bike" form → `POST /cases/field`. Shows "awaiting approval". | — | The case appears in review with `needs_approval`. |
 | **D5** ✅ | Offline: keep the last mission in `localStorage`, queue outcomes in IndexedDB, resend with the same `client_uuid`. Show a "pending sync" badge. | D3 | Works with DevTools offline. |
 | **E3** ✅ | Correct position/status with a reason, approve a field case, block or unblock a case. | — | The timeline shows before and after values. |
@@ -105,17 +105,21 @@ gantt
 | **E6** ✅ | Ops KPI strip: cases by status, not-found rate, median time from eligible to pickup. | C4 | — |
 | **A2** ✅ | Demo scenario: choose a replay window with several abandonments, one trip start on an assigned bike, and one provider pickup. Save it as `make demo`. | B3 | A 2-minute scripted run works. |
 
-## Phase 3 — Data-analysis MVP (17:00 → 02:00, then F owns it), Gate **M3**
+## Phase 3 — Data-analysis MVP
+
+> **Status:** ingest, analysis tables and the `/insights` page are done. See [analytics_architecture.md](analytics_architecture.md) for commands, findings and the list of what is not built yet.
+
+### Original plan (17:00 → 02:00, then F owns it), Gate **M3**
 
 Scope comes from [analytics_prediction_requirements.md](analytics_prediction_requirements.md). Keep it separate in `project/analytics/` (a notebook or scripts writing to `analytics/derived/`). Show the result as a third page, `/insights`, fed from static JSON.
 
 | ID | Task |
 |---|---|
-| **F0** | Choose 2–3 outputs from the requirements doc's recommended defaults and write down which ones. |
-| **F1** | Recovery KPIs per station catchment and H3 hex: abandonments per 100 trip ends, idle hours, time to provider pickup. |
-| **F2** | Station opportunity: hexes with high demand and many out-of-station parkings but no station. |
-| **F3** | Supply/demand by hour: departures, arrivals, net flow per station. |
-| **F4** | Export JSON and add the `/insights` map page (reusing `BaseMap`). |
+| **F0** ✅ | Choose 2–3 outputs from the requirements doc's recommended defaults and write down which ones. |
+| **F1** ✅ | Recovery KPIs per station catchment and H3 hex: abandonments per 100 trip ends, idle hours, time to provider pickup. |
+| **F2** ✅ | Station opportunity: hexes with high demand and many out-of-station parkings but no station. |
+| **F3** ✅ | Supply/demand by hour: departures, arrivals, net flow per station. |
+| **F4** ✅ | Export JSON and add the `/insights` map page (reusing `BaseMap`). |
 
 ## Phase 4 — Stabilise and pitch (02:00 → 09:30)
 

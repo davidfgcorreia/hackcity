@@ -15,6 +15,7 @@ make test                # backend unit tests (detector, geo, routing)
 - Field app (mobile): http://localhost:5173/field. On a phone on the same LAN, use `http://<laptop-ip>:5173/field`.
 - Review app: http://localhost:5173/review
 - API docs: http://localhost:8000/docs
+- Data analysis: http://localhost:5173/insights. The analytics DB and API are separate (`analytics-db`, `analytics`). Load the data with `docker compose exec analytics python -m analytics.ingest && docker compose exec analytics python -m analytics.derive`; see `../docs/analytics_architecture.md`.
 - Live detection starts with the API: it polls the Bird GBFS feed every 60 s (`GET /api/live` shows its status). `make demo` switches to replay mode, and `POST /api/live/start` switches back.
 - If `docker compose` can't find the containers, check `docker context ls`. Docker Desktop and the system engine are different contexts; use `DOCKER_CONTEXT=default`.
 - Frontend without a backend: `VITE_USE_MOCKS=true docker compose up web`

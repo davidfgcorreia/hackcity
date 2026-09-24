@@ -41,7 +41,6 @@ function Loading({ err }: { err?: string | null }) {
   return <div style={{ ...card, color: err ? '#c0302f' : C.text2 }}>{err ?? 'Loading…'}</div>
 }
 
-const grid2: React.CSSProperties = { display: 'grid', gridTemplateColumns: 'minmax(0, 1.6fr) minmax(300px, 1fr)', gap: 16, alignItems: 'start' }
 
 /* ------------------------------------------------------------------ Overview */
 function OverviewTab() {
@@ -88,7 +87,7 @@ function RecoveryTab() {
   const reasons: Record<string, string> = { new_trip: 'Taken by a rider', provider_recovery: 'Collected by provider', moved: 'Moved (>10 m)',
     left_area: 'Left operating area', censored: 'Still parked at data end', restarted: 'New rest event' }
   return (
-    <div style={grid2}>
+    <div className="ins-grid2">
       <div style={{ display: 'grid', gap: 10 }}>
         <div style={{ display: 'flex', gap: 8 }}>
           {([['supported_120', 'Bikes parked >120 min'], ['outside_per_100_trip_ends', 'Outside parkings per 100 trip ends']] as const).map(([k, l]) => (
@@ -138,7 +137,7 @@ function CandidatesTab() {
   useEffect(() => { if (scored.length && !sel) setSel(scored[0]) }, [scored, sel])
   if (!d) return <Loading err={err} />
   return (
-    <div style={grid2}>
+    <div className="ins-grid2">
       <div style={{ display: 'grid', gap: 10 }}>
         <Map>
           <GeoJSON data={d.cells as unknown as GeoJSON.GeoJsonObject}
@@ -219,7 +218,7 @@ function StationsTab() {
   }
   const top = [...st].sort((a, b) => b.properties.departures - a.properties.departures).slice(0, 12)
   return (
-    <div style={grid2}>
+    <div className="ins-grid2">
       <div style={{ display: 'grid', gap: 10 }}>
         <Map>
           {st.map((f) => {
@@ -274,7 +273,7 @@ function TransitTab() {
   }
   const delays = d.bus_delay.filter((r) => r.time_window === 'all').sort((a, b) => b.median_delay_min - a.median_delay_min)
   return (
-    <div style={grid2}>
+    <div className="ins-grid2">
       <div style={{ display: 'grid', gap: 10 }}>
         <Map>
           {stops.map((f) => {
@@ -293,6 +292,14 @@ function TransitTab() {
       <div style={{ display: 'grid', gap: 12 }}>
         <Section title="MobiCascais boardings by hour (average per day)">
           <HourChart unit="boardings" series={[{ name: 'Weekday', color: C.s1, values: hourly(false) }, { name: 'Weekend', color: C.s2, values: hourly(true) }]} />
+        </Section>
+        <Section title="Bus/rail ↔ bike transfer proxy: no signal">
+          <div style={{ fontSize: 14, lineHeight: 1.6 }}>
+            {fmtN(d.transfer_proxy.summary.find((r) => r.kind === 'start')?.pct, 1)}% of bike trips start within 300 m and 15 min
+            after a scheduled bus/rail arrival. With every start time shifted by 30 min the rate is still
+            <b> {fmtN(d.transfer_proxy.placebo.pct, 1)}%</b>. The proxy measures how dense the service is, not transfers, so it is
+            <b> not used</b> as bus-to-bike demand. Verified transfers need linked journey data.
+          </div>
         </Section>
         <Section title="Route departure delay, M01–M36 (median minutes late)">
           <Bars rows={delays.slice(0, 14).map((r) => ({ label: r.route, value: Number(r.median_delay_min), note: `p90 ${r.p90_delay_min} min · ${r.services} services` }))} unit=" min" />
@@ -318,7 +325,7 @@ function JourneysTab() {
   const s = d.summary
   const muni = d.municipalities.filter((m) => m.origin_municipality !== m.dest_municipality).slice(0, 10)
   return (
-    <div style={grid2}>
+    <div className="ins-grid2">
       <div style={{ display: 'grid', gap: 10 }}>
         <div style={{ display: 'flex', gap: 8 }}>
           {([['journeys', 'All day'], ['am_peak', '07–10'], ['pm_peak', '16–19']] as const).map(([k, l]) => (
@@ -413,7 +420,7 @@ export function InsightsPage() {
   }
   return (
     <div style={{ minHeight: '100dvh', background: '#f6f6f4', fontFamily: 'system-ui, sans-serif', color: C.text }}>
-      <header style={{ background: '#fff', borderBottom: `1px solid ${C.line}`, padding: '14px 20px 0' }}>
+      <header className="ins-header" style={{ background: '#fff', borderBottom: `1px solid ${C.line}`, padding: '14px 20px 0' }}>
         <div style={{ display: 'flex', alignItems: 'baseline', gap: 12, flexWrap: 'wrap' }}>
           <h1 style={{ margin: 0, fontSize: 20 }}>Cascais micromobility insights</h1>
           <span style={{ fontSize: 13, color: C.text2 }}>Planning analysis · bike sample 18 Aug–8 Sep 2026 · transit week 31 Aug–6 Sep 2026</span>
@@ -428,7 +435,9 @@ export function InsightsPage() {
         </nav>
       </header>
       <main style={{ padding: 20, maxWidth: 1400, margin: '0 auto' }}>{body[tab]}</main>
-      <style>{`.tiles-muted { filter: grayscale(1) brightness(1.06) contrast(0.85); }`}</style>
+      <style>{`.tiles-muted { filter: grayscale(1) brightness(1.06) contrast(0.85); }
+.ins-grid2 { display: grid; grid-template-columns: minmax(0, 1.6fr) minmax(300px, 1fr); gap: 16px; align-items: start; }
+@media (max-width: 900px) { .ins-grid2 { grid-template-columns: minmax(0, 1fr); } .ins-header { padding-top: 44px !important; } }`}</style>
     </div>
   )
 }

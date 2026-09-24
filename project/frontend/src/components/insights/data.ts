@@ -43,7 +43,8 @@ export interface StationP { station_id: string; name: string; departures: number
 export interface HourRow { is_weekend: boolean; hour_local: number; departures: number; arrivals: number; net_flow: number; n_days: number }
 export interface StopP { agency_id: string; agency_name: string; stop_id: string; stop_name: string; weekday_departures: number; departures_per_hour: number; weekly_boardings: number }
 export interface DelayRow { route: string; time_window: string; services: number; observed: number; median_delay_min: number; p90_delay_min: number; median_early_min: number; n_days: number }
-export interface Transit { stops: FC<StopP>; bus_delay: DelayRow[]; boardings_by_hour: { is_weekend: boolean; hour_local: number; validations: number }[]; meta: Meta }
+export interface Transit { stops: FC<StopP>; bus_delay: DelayRow[];
+  transfer_proxy: { summary: { kind: string; bike_endpoints: number; with_transit_proxy: number; pct: number }[]; placebo: { pct: number } }; boardings_by_hour: { is_weekend: boolean; hour_local: number; validations: number }[]; meta: Meta }
 export interface FlowP { origin_zone: string; dest_zone: string; origin_municipality: string; dest_municipality: string; journeys: number; cards: number; am_peak: number; pm_peak: number; with_transfer: number; observed_destinations: number }
 export interface Journeys {
   flows: FC<FlowP>; municipalities: { origin_municipality: string; dest_municipality: string; journeys: number; cards: number }[]

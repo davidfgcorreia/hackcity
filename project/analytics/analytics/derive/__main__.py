@@ -10,7 +10,7 @@ from analytics.derive import parking
 
 SQL = Path(__file__).parent / "sql"
 STEPS = [("01_base.sql", None), ("parking", parking.run), ("03_recovery.sql", None), ("04_transit.sql", None),
-         ("05_journeys.sql", None), ("06_candidates.sql", None), ("07_weather.sql", None)]
+         ("05_journeys.sql", None), ("06_candidates.sql", None), ("07_weather.sql", None), ("08_transfer_proxy.sql", None)]
 
 
 def main() -> None:
