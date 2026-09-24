@@ -32,12 +32,42 @@ services:
     ports: ["5173:5173"]
     environment:
       API_TARGET: http://api:8000
+      ANALYTICS_TARGET: http://analytics:8100
       VITE_USE_MOCKS: ${VITE_USE_MOCKS:-false}
     volumes:
       - ./frontend:/app
       - /app/node_modules
     command: npm run dev -- --host 0.0.0.0
 
+  # --- data analysis (separate, persistent, PostGIS) ---
+  analytics-db:
+    image: postgis/postgis:16-3.4
+    environment:
+      POSTGRES_USER: analytics
+      POSTGRES_PASSWORD: analytics
+      POSTGRES_DB: analytics
+    ports: ["5433:5432"]
+    volumes: [analytics_pgdata:/var/lib/postgresql/data]
+    command: postgres -c shared_buffers=512MB -c work_mem=64MB -c maintenance_work_mem=512MB
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U analytics"]
+      interval: 3s
+      retries: 30
+
+  analytics:
+    build: ./analytics
+    env_file: .env
+    depends_on:
+      analytics-db: { condition: service_healthy }
+    ports: ["8100:8100"]
+    volumes:
+      - ./analytics:/code
+      - ../datasets:/data:ro
+      - analytics_cache:/cache      # downloaded external sources (GTFS plans)
+    command: uvicorn analytics.api:app --host 0.0.0.0 --port 8100 --reload
+
 volumes:
   pgdata:
   uploads:
+  analytics_pgdata:
+  analytics_cache:

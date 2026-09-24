@@ -1,0 +1,10 @@
+duckdb==1.*
+psycopg[binary]==3.2.*
+pandas==2.*
+openpyxl==3.*
+pyarrow
+httpx
+shapely==2.*
+pyproj==3.*
+fastapi[standard]==0.115.*
+pytest==8.*
