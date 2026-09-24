@@ -1,6 +1,6 @@
 # Task Timeline — Parallel Workstreams
 
-> **Status (24 Sep, afternoon):** backend workstreams B and C are done. ✅ = done. **Live detection from the provider GBFS feed runs by default** (`GET /api/live`); `make demo` switches to replay mode and sets up a route for op1.
+> **Status (24 Sep, evening):** backend workstreams B and C are done, and the field app (D) and review app (E) are built on top of them. ✅ = done. Still open: **B5** validation numbers, **A1**/**A3**, workstream **F** analytics and the pitch (**P1**/**P2**). **Live detection from the provider GBFS feed runs by default** (`GET /api/live`); `make demo` switches to replay mode and sets up a route for op1.
 
 **Now: Thu 24 Sep, 12:30 · Devpost deadline: Fri 25 Sep, 10:00 (about 21 h)**
 
@@ -81,12 +81,12 @@ gantt
 | **C1** ✅ | Put the real depot coordinates in `.env`. Create a mission on the operator's first request, starting from their position. | — | `GET /missions/current` returns a mission. |
 | **C2** ✅ | `replan()`: eligible, unblocked, approved cases → `plan_mission` → rewrite planned stops plus a final depot stop. Set cases to `assigned`, increase `version`, and set `last_change`. | C1 | `POST /missions/replan` returns ordered stops. |
 | **C4** ✅ | `record_outcome()`: idempotent on `client_uuid`, saves the photo to `/uploads`, updates the stop and case status, sets `blocked_reason` for unsafe, inaccessible and unable_to_load, then replans. | C2 | curl multipart pickup → case `picked_up`. |
-| **D1** | Operator picker (op1/op2) and `navigator.geolocation` watch, used as the replan start position. | — | Position dot on the map. |
-| **D2** | Route polyline, numbered stops, map/list toggle, and a "next stop" card. | D1 (mocks) | Works with `VITE_USE_MOCKS=true`. |
-| **D3** | Stop sheet: case ref, bike ID, last position and time, reason, uncertainty badge. Seven outcome buttons. Pickup requires a bike ID and a photo (`<input type=file accept=image/* capture=environment>`). | D2 | Pickup is posted to the API. |
-| **E5** | Replay control bar: start, pause, step +30 min, sim clock, speed. **Demo-critical.** | B3 API shape | Buttons call `/api/replay/*`. |
-| **E1** | Status filter chips with counts. Map colours by status. | — | — |
-| **E2** | Case detail drawer: evidence timeline, station-boundary distance, 120-minute calculation, reason. | — | Opens from the list and the map. |
+| **D1** ✅ | Operator picker (op1/op2) and `navigator.geolocation` watch, used as the replan start position. | — | Position dot on the map. |
+| **D2** ✅ | Route polyline, numbered stops, map/list toggle, and a "next stop" card. | D1 (mocks) | Works with `VITE_USE_MOCKS=true`. |
+| **D3** ✅ | Stop sheet: case ref, bike ID, last position and time, reason, uncertainty badge. Seven outcome buttons. Pickup requires a bike ID and a photo (`<input type=file accept=image/* capture=environment>`). | D2 | Pickup is posted to the API. |
+| **E5** ✅ | Replay control bar: start, pause, step +30 min, sim clock, speed. **Demo-critical.** | B3 API shape | Buttons call `/api/replay/*`. |
+| **E1** ✅ | Status filter chips with counts. Map colours by status. | — | — |
+| **E2** ✅ | Case detail drawer: evidence timeline, station-boundary distance, 120-minute calculation, reason. | — | Opens from the list and the map. |
 | **A1** | Fresh clone → `cp .env.example .env && make up && make seed && make test` works. Fix anything that fails. | — | Commands documented in README. |
 
 ## Phase 2 — Dynamic behaviour and robustness (17:00 → 21:00), Gate **M2** (ops feature freeze)
@@ -98,12 +98,12 @@ gantt
 | **C3** ✅ | Replan triggers: a new eligible case, an assigned bike going `gone` (the stop is removed and `last_change="bike X started a trip — removed"`), an approval, and an outcome. | B4, C2 | A banner appears in `/field` during replay. |
 | **C5** ✅ | Capacity queue and depot legs: when the van is full, the route ends at the depot and the remaining cases stay `eligible` in a queue. | C2 | Test with capacity 2 and 5 cases. |
 | **B5** | Validation: the share of `maintenance_pick_up` events that the detector flagged beforehand, and the average lead time. **This number goes in the pitch.** | B3 | Numbers in `docs/`. |
-| **D4** | "Found another bike" form → `POST /cases/field`. Shows "awaiting approval". | — | The case appears in review with `needs_approval`. |
-| **D5** | Offline: keep the last mission in `localStorage`, queue outcomes in IndexedDB, resend with the same `client_uuid`. Show a "pending sync" badge. | D3 | Works with DevTools offline. |
-| **E3** | Correct position/status with a reason, approve a field case, block or unblock a case. | — | The timeline shows before and after values. |
-| **E4** | Export button → JSON download of `/cases/{id}/export`. | — | — |
-| **E6** | Ops KPI strip: cases by status, not-found rate, median time from eligible to pickup. | C4 | — |
-| **A2** | Demo scenario: choose a replay window with several abandonments, one trip start on an assigned bike, and one provider pickup. Save it as `make demo`. | B3 | A 2-minute scripted run works. |
+| **D4** ✅ | "Found another bike" form → `POST /cases/field`. Shows "awaiting approval". | — | The case appears in review with `needs_approval`. |
+| **D5** ✅ | Offline: keep the last mission in `localStorage`, queue outcomes in IndexedDB, resend with the same `client_uuid`. Show a "pending sync" badge. | D3 | Works with DevTools offline. |
+| **E3** ✅ | Correct position/status with a reason, approve a field case, block or unblock a case. | — | The timeline shows before and after values. |
+| **E4** ✅ | Export button → JSON download of `/cases/{id}/export`. | — | — |
+| **E6** ✅ | Ops KPI strip: cases by status, not-found rate, median time from eligible to pickup. | C4 | — |
+| **A2** ✅ | Demo scenario: choose a replay window with several abandonments, one trip start on an assigned bike, and one provider pickup. Save it as `make demo`. | B3 | A 2-minute scripted run works. |
 
 ## Phase 3 — Data-analysis MVP (17:00 → 02:00, then F owns it), Gate **M3**
 
