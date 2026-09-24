@@ -116,6 +116,16 @@ class ReplanIn(PositionIn):
     operator_id: str
 
 
+class LiveState(BaseModel):
+    running: bool
+    last_poll: datetime | None
+    last_error: str | None
+    vehicles_in_feed: int  # after the form-factor filter
+    tracked: int
+    form_factors: str
+    last_changes: list[str] = []
+
+
 class ReplayState(BaseModel):
     running: bool
     sim_time: datetime | None

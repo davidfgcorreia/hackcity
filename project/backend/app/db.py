@@ -1,4 +1,4 @@
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, text
 from sqlalchemy.orm import DeclarativeBase, sessionmaker
 
 from app.config import settings
@@ -24,3 +24,7 @@ def init_db() -> None:
     from app import models  # noqa: F401
 
     Base.metadata.create_all(engine)
+    # columns added after the first deploy (create_all does not alter existing tables)
+    with engine.begin() as c:
+        c.execute(text("ALTER TABLE vehicle_events ADD COLUMN IF NOT EXISTS source varchar NOT NULL DEFAULT 'history'"))
+        c.execute(text("ALTER TABLE vehicle_events ADD COLUMN IF NOT EXISTS vehicle_type_id varchar"))

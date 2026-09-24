@@ -32,7 +32,7 @@ SEEN = (110, "available", ("located",), POS)
 
 
 def eligible_case(db, device, lat, lng, minutes_ago=200):
-    c = Case(device_id=device, status="eligible", lat=lat, lng=lng, rest_since=at(-minutes_ago), reason="test")
+    c = Case(device_id=device, status="eligible", source="replay", lat=lat, lng=lng, rest_since=at(-minutes_ago), reason="test")
     db.add(c)
     db.commit()
     return c
@@ -40,14 +40,14 @@ def eligible_case(db, device, lat, lng, minutes_ago=200):
 
 def test_case_lifecycle_candidate_to_resolved(db):
     s = state(REST)
-    assert cases.sync_all(db, {"b": s}, OUTSIDE, at(30), RULES) == []
+    assert cases.sync_all(db, {"b": s}, OUTSIDE, at(30), RULES, source="replay") == []
     assert db.scalar(select(Case)).status == "candidate"
-    cases.sync_all(db, {"b": s}, OUTSIDE, at(121), RULES)
+    cases.sync_all(db, {"b": s}, OUTSIDE, at(121), RULES, source="replay")
     assert db.scalar(select(Case)).status == "supported"
     s = state(REST, SEEN)
-    assert cases.sync_all(db, {"b": s}, OUTSIDE, at(125), RULES) == ["new eligible bike bike-aaa"]
+    assert cases.sync_all(db, {"b": s}, OUTSIDE, at(125), RULES, source="replay") == ["new eligible bike aaaaaaaa"]
     s = state(REST, SEEN, (130, "on_trip", ("trip_start",), POS))
-    cases.sync_all(db, {"b": s}, OUTSIDE, at(131), RULES)
+    cases.sync_all(db, {"b": s}, OUTSIDE, at(131), RULES, source="replay")
     case = db.scalar(select(Case))
     assert case.status == "resolved" and "started a trip" in case.reason
     assert [e.detail["to"] for e in case.timeline] == ["candidate", "supported", "eligible", "resolved"]
@@ -56,12 +56,12 @@ def test_case_lifecycle_candidate_to_resolved(db):
 def test_unchanged_verdict_adds_no_timeline_noise(db):
     s = state(REST)
     for m in (10, 20, 30):
-        cases.sync_all(db, {"b": s}, OUTSIDE, at(m), RULES)
+        cases.sync_all(db, {"b": s}, OUTSIDE, at(m), RULES, source="replay")
     assert len(db.scalar(select(Case)).timeline) == 1
 
 
 def test_inside_bike_creates_no_case(db):
-    cases.sync_all(db, {"b": state(REST)}, lambda la, ln: 0.0, at(500), RULES)
+    cases.sync_all(db, {"b": state(REST)}, lambda la, ln: 0.0, at(500), RULES, source="replay")
     assert db.scalar(select(Case)) is None
 
 
@@ -88,10 +88,10 @@ def test_capacity_queues_extra_cases(db, monkeypatch):
 
 def test_assigned_bike_starting_trip_is_removed_from_route(db):
     s = state(REST, SEEN)
-    cases.sync_all(db, {"b": s}, OUTSIDE, at(125), RULES)
+    cases.sync_all(db, {"b": s}, OUTSIDE, at(125), RULES, source="replay")
     m = missions.replan(db, "op1", 38.70, -9.42, "start")
     moved = state(REST, SEEN, (130, "on_trip", ("trip_start",), POS))
-    reasons = cases.sync_all(db, {"b": moved}, OUTSIDE, at(131), RULES)
+    reasons = cases.sync_all(db, {"b": moved}, OUTSIDE, at(131), RULES, source="replay")
     db.commit()
     missions.replan_all(db, "; ".join(reasons))
     m = missions.current_mission(db, "op1")
@@ -153,11 +153,11 @@ def test_blocked_or_unapproved_cases_never_routed(db):
 
 def test_picked_up_bike_is_not_recreated_while_feed_still_shows_it_parked(db):
     s = state(REST, SEEN)
-    cases.sync_all(db, {"b": s}, OUTSIDE, at(125), RULES)
+    cases.sync_all(db, {"b": s}, OUTSIDE, at(125), RULES, source="replay")
     db.scalar(select(Case)).status = "picked_up"
     db.commit()
-    cases.sync_all(db, {"b": s}, OUTSIDE, at(200), RULES)
+    cases.sync_all(db, {"b": s}, OUTSIDE, at(200), RULES, source="replay")
     assert db.scalar(select(func.count()).select_from(Case)) == 1
     moved = state(REST, SEEN, (300, "available", ("trip_end",), (38.71, -9.42)))
-    cases.sync_all(db, {"b": moved}, OUTSIDE, at(310), RULES)
+    cases.sync_all(db, {"b": moved}, OUTSIDE, at(310), RULES, source="replay")
     assert db.scalar(select(func.count()).select_from(Case)) == 2  # new parking interval = new case

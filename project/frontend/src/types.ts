@@ -20,4 +20,6 @@ export interface Stop { id: number; case_id: number | null; seq: number; kind: '
 
 export interface Mission { id: number; operator_id: string; status: string; version: number; last_change: string | null; total_km: number | null; capacity: number; stops: Stop[] }
 
+export interface LiveState { running: boolean; last_poll: string | null; last_error: string | null; vehicles_in_feed: number; tracked: number; form_factors: string; last_changes: string[] }
+
 export interface ReplayState { running: boolean; sim_time: string | null; speed: number; last_changes: string[] }

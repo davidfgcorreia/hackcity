@@ -1,4 +1,5 @@
-"""Demo mode: replay supplied events against a simulated clock.
+"""Demo mode: replay the supplied history (viagens.xlsx) against a simulated clock.
+Exclusive with live mode (services/live.py): starting or stepping the replay pauses live polling.
 
 Only events with event_time <= sim_time are visible (no look-ahead). Each tick:
   1. fold new events (cursor, sim_time] into per-bike state (core.vehicle_state)
@@ -54,7 +55,7 @@ class ReplayEngine:
 
     def tick(self, to_time: datetime) -> list[str]:
         with self._lock, self._sf() as db:
-            q = select(VehicleEvent).where(VehicleEvent.event_time <= to_time)
+            q = select(VehicleEvent).where(VehicleEvent.source == "history", VehicleEvent.event_time <= to_time)
             if self.cursor is not None:
                 q = q.where(VehicleEvent.event_time > self.cursor)
             for e in db.scalars(q.order_by(VehicleEvent.event_time, VehicleEvent.id)):
@@ -62,7 +63,7 @@ class ReplayEngine:
                                                        settings.move_tolerance_m)
             self.cursor = self.sim_time = to_time
             clock.set_sim_time(to_time)
-            changes = cases.sync_all(db, self.states, self.distance_fn(db), to_time, cases.rules())
+            changes = cases.sync_all(db, self.states, self.distance_fn(db), to_time, cases.rules("replay"), source="replay")
             db.commit()
             if changes:
                 missions.replan_all(db, "; ".join(changes[:3]) + (f" (+{len(changes) - 3} more)" if len(changes) > 3 else ""))
@@ -71,7 +72,7 @@ class ReplayEngine:
 
     def _first_event_time(self) -> datetime:
         with self._sf() as db:
-            return db.scalar(select(func.min(VehicleEvent.event_time)))
+            return db.scalar(select(func.min(VehicleEvent.event_time)).where(VehicleEvent.source == "history"))
 
     def _seek(self, from_time: datetime | None) -> None:
         if from_time is not None and self.cursor is not None and from_time < self.cursor:
@@ -82,7 +83,14 @@ class ReplayEngine:
         elif from_time is not None:
             self.tick(from_time)
 
+    @staticmethod
+    def _pause_live() -> None:
+        from app.services.live import engine as live
+
+        live.pause()
+
     async def start(self, from_time: datetime | None, speed: float | None) -> ReplayState:
+        self._pause_live()
         self.speed = speed or self.speed
         await asyncio.to_thread(self._seek, from_time)
         if not self.running:
@@ -101,12 +109,14 @@ class ReplayEngine:
         return self.state()
 
     async def step(self, minutes: float) -> ReplayState:
+        self._pause_live()
         await asyncio.to_thread(self._seek, None)
         await asyncio.to_thread(self.tick, self.sim_time + timedelta(minutes=minutes))
         return self.state()
 
     def reset(self) -> ReplayState:
-        """Demo only: forget replay state and delete cases and missions (events and stations stay)."""
+        """Demo only: forget replay state and delete all cases and missions (events and stations stay).
+        Live cases are re-derived from live state on the next poll."""
         self.running = False
         with self._lock, self._sf() as db:
             for model in (Stop, Mission, CaseEvent, Case):

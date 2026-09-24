@@ -20,9 +20,11 @@ class Station(Base):
 
 
 class VehicleEvent(Base):
-    """Supplied bicycle event (viagens.xlsx) or, later, a live provider event."""
+    """Provider event: supplied history (viagens.xlsx) or a live GBFS transition."""
     __tablename__ = "vehicle_events"
     id: Mapped[str] = mapped_column(String, primary_key=True)
+    source: Mapped[str] = mapped_column(String, default="history", server_default="history", index=True)  # history | gbfs
+    vehicle_type_id: Mapped[str | None]
     device_id: Mapped[str] = mapped_column(String, index=True)
     state: Mapped[str]
     event_types: Mapped[list] = mapped_column(JSON)
@@ -40,7 +42,7 @@ class Case(Base):
     device_id: Mapped[str] = mapped_column(String, index=True)
     # candidate | uncertain | supported | eligible | assigned | picked_up | resolved
     status: Mapped[str] = mapped_column(String, index=True)
-    source: Mapped[str] = mapped_column(String, default="detector")  # detector | field
+    source: Mapped[str] = mapped_column(String, default="live")  # live | replay | field
     lat: Mapped[float]
     lng: Mapped[float]
     rest_since: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))

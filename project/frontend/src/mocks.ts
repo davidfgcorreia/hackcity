@@ -13,6 +13,6 @@ export const mockMission: Mission = {
   stops: [
     { id: 10, case_id: 3, seq: 1, kind: 'pickup', status: 'planned', lat: 38.7050, lng: -9.4000, outcome: null, photo_path: null },
     { id: 11, case_id: 1, seq: 2, kind: 'pickup', status: 'planned', lat: 38.6975, lng: -9.4230, outcome: null, photo_path: null },
-    { id: 12, case_id: null, seq: 3, kind: 'depot', status: 'planned', lat: 38.7223, lng: -9.4205, outcome: null, photo_path: null },
+    { id: 12, case_id: null, seq: 3, kind: 'depot', status: 'planned', lat: 38.736686, lng: -9.386868, outcome: null, photo_path: null },
   ],
 }

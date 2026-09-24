@@ -11,7 +11,7 @@ flowchart LR
   subgraph Inputs
     EV[viagens.xlsx<br/>bicycle events]
     ST[station_information.json<br/>157 station areas]
-    GB[(Provider live feed<br/>future adapter)]
+    GB[(Bird GBFS 2.3<br/>free_bike_status · station_information<br/>vehicle_types — polled every 60 s)]
   end
   subgraph Docker["docker compose"]
     API[api<br/>FastAPI · Python 3.12]
@@ -19,7 +19,7 @@ flowchart LR
     WEB[web<br/>React + Vite]
   end
   EV & ST -->|scripts.load_data| DB
-  GB -.-> API
+  GB -->|live detection, default mode| API
   API <--> DB
   WEB -->|/api proxy, 5 s polling| API
   OP[Field operator<br/>smartphone webview] --> WEB
@@ -32,12 +32,41 @@ flowchart LR
 | `api` | 8000 | Replay clock, detector, case lifecycle, route planning, and the REST API. Docs at `/docs`. |
 | `web` | 5173 | `/field`: mobile operator view in a webview/PWA. `/review`: desktop case review. Supports PT and EN. |
 
-## 2. Backend components
+## 2. Detection sources: live (default) and replay (demo)
+
+| Mode | Source | Clock | Fresh-evidence rule | Case `source` |
+|---|---|---|---|---|
+| **Live** (starts with the API) | Provider GBFS feeds listed in `datasets/gbfs.json`, polled every `GBFS_POLL_S`=60 s (the feed's ttl) | Wall clock (UTC) | **On**: every poll re-observes parked bikes | `live` |
+| Replay (demo) | Supplied history `viagens.xlsx` | Simulated | Off (`REPLAY_REQUIRE_FRESH_OBSERVATION=false`) | `replay` |
+
+The two modes are exclusive. `POST /api/replay/start` or `/step` pauses live polling, and `POST /api/live/start` resumes it and pauses the replay.
+
+**Tracking bikes although the public ID rotates.** Measured on 24 Sep: two `free_bike_status` snapshots taken 70 s apart shared **0 of 855 `bike_id`s**, but **757 had identical coordinates** and 754 of those had an unchanged battery level. `core/gbfs_tracker.py` therefore identifies a parked vehicle as a sighting of the same `vehicle_type_id`, within `MOVE_TOLERANCE_M` (10 m), with a battery level within 0.05. Exact matches are tried first, then the nearest match. Each vehicle gets a stable internal ID such as `bicycle-3f2a9c1e0b4d`, and a re-sighting is a fresh same-position observation. It emits the same `Event`s as the provider log, so the detector is unchanged:
+
+| Feed signal | Event / state | Effect |
+|---|---|---|
+| New vehicle not matching a track | `gbfs_appeared`, `available` | Parking clock starts at the first sighting. This is a **lower bound**, because the feed has no parking history. |
+| Re-sighted at the same spot | `located` | The clock continues, and the sighting counts as fresh evidence. |
+| `is_disabled` | `non_operational` | Still at rest. |
+| `is_reserved` | `reserved` | Not at rest, so it leaves the route. |
+| `last_reported` older than `GBFS_STALE_REPORT_MIN` (30) | `non_contactable` | Marked **uncertain** and never dispatched. |
+| Missing for longer than `GBFS_GONE_GRACE_S` (180 s) | `gbfs_disappeared`, `not_in_feed` | Case resolved: "trip started or provider pickup". The stop is removed. |
+
+- **Stations:** station areas are refreshed from live `station_information` every 30 min, so the buffer uses the shape that applied at the time of each observation. `vehicle_types` gives the form factor. The feed contains about 600 scooters and 250 bicycles, and `GBFS_FORM_FACTORS=bicycle` limits detection to bicycles, which is the scope of the first release.
+- **Stored events:** only transitions (appeared, disappeared, state change) are stored in `vehicle_events` with `source=gbfs`, rather than about 250 rows per minute. Folding them at startup restores parking clocks after an API restart.
+- **Limits to state in the pitch:**
+  - Two identical bikes swapping places inside 10 m look like one bike.
+  - A bike taken for a short trip and returned to the exact spot within 3 minutes keeps its clock.
+  - Real use still needs the provider's authorised feed with stable IDs (§11 of the requirements).
+
+## 3. Backend components
 
 The code is split into three layers. `app/core` is pure Python (no DB, no HTTP) and is fully unit-tested. `app/services` connects the core to the database. `app/api` contains thin HTTP handlers.
 
 ```mermaid
 flowchart LR
+  LV[services/live.py<br/>GBFS poll 60 s] --> TR[core/gbfs_tracker.py<br/>identity by position]
+  TR --> VS
   RP[services/replay.py<br/>sim clock] -->|events ≤ sim_time| VS[core/vehicle_state.py<br/>apply_event fold]
   VS --> DT[core/detector.py<br/>evaluate]
   GZ[core/geo.py<br/>ZoneIndex: union + 30 m buffer<br/>EPSG:3763] --> DT
@@ -57,10 +86,12 @@ flowchart LR
 | `services/replay.py` | done, tested | `ReplayEngine.tick(to_time)`: folds events ≤ `sim_time`, evaluates all bikes at rest, syncs cases, replans. Runs as an asyncio loop at `REPLAY_SPEED`. |
 | `services/cases.py` | done, tested | `sync_all(db, states, distance_fn, now, rules) -> replan reasons`. One open case per device. A closed interval (pickup, not found) is never re-detected. |
 | `services/missions.py` | done, tested | `replan`, `replan_all`, `record_outcome` (idempotent on `client_uuid`), `depot_arrived`. Stops leave the route when their case stops being routable. |
+| `core/gbfs_tracker.py` | done, tested | `Tracker.update(sightings, now) -> [Event]`: matching by position, type and battery; grace period before a bike counts as gone; `restore()` after a restart. |
+| `services/live.py` | done, tested | `LiveEngine.poll_once(now)`: fetch the feeds, refresh stations, track, fold, sync cases (`source=live`), replan. Runs as an asyncio loop that starts with the API. |
 | `services/clock.py` | done | `now()` returns replay time in demo mode and wall-clock UTC otherwise. |
 | `scripts/load_data.py` | done | Loads 157 stations and 53,764 events, converting to UTC at ingestion. |
 
-## 3. Key flow: detection to re-route
+## 4. Key flow: detection to re-route
 
 ```mermaid
 sequenceDiagram
@@ -82,7 +113,7 @@ sequenceDiagram
   M->>C: picked_up / resolved / blocked → replan
 ```
 
-## 4. Detection rule as implemented
+## 5. Detection rule as implemented
 
 The source is operations_requirements.md §4. Thresholds are defined only in `app/config.py` and `.env`.
 
@@ -97,22 +128,22 @@ The source is operations_requirements.md §4. Thresholds are defined only in `ap
 | `non_contactable` / `missing` → uncertain, not dropped | Keeps the last position and marks the case uncertain | `test_non_contactable_is_uncertain` |
 | A new trip or provider pickup removes the bike | Non-rest state → `gone` → case resolved and stop removed | `test_trip_start_*`, `test_provider_pickup_*` |
 
-**Assumptions to confirm:** the source timestamps are UTC (`SOURCE_TZ`). The B1 check found that trip starts are lowest at 04 UTC and highest at 16–17 UTC. That fits UTC but does not rule out local time, so confirm with the data partner. Only display is affected, because the rule uses time differences; `FRESH_MAX_AGE_MIN=60`; `DEFAULT_LOCATION_ERROR_M=0` because the feed has no accuracy field; the depot coordinates are a **placeholder**; `VAN_CAPACITY=6`. **Measured:** with the strict rule, 7 replayed days produce only 1 eligible bike, so the demo default is `REQUIRE_FRESH_OBSERVATION=false`. Set it to `true` for real use. The UI labels those cases "fresh-evidence rule disabled".
+**Assumptions to confirm:** the source timestamps are UTC (`SOURCE_TZ`). The B1 check found that trip starts are lowest at 04 UTC and highest at 16–17 UTC. That fits UTC but does not rule out local time, so confirm with the data partner. Only display is affected, because the rule uses time differences; `FRESH_MAX_AGE_MIN=60`; `DEFAULT_LOCATION_ERROR_M=0` because the feed has no accuracy field; the depot is the Complexo Multisserviços at 38.736686, -9.386868 (source: CMC); `VAN_CAPACITY=6`. **Measured:** with the strict rule, 7 replayed days produce only 1 eligible bike, so the demo default is `REQUIRE_FRESH_OBSERVATION=false`. Set it to `true` for real use. The UI labels those cases "fresh-evidence rule disabled".
 
-## 5. Data model
+## 6. Data model
 
 | Table | Key fields | Notes |
 |---|---|---|
 | `stations` | id, name, lat, lng, area (GeoJSON) | Snapshot from 11 Sep 2026. |
-| `vehicle_events` | id, device_id, state, event_types[], lat, lng, trip_id, event_time, battery, received_at | Supplied data is immutable. `received_at` stores when the information reached staff. |
-| `cases` | device_id, status, source (detector/field), lat, lng, rest_since, distance_outside_m, reason, field_confirmed, needs_approval, blocked_reason | One open case per device. |
+| `vehicle_events` | id, source (history/gbfs), vehicle_type_id, device_id, state, event_types[], lat, lng, trip_id, event_time, battery, received_at | Supplied data is immutable. `received_at` stores when the information reached staff. |
+| `cases` | device_id, status, source (live/replay/field), lat, lng, rest_since, distance_outside_m, reason, field_confirmed, needs_approval, blocked_reason | One open case per device. |
 | `case_events` | case_id, kind, detail JSON, actor, event_time, recorded_at | **Append-only** evidence timeline. Corrections store `before` and `after` values. |
 | `missions` | operator_id, status, capacity, start position, **version**, last_change, total_km | `version` increases on every replan. |
 | `stops` | mission_id, case_id, seq, kind (pickup/verify/depot), status, outcome, photo_path, actual position, confirmed_device_id, **client_uuid** | `client_uuid` makes offline resubmits idempotent. |
 
 Case statuses are `candidate → uncertain → supported → eligible → assigned → picked_up | resolved`. Stop outcomes are `picked_up, not_found, in_use, provider_recovered, unsafe, inaccessible, unable_to_load`.
 
-## 6. API contract
+## 7. API contract
 
 Swagger UI is at `http://localhost:8000/docs`. The TypeScript mirror is `frontend/src/types.ts`; change it in the same commit as `schemas.py`.
 
@@ -129,9 +160,10 @@ Swagger UI is at `http://localhost:8000/docs`. The TypeScript mirror is `fronten
 | POST | `/api/missions/{id}/depot` `{lat, lng}` (unloaded; frees capacity) | done |
 | POST | `/api/stops/{id}/outcome` (multipart: outcome, actor, lat, lng, device_id, photo, client_uuid) | done |
 | GET | `/api/uploads/{photo_path}` (pickup photos) | done |
+| GET/POST | `/api/live`, `/live/start`, `/live/pause`, `/live/poll` (live feed status: vehicles in feed, tracked, last error) | done |
 | GET/POST | `/api/replay`, `/replay/start?from_time=&speed=`, `/replay/pause`, `/replay/step?minutes=`, `/replay/reset` | done |
 
-## 7. Engineering requirements (MVP acceptance)
+## 8. Engineering requirements (MVP acceptance)
 
 | ID | Requirement | Maps to ops req §10 |
 |---|---|---|
@@ -146,9 +178,9 @@ Swagger UI is at `http://localhost:8000/docs`. The TypeScript mirror is `fronten
 | ER-9 | Every route change shows "what changed, why, next target" in the field app. | §6 |
 | ER-10 | Every correction stores the actor, time, reason, and previous values. | §4, §8 |
 
-## 8. Out of scope for the MVP (scaling notes for the pitch)
+## 9. Out of scope for the MVP (scaling notes for the pitch)
 
-- **Live data:** add a `ProviderSource` adapter that uses the same `Event` type. The public GBFS `bike_id` rotates, so live use needs an authorised provider feed with stable IDs.
+- **Live data:** the public GBFS feed is live now, with position-based tracking. For production, use the provider's authorised MDS/GBFS feed with stable IDs and movement events. It can feed the same `Event` pipeline.
 - **Routing:** replace the haversine × 1.3 matrix with OSRM road distances, and NN + 2-opt with an OR-Tools CVRP for several vans.
 - **Push:** replace 5 s polling with SSE or WebSocket. Add web push for route changes.
 - **Auth and roles:** reviewer and operator permissions are still to be confirmed. The MVP uses a free-text `actor`.
