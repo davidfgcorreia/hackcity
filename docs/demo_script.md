@@ -1,119 +1,150 @@
-# Demo script — 2 minutes (task A3)
+# Demo script — 3 minutes (task A3)
 
-**Every timing below was measured against the running stack on 24 Sep**, not estimated. The
-replay window in `make demo` was chosen so the live route change lands three steps in; see
-[TASKS.md](TASKS.md) A2.
+Rewritten 24 Sep (evening) for the current build: live GBFS detection, automatic missions, road
+navigation, and the analytics page. Timings were measured against the running stack.
 
-> **Backup video: not recorded.** I have no screen recorder or camera in this environment, so the
-> recording half of A3 is still open and needs a person. The shot list at the end is written so
-> someone can record it in one take.
+> **Backup video: still not recorded.** No screen recorder here. Shot list at the end.
 
-## Before you start (5 minutes, not on camera)
+## Prep — do this before you present, not on camera
 
 ```bash
 cd project
-cp .env.example .env          # on Windows also set DB_PORT=5433 if Postgres is installed locally
-make up && make seed          # ~2 min build, then 157 stations + 53,764 events
-make demo                     # reset, jump the clock to 25 Aug 18:30 UTC, build op1's route
+cp .env.example .env         # Windows: DB_PORT=5434 (5433 belongs to analytics-db)
+make up && make seed         # ~2 min
+make osrm                    # ONCE, and it is slow — see the warning below
+docker compose exec analytics python -m analytics.ingest
+docker compose exec analytics python -m analytics.derive
+make demo                    # clock to 25 Aug 18:30 UTC, builds op1's route
 ```
 
-Open three tabs and leave them on these pages:
+**Two things will silently spoil the demo if you skip them:**
 
-| Tab | URL | Why |
+| Check | Command | Must say |
 |---|---|---|
-| 1 | `http://localhost:5173/review` | the story is told from here |
-| 2 | `http://localhost:5173/field` (phone, or a narrow window) | the operator's side |
-| 3 | `http://localhost:8000/docs` | only if someone asks "is this real?" |
+| Road routing is live | `curl -s localhost:8000/api/missions/current?operator_id=op1 \| grep -o '"routing_engine":"[a-z-]*"'` | `"osrm"` — **not** `"straight-line"` |
+| Analytics has data | open `/insights` | charts, not an empty page |
 
-Check before going live: the review page shows ~54 cases, and `/field` shows **6 stops + depot**.
-If the field map is empty, `make demo` did not run.
+Right now this machine reports **`straight-line`**, which means OSRM is not built. The turn-by-turn
+navigation is the newest and best-looking part of the field app — do not present without it.
 
-## The two minutes
+Tabs to open: **1** `/` (home) · **2** `/review` · **3** `/field` on the phone · **4** `/insights`.
 
-### 0:00–0:20 · The problem, on the live feed
+## The three minutes
 
-> "Cascais bikes get left outside station areas. The provider is supposed to collect them, and
-> when it doesn't, the municipality has to — but today nobody knows which bikes those are."
+### 0:00–0:25 · The problem, on live data
 
-Open **tab 1**. Point at the map, already full of coloured cases.
+Tab 1, then tab 2.
 
-> "This is running against the provider's live GBFS feed right now. Every dot is a bike we
-> detected outside a permitted area. Colour is how strong the evidence is."
+> "Cascais has shared bikes left outside station areas. The operator is contracted to recover
+> them; when it doesn't, the municipality has to — and today nobody knows which bikes those are."
 
-Click the **Eligible** filter chip.
+Point at the map.
 
-> "These are the ones that meet the rule: outside the station area plus 30 metres, parked
-> **strictly more than 120 minutes**, with a fresh observation. Not one old trip-end guess."
+> "This is not a recording. We are polling the provider's live feed right now — **253 bikes
+> tracked at this moment**. Every dot is one we detected parked outside a permitted area."
 
-### 0:20–0:45 · Why we can defend each one
+Click the **Eligible** chip.
 
-Click any eligible case to open the drawer. Point at the three blocks in order.
+> "These meet the municipal rule: outside the station area plus 30 metres, parked **strictly more
+> than 120 minutes**, confirmed by a fresh observation — not one stale trip-end guess."
 
-> "Every case shows its own evidence: the distance outside the boundary, the 120-minute
-> calculation against the clock we're looking at, and the full timeline — what was observed,
-> when it arrived, and every change a person made. That exports as a JSON evidence record for the
-> enforcement process. It's evidence, not a fine."
+### 0:25–0:50 · Why every case is defensible
 
-Click **Exportar**. Let the download appear. Don't open it.
+Open any eligible case.
 
-### 0:45–1:15 · The operator (tab 2, hold the phone up)
+> "Each case carries its own evidence: distance outside the boundary, the 120-minute calculation
+> against the clock we're looking at, and a full timeline — what was observed, when it reached
+> us, and every change a person made."
 
-> "The operator gets the route, ordered, ending at the depot. Van capacity is six, so the rest
-> stay queued."
+Click **Exportar**.
+
+> "That's the evidence record for the enforcement process. Evidence, not a fine — we don't decide
+> penalties."
+
+### 0:50–1:20 · The mission builds itself ← *the part to be proud of*
+
+Stay on the laptop. Show the terminal for four seconds:
+
+```bash
+curl -s "localhost:8000/api/missions/current?operator_id=op2"
+# null
+```
+
+> "There is no route for operator 2. Nobody creates missions by hand."
+
+Now hand the phone over (or pick **op2** in the operator selector) and let it load.
+
+> "The operator just opens the app. It sends their GPS position, and the route is built around
+> them — from where they actually are, not from the depot, ending at the depot, respecting the
+> van's capacity of six. The rest stay queued."
+
+Back to op1 and point at the version number.
+
+> "This route is at **version 62**. That is 62 automatic recalculations since this afternoon —
+> every one triggered by the live feed, an approval, or a recorded outcome. Nobody pressed a
+> button."
+
+### 1:20–1:55 · At the stop (phone)
 
 Tap the first stop.
 
-> "Bike ID, where it was last seen, why it's a case. Seven outcomes — and a pickup is refused
-> without the bike ID **and** a photo."
+> "Bike ID, where it was last seen, why it's a case, and how certain we are."
 
-Tap **Recolhida** with no photo → the button stays disabled and the rule is on screen. Then add
-the photo, tap again.
+Try **Recolhida** with nothing filled in — the button stays disabled.
 
-> "Recorded. The stop drops off the route."
+> "A pickup is refused without the bike ID **and** a photo."
 
-### 1:15–1:45 · The route changes by itself (back to tab 1)
+Add both, submit.
 
-Press **+30 min** on the replay bar three times, narrating as you go.
+> "Recorded — and the stop leaves the route immediately."
 
-> "This is the same engine on historical data, so I can fast-forward. 19:00… 19:30… 20:00 —"
+### 1:55–2:25 · The route repairs itself
 
-At **20:00** the clock chips under the bar change and the field route re-versions.
+Laptop, `/review`. Press **+30 min** three times, narrating: 19:00… 19:30… 20:00.
 
-> "There. That bike moved back inside a station area on its own, so the stop was removed and the
-> route recalculated. The operator's phone says *what* changed and *why* — they don't drive to a
-> bike that isn't there. That's the whole point: fewer wasted trips."
+> "Same engine, historical data, so I can fast-forward. There — that bike moved back inside a
+> station area on its own. The stop was removed and the route recalculated, and the operator's
+> phone says *what* changed and *why*."
 
-Hold up **tab 2** so the yellow banner is visible.
+Hold up the phone with the banner.
 
-### 1:45–2:00 · Close
+> "They don't drive to a bike that isn't there. That is the whole point: fewer wasted trips."
 
-> "Detection with evidence, a route that maintains itself, and a case record the municipality can
-> act on. It runs on the live feed today, and everything you saw is in one `docker compose up`."
+### 2:25–2:50 · Where the next station should go
 
-If there is time, open **tab 3** `/insights` — one line only:
+Tab 4, `/insights`.
 
-> "And the same data feeds a planning view for where new stations should go — that part is still
-> mock numbers, and it says so on screen."
+> "The same data answers the planning question. Abandonment per area, and candidate sites scored
+> on demand, unresolved parking, transport gaps and bus delay — with the weights on screen,
+> because the municipality has to approve them, and with missing inputs shown as missing rather
+> than as zero."
+
+### 2:50–3:00 · Close
+
+> "Detection with evidence, routes that maintain themselves, and a planning view — all on the
+> live feed, all from one `docker compose up`."
 
 ## If something breaks
 
-| Symptom | Do this, keep talking |
+| Symptom | Say this, keep moving |
 |---|---|
-| Field map empty | `make demo` again in a spare terminal; meanwhile talk over tab 1 |
-| Route does not change at 20:00 | press **+30 min** twice more; removals also occur later in the evening |
-| Live feed shows an error | say "we're on replay for the demo" and carry on — replay is the scripted path |
-| Anything else | switch to the recorded video |
+| Field map empty | `make demo` again in a spare terminal; talk over `/review` |
+| No route change at 20:00 | press **+30 min** twice more; removals also happen later that evening |
+| Navigation says straight-line | skip the turn-by-turn beat, show the stop list instead |
+| `/insights` empty | the derive step didn't run — skip tab 4, it isn't load-bearing |
+| Live feed errors | "we're on replay for the demo" and carry on |
+| Anything else | cut to the video |
 
-## Shot list for the backup video (still to record)
+## Shot list for the backup video
 
-One take, 1080p, no cuts, same order as above. Record the phone as a screen capture, not a camera
-pointed at a handset.
+One take, 1080p, phone as a screen recording (not a camera pointed at a handset).
 
-1. Terminal: `make up && make seed && make demo` — speed this up ×8 in the edit.
-2. Review map with the eligible chip selected (8 s).
-3. Case drawer: boundary distance → 120-minute block → timeline → export click (15 s).
-4. Field: route, stop sheet, blocked pickup, then pickup with photo (25 s).
-5. Review: three **+30 min** presses ending at 20:00, then cut to the field banner (20 s).
-6. `/insights` with its mock banner visible (5 s).
+1. Terminal: `make up && make seed && make demo` — speed ×8 in the edit (10 s)
+2. `/review`, eligible chip selected (8 s)
+3. Case drawer: boundary → 120-minute block → timeline → export (15 s)
+4. `curl` showing `null` for op2, then the phone building its own route (15 s)
+5. Stop sheet: blocked pickup, then pickup with photo, stop disappears (20 s)
+6. `+30 min` ×3 to 20:00, cut to the phone banner (20 s)
+7. `/insights` (7 s)
 
-Total ≈ 80 s of footage; the narration above fits over it.
+≈95 s of footage; the narration above fits over it.
