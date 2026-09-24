@@ -14,9 +14,9 @@ psql:
 	docker compose exec db psql -U hackcity
 reset-db:  ## drop everything (dev only)
 	docker compose down -v
-demo:      ## reset cases/missions, jump replay to a busy morning, create op1's route
+demo:      ## reset cases/missions, jump replay to just before a live route change, create op1's route
 	curl -s -XPOST localhost:8000/api/replay/reset >/dev/null
-	curl -s -XPOST "localhost:8000/api/replay/start?from_time=2026-08-25T06:00:00Z" >/dev/null
+	curl -s -XPOST "localhost:8000/api/replay/start?from_time=2026-08-25T18:30:00Z" >/dev/null
 	curl -s -XPOST localhost:8000/api/replay/pause >/dev/null
 	curl -s -XPOST localhost:8000/api/missions/replan -H 'content-type: application/json' \
 	  -d '{"operator_id":"op1","lat":38.736686,"lng":-9.386868}' | head -c 300; echo

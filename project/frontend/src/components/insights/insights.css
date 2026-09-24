@@ -1,0 +1,17 @@
+/* Rank sits directly on the candidate marker, so identity never rests on colour alone.
+   Leaflet's default tooltip chrome is stripped: this is a label, not a callout. */
+.leaflet-tooltip.insights-rank {
+  background: transparent;
+  border: none;
+  box-shadow: none;
+  padding: 0;
+  margin: 0;
+  color: #ffffff;
+  font: 700 12px/1 system-ui, -apple-system, 'Segoe UI', sans-serif;
+  text-shadow: 0 1px 2px rgba(11, 11, 11, 0.55);
+  pointer-events: none;
+}
+
+.leaflet-tooltip.insights-rank::before {
+  display: none; /* no pointer arrow on a direct label */
+}

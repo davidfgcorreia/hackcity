@@ -1,0 +1,2544 @@
+{
+ "meta": {
+  "status": "mock",
+  "generated_at": "2026-09-24T12:37:44+00:00",
+  "observed_from": "2026-08-18",
+  "observed_to": "2026-09-08",
+  "timezone_display": "Europe/Lisbon",
+  "coverage": "Cascais operating area",
+  "grid": {
+   "crs": "EPSG:3763",
+   "cell_m": 250
+  },
+  "sources": [
+   {
+    "name": "viagens.xlsx",
+    "retrieved": "2026-09-11",
+    "rows": 53764
+   },
+   {
+    "name": "station_information.json",
+    "retrieved": "2026-09-11",
+    "rows": 157
+   }
+  ],
+  "notes": [
+   "Trip flow by station and local hour (F3). Net flow is not station stock.",
+   "Mock values. No measurement has been performed yet (F1-F3 open)."
+  ]
+ },
+ "rows": [
+  {
+   "station_id": "cascais-001",
+   "name": "Estação de Cascais",
+   "lat": 38.6979,
+   "lng": -9.4215,
+   "day_type": "weekday",
+   "departures": 184,
+   "arrivals": 183,
+   "net_flow": -1,
+   "by_hour": [
+    {
+     "hour": 0,
+     "departures": 0,
+     "arrivals": 0,
+     "net": 0
+    },
+    {
+     "hour": 1,
+     "departures": 0,
+     "arrivals": 0,
+     "net": 0
+    },
+    {
+     "hour": 2,
+     "departures": 0,
+     "arrivals": 0,
+     "net": 0
+    },
+    {
+     "hour": 3,
+     "departures": 0,
+     "arrivals": 0,
+     "net": 0
+    },
+    {
+     "hour": 4,
+     "departures": 0,
+     "arrivals": 0,
+     "net": 0
+    },
+    {
+     "hour": 5,
+     "departures": 0,
+     "arrivals": 0,
+     "net": 0
+    },
+    {
+     "hour": 6,
+     "departures": 7,
+     "arrivals": 4,
+     "net": -3
+    },
+    {
+     "hour": 7,
+     "departures": 10,
+     "arrivals": 9,
+     "net": -1
+    },
+    {
+     "hour": 8,
+     "departures": 19,
+     "arrivals": 28,
+     "net": 9
+    },
+    {
+     "hour": 9,
+     "departures": 20,
+     "arrivals": 31,
+     "net": 11
+    },
+    {
+     "hour": 10,
+     "departures": 17,
+     "arrivals": 22,
+     "net": 5
+    },
+    {
+     "hour": 11,
+     "departures": 7,
+     "arrivals": 4,
+     "net": -3
+    },
+    {
+     "hour": 12,
+     "departures": 1,
+     "arrivals": 1,
+     "net": 0
+    },
+    {
+     "hour": 13,
+     "departures": 0,
+     "arrivals": 0,
+     "net": 0
+    },
+    {
+     "hour": 14,
+     "departures": 1,
+     "arrivals": 0,
+     "net": -1
+    },
+    {
+     "hour": 15,
+     "departures": 3,
+     "arrivals": 4,
+     "net": 1
+    },
+    {
+     "hour": 16,
+     "departures": 10,
+     "arrivals": 9,
+     "net": -1
+    },
+    {
+     "hour": 17,
+     "departures": 17,
+     "arrivals": 14,
+     "net": -3
+    },
+    {
+     "hour": 18,
+     "departures": 23,
+     "arrivals": 21,
+     "net": -2
+    },
+    {
+     "hour": 19,
+     "departures": 23,
+     "arrivals": 19,
+     "net": -4
+    },
+    {
+     "hour": 20,
+     "departures": 22,
+     "arrivals": 15,
+     "net": -7
+    },
+    {
+     "hour": 21,
+     "departures": 4,
+     "arrivals": 2,
+     "net": -2
+    },
+    {
+     "hour": 22,
+     "departures": 0,
+     "arrivals": 0,
+     "net": 0
+    },
+    {
+     "hour": 23,
+     "departures": 0,
+     "arrivals": 0,
+     "net": 0
+    }
+   ],
+   "evidence": "observed"
+  },
+  {
+   "station_id": "cascais-001",
+   "name": "Estação de Cascais",
+   "lat": 38.6979,
+   "lng": -9.4215,
+   "day_type": "weekend",
+   "departures": 90,
+   "arrivals": 99,
+   "net_flow": 9,
+   "by_hour": [
+    {
+     "hour": 0,
+     "departures": 0,
+     "arrivals": 0,
+     "net": 0
+    },
+    {
+     "hour": 1,
+     "departures": 0,
+     "arrivals": 0,
+     "net": 0
+    },
+    {
+     "hour": 2,
+     "departures": 0,
+     "arrivals": 0,
+     "net": 0
+    },
+    {
+     "hour": 3,
+     "departures": 0,
+     "arrivals": 0,
+     "net": 0
+    },
+    {
+     "hour": 4,
+     "departures": 0,
+     "arrivals": 0,
+     "net": 0
+    },
+    {
+     "hour": 5,
+     "departures": 0,
+     "arrivals": 0,
+     "net": 0
+    },
+    {
+     "hour": 6,
+     "departures": 0,
+     "arrivals": 0,
+     "net": 0
+    },
+    {
+     "hour": 7,
+     "departures": 0,
+     "arrivals": 0,
+     "net": 0
+    },
+    {
+     "hour": 8,
+     "departures": 1,
+     "arrivals": 1,
+     "net": 0
+    },
+    {
+     "hour": 9,
+     "departures": 2,
+     "arrivals": 2,
+     "net": 0
+    },
+    {
+     "hour": 10,
+     "departures": 2,
+     "arrivals": 3,
+     "net": 1
+    },
+    {
+     "hour": 11,
+     "departures": 9,
+     "arrivals": 7,
+     "net": -2
+    },
+    {
+     "hour": 12,
+     "departures": 15,
+     "arrivals": 14,
+     "net": -1
+    },
+    {
+     "hour": 13,
+     "departures": 10,
+     "arrivals": 9,
+     "net": -1
+    },
+    {
+     "hour": 14,
+     "departures": 16,
+     "arrivals": 21,
+     "net": 5
+    },
+    {
+     "hour": 15,
+     "departures": 12,
+     "arrivals": 15,
+     "net": 3
+    },
+    {
+     "hour": 16,
+     "departures": 5,
+     "arrivals": 9,
+     "net": 4
+    },
+    {
+     "hour": 17,
+     "departures": 10,
+     "arrivals": 13,
+     "net": 3
+    },
+    {
+     "hour": 18,
+     "departures": 5,
+     "arrivals": 3,
+     "net": -2
+    },
+    {
+     "hour": 19,
+     "departures": 2,
+     "arrivals": 2,
+     "net": 0
+    },
+    {
+     "hour": 20,
+     "departures": 1,
+     "arrivals": 0,
+     "net": -1
+    },
+    {
+     "hour": 21,
+     "departures": 0,
+     "arrivals": 0,
+     "net": 0
+    },
+    {
+     "hour": 22,
+     "departures": 0,
+     "arrivals": 0,
+     "net": 0
+    },
+    {
+     "hour": 23,
+     "departures": 0,
+     "arrivals": 0,
+     "net": 0
+    }
+   ],
+   "evidence": "observed"
+  },
+  {
+   "station_id": "cascais-002",
+   "name": "Mercado da Vila",
+   "lat": 38.6996,
+   "lng": -9.4188,
+   "day_type": "weekday",
+   "departures": 175,
+   "arrivals": 185,
+   "net_flow": 10,
+   "by_hour": [
+    {
+     "hour": 0,
+     "departures": 0,
+     "arrivals": 0,
+     "net": 0
+    },
+    {
+     "hour": 1,
+     "departures": 0,
+     "arrivals": 0,
+     "net": 0
+    },
+    {
+     "hour": 2,
+     "departures": 0,
+     "arrivals": 0,
+     "net": 0
+    },
+    {
+     "hour": 3,
+     "departures": 0,
+     "arrivals": 0,
+     "net": 0
+    },
+    {
+     "hour": 4,
+     "departures": 0,
+     "arrivals": 0,
+     "net": 0
+    },
+    {
+     "hour": 5,
+     "departures": 1,
+     "arrivals": 0,
+     "net": -1
+    },
+    {
+     "hour": 6,
+     "departures": 5,
+     "arrivals": 5,
+     "net": 0
+    },
+    {
+     "hour": 7,
+     "departures": 7,
+     "arrivals": 14,
+     "net": 7
+    },
+    {
+     "hour": 8,
+     "departures": 25,
+     "arrivals": 21,
+     "net": -4
+    },
+    {
+     "hour": 9,
+     "departures": 37,
+     "arrivals": 30,
+     "net": -7
+    },
+    {
+     "hour": 10,
+     "departures": 16,
+     "arrivals": 16,
+     "net": 0
+    },
+    {
+     "hour": 11,
+     "departures": 2,
+     "arrivals": 3,
+     "net": 1
+    },
+    {
+     "hour": 12,
+     "departures": 1,
+     "arrivals": 1,
+     "net": 0
+    },
+    {
+     "hour": 13,
+     "departures": 0,
+     "arrivals": 0,
+     "net": 0
+    },
+    {
+     "hour": 14,
+     "departures": 0,
+     "arrivals": 1,
+     "net": 1
+    },
+    {
+     "hour": 15,
+     "departures": 2,
+     "arrivals": 1,
+     "net": -1
+    },
+    {
+     "hour": 16,
+     "departures": 12,
+     "arrivals": 20,
+     "net": 8
+    },
+    {
+     "hour": 17,
+     "departures": 22,
+     "arrivals": 22,
+     "net": 0
+    },
+    {
+     "hour": 18,
+     "departures": 19,
+     "arrivals": 17,
+     "net": -2
+    },
+    {
+     "hour": 19,
+     "departures": 13,
+     "arrivals": 18,
+     "net": 5
+    },
+    {
+     "hour": 20,
+     "departures": 10,
+     "arrivals": 12,
+     "net": 2
+    },
+    {
+     "hour": 21,
+     "departures": 2,
+     "arrivals": 3,
+     "net": 1
+    },
+    {
+     "hour": 22,
+     "departures": 1,
+     "arrivals": 1,
+     "net": 0
+    },
+    {
+     "hour": 23,
+     "departures": 0,
+     "arrivals": 0,
+     "net": 0
+    }
+   ],
+   "evidence": "observed"
+  },
+  {
+   "station_id": "cascais-002",
+   "name": "Mercado da Vila",
+   "lat": 38.6996,
+   "lng": -9.4188,
+   "day_type": "weekend",
+   "departures": 100,
+   "arrivals": 118,
+   "net_flow": 18,
+   "by_hour": [
+    {
+     "hour": 0,
+     "departures": 0,
+     "arrivals": 0,
+     "net": 0
+    },
+    {
+     "hour": 1,
+     "departures": 0,
+     "arrivals": 0,
+     "net": 0
+    },
+    {
+     "hour": 2,
+     "departures": 0,
+     "arrivals": 0,
+     "net": 0
+    },
+    {
+     "hour": 3,
+     "departures": 0,
+     "arrivals": 0,
+     "net": 0
+    },
+    {
+     "hour": 4,
+     "departures": 0,
+     "arrivals": 0,
+     "net": 0
+    },
+    {
+     "hour": 5,
+     "departures": 0,
+     "arrivals": 0,
+     "net": 0
+    },
+    {
+     "hour": 6,
+     "departures": 0,
+     "arrivals": 0,
+     "net": 0
+    },
+    {
+     "hour": 7,
+     "departures": 0,
+     "arrivals": 0,
+     "net": 0
+    },
+    {
+     "hour": 8,
+     "departures": 0,
+     "arrivals": 0,
+     "net": 0
+    },
+    {
+     "hour": 9,
+     "departures": 3,
+     "arrivals": 3,
+     "net": 0
+    },
+    {
+     "hour": 10,
+     "departures": 3,
+     "arrivals": 3,
+     "net": 0
+    },
+    {
+     "hour": 11,
+     "departures": 9,
+     "arrivals": 7,
+     "net": -2
+    },
+    {
+     "hour": 12,
+     "departures": 12,
+     "arrivals": 22,
+     "net": 10
+    },
+    {
+     "hour": 13,
+     "departures": 19,
+     "arrivals": 20,
+     "net": 1
+    },
+    {
+     "hour": 14,
+     "departures": 11,
+     "arrivals": 12,
+     "net": 1
+    },
+    {
+     "hour": 15,
+     "departures": 19,
+     "arrivals": 19,
+     "net": 0
+    },
+    {
+     "hour": 16,
+     "departures": 8,
+     "arrivals": 15,
+     "net": 7
+    },
+    {
+     "hour": 17,
+     "departures": 10,
+     "arrivals": 10,
+     "net": 0
+    },
+    {
+     "hour": 18,
+     "departures": 3,
+     "arrivals": 5,
+     "net": 2
+    },
+    {
+     "hour": 19,
+     "departures": 2,
+     "arrivals": 1,
+     "net": -1
+    },
+    {
+     "hour": 20,
+     "departures": 1,
+     "arrivals": 1,
+     "net": 0
+    },
+    {
+     "hour": 21,
+     "departures": 0,
+     "arrivals": 0,
+     "net": 0
+    },
+    {
+     "hour": 22,
+     "departures": 0,
+     "arrivals": 0,
+     "net": 0
+    },
+    {
+     "hour": 23,
+     "departures": 0,
+     "arrivals": 0,
+     "net": 0
+    }
+   ],
+   "evidence": "observed"
+  },
+  {
+   "station_id": "cascais-003",
+   "name": "Parede",
+   "lat": 38.6905,
+   "lng": -9.356,
+   "day_type": "weekday",
+   "departures": 171,
+   "arrivals": 180,
+   "net_flow": 9,
+   "by_hour": [
+    {
+     "hour": 0,
+     "departures": 0,
+     "arrivals": 0,
+     "net": 0
+    },
+    {
+     "hour": 1,
+     "departures": 0,
+     "arrivals": 0,
+     "net": 0
+    },
+    {
+     "hour": 2,
+     "departures": 0,
+     "arrivals": 0,
+     "net": 0
+    },
+    {
+     "hour": 3,
+     "departures": 0,
+     "arrivals": 0,
+     "net": 0
+    },
+    {
+     "hour": 4,
+     "departures": 0,
+     "arrivals": 0,
+     "net": 0
+    },
+    {
+     "hour": 5,
+     "departures": 0,
+     "arrivals": 0,
+     "net": 0
+    },
+    {
+     "hour": 6,
+     "departures": 8,
+     "arrivals": 10,
+     "net": 2
+    },
+    {
+     "hour": 7,
+     "departures": 9,
+     "arrivals": 9,
+     "net": 0
+    },
+    {
+     "hour": 8,
+     "departures": 25,
+     "arrivals": 24,
+     "net": -1
+    },
+    {
+     "hour": 9,
+     "departures": 19,
+     "arrivals": 17,
+     "net": -2
+    },
+    {
+     "hour": 10,
+     "departures": 14,
+     "arrivals": 17,
+     "net": 3
+    },
+    {
+     "hour": 11,
+     "departures": 3,
+     "arrivals": 3,
+     "net": 0
+    },
+    {
+     "hour": 12,
+     "departures": 1,
+     "arrivals": 1,
+     "net": 0
+    },
+    {
+     "hour": 13,
+     "departures": 0,
+     "arrivals": 0,
+     "net": 0
+    },
+    {
+     "hour": 14,
+     "departures": 1,
+     "arrivals": 1,
+     "net": 0
+    },
+    {
+     "hour": 15,
+     "departures": 5,
+     "arrivals": 6,
+     "net": 1
+    },
+    {
+     "hour": 16,
+     "departures": 9,
+     "arrivals": 9,
+     "net": 0
+    },
+    {
+     "hour": 17,
+     "departures": 25,
+     "arrivals": 14,
+     "net": -11
+    },
+    {
+     "hour": 18,
+     "departures": 27,
+     "arrivals": 28,
+     "net": 1
+    },
+    {
+     "hour": 19,
+     "departures": 12,
+     "arrivals": 26,
+     "net": 14
+    },
+    {
+     "hour": 20,
+     "departures": 9,
+     "arrivals": 11,
+     "net": 2
+    },
+    {
+     "hour": 21,
+     "departures": 3,
+     "arrivals": 3,
+     "net": 0
+    },
+    {
+     "hour": 22,
+     "departures": 1,
+     "arrivals": 1,
+     "net": 0
+    },
+    {
+     "hour": 23,
+     "departures": 0,
+     "arrivals": 0,
+     "net": 0
+    }
+   ],
+   "evidence": "observed"
+  },
+  {
+   "station_id": "cascais-003",
+   "name": "Parede",
+   "lat": 38.6905,
+   "lng": -9.356,
+   "day_type": "weekend",
+   "departures": 97,
+   "arrivals": 113,
+   "net_flow": 16,
+   "by_hour": [
+    {
+     "hour": 0,
+     "departures": 0,
+     "arrivals": 0,
+     "net": 0
+    },
+    {
+     "hour": 1,
+     "departures": 0,
+     "arrivals": 0,
+     "net": 0
+    },
+    {
+     "hour": 2,
+     "departures": 0,
+     "arrivals": 0,
+     "net": 0
+    },
+    {
+     "hour": 3,
+     "departures": 0,
+     "arrivals": 0,
+     "net": 0
+    },
+    {
+     "hour": 4,
+     "departures": 0,
+     "arrivals": 0,
+     "net": 0
+    },
+    {
+     "hour": 5,
+     "departures": 0,
+     "arrivals": 0,
+     "net": 0
+    },
+    {
+     "hour": 6,
+     "departures": 0,
+     "arrivals": 0,
+     "net": 0
+    },
+    {
+     "hour": 7,
+     "departures": 0,
+     "arrivals": 0,
+     "net": 0
+    },
+    {
+     "hour": 8,
+     "departures": 1,
+     "arrivals": 0,
+     "net": -1
+    },
+    {
+     "hour": 9,
+     "departures": 3,
+     "arrivals": 3,
+     "net": 0
+    },
+    {
+     "hour": 10,
+     "departures": 4,
+     "arrivals": 3,
+     "net": -1
+    },
+    {
+     "hour": 11,
+     "departures": 10,
+     "arrivals": 10,
+     "net": 0
+    },
+    {
+     "hour": 12,
+     "departures": 15,
+     "arrivals": 24,
+     "net": 9
+    },
+    {
+     "hour": 13,
+     "departures": 19,
+     "arrivals": 15,
+     "net": -4
+    },
+    {
+     "hour": 14,
+     "departures": 10,
+     "arrivals": 19,
+     "net": 9
+    },
+    {
+     "hour": 15,
+     "departures": 15,
+     "arrivals": 24,
+     "net": 9
+    },
+    {
+     "hour": 16,
+     "departures": 6,
+     "arrivals": 5,
+     "net": -1
+    },
+    {
+     "hour": 17,
+     "departures": 7,
+     "arrivals": 4,
+     "net": -3
+    },
+    {
+     "hour": 18,
+     "departures": 4,
+     "arrivals": 4,
+     "net": 0
+    },
+    {
+     "hour": 19,
+     "departures": 2,
+     "arrivals": 1,
+     "net": -1
+    },
+    {
+     "hour": 20,
+     "departures": 1,
+     "arrivals": 1,
+     "net": 0
+    },
+    {
+     "hour": 21,
+     "departures": 0,
+     "arrivals": 0,
+     "net": 0
+    },
+    {
+     "hour": 22,
+     "departures": 0,
+     "arrivals": 0,
+     "net": 0
+    },
+    {
+     "hour": 23,
+     "departures": 0,
+     "arrivals": 0,
+     "net": 0
+    }
+   ],
+   "evidence": "observed"
+  },
+  {
+   "station_id": "cascais-004",
+   "name": "Carcavelos praia",
+   "lat": 38.6807,
+   "lng": -9.3372,
+   "day_type": "weekday",
+   "departures": 165,
+   "arrivals": 178,
+   "net_flow": 13,
+   "by_hour": [
+    {
+     "hour": 0,
+     "departures": 0,
+     "arrivals": 0,
+     "net": 0
+    },
+    {
+     "hour": 1,
+     "departures": 0,
+     "arrivals": 0,
+     "net": 0
+    },
+    {
+     "hour": 2,
+     "departures": 0,
+     "arrivals": 0,
+     "net": 0
+    },
+    {
+     "hour": 3,
+     "departures": 0,
+     "arrivals": 0,
+     "net": 0
+    },
+    {
+     "hour": 4,
+     "departures": 0,
+     "arrivals": 0,
+     "net": 0
+    },
+    {
+     "hour": 5,
+     "departures": 1,
+     "arrivals": 0,
+     "net": -1
+    },
+    {
+     "hour": 6,
+     "departures": 8,
+     "arrivals": 6,
+     "net": -2
+    },
+    {
+     "hour": 7,
+     "departures": 15,
+     "arrivals": 21,
+     "net": 6
+    },
+    {
+     "hour": 8,
+     "departures": 30,
+     "arrivals": 24,
+     "net": -6
+    },
+    {
+     "hour": 9,
+     "departures": 17,
+     "arrivals": 20,
+     "net": 3
+    },
+    {
+     "hour": 10,
+     "departures": 13,
+     "arrivals": 13,
+     "net": 0
+    },
+    {
+     "hour": 11,
+     "departures": 3,
+     "arrivals": 5,
+     "net": 2
+    },
+    {
+     "hour": 12,
+     "departures": 0,
+     "arrivals": 1,
+     "net": 1
+    },
+    {
+     "hour": 13,
+     "departures": 0,
+     "arrivals": 0,
+     "net": 0
+    },
+    {
+     "hour": 14,
+     "departures": 0,
+     "arrivals": 0,
+     "net": 0
+    },
+    {
+     "hour": 15,
+     "departures": 6,
+     "arrivals": 3,
+     "net": -3
+    },
+    {
+     "hour": 16,
+     "departures": 10,
+     "arrivals": 12,
+     "net": 2
+    },
+    {
+     "hour": 17,
+     "departures": 15,
+     "arrivals": 12,
+     "net": -3
+    },
+    {
+     "hour": 18,
+     "departures": 15,
+     "arrivals": 18,
+     "net": 3
+    },
+    {
+     "hour": 19,
+     "departures": 17,
+     "arrivals": 27,
+     "net": 10
+    },
+    {
+     "hour": 20,
+     "departures": 9,
+     "arrivals": 12,
+     "net": 3
+    },
+    {
+     "hour": 21,
+     "departures": 6,
+     "arrivals": 3,
+     "net": -3
+    },
+    {
+     "hour": 22,
+     "departures": 0,
+     "arrivals": 1,
+     "net": 1
+    },
+    {
+     "hour": 23,
+     "departures": 0,
+     "arrivals": 0,
+     "net": 0
+    }
+   ],
+   "evidence": "observed"
+  },
+  {
+   "station_id": "cascais-004",
+   "name": "Carcavelos praia",
+   "lat": 38.6807,
+   "lng": -9.3372,
+   "day_type": "weekend",
+   "departures": 106,
+   "arrivals": 90,
+   "net_flow": -16,
+   "by_hour": [
+    {
+     "hour": 0,
+     "departures": 0,
+     "arrivals": 0,
+     "net": 0
+    },
+    {
+     "hour": 1,
+     "departures": 0,
+     "arrivals": 0,
+     "net": 0
+    },
+    {
+     "hour": 2,
+     "departures": 0,
+     "arrivals": 0,
+     "net": 0
+    },
+    {
+     "hour": 3,
+     "departures": 0,
+     "arrivals": 0,
+     "net": 0
+    },
+    {
+     "hour": 4,
+     "departures": 0,
+     "arrivals": 0,
+     "net": 0
+    },
+    {
+     "hour": 5,
+     "departures": 0,
+     "arrivals": 0,
+     "net": 0
+    },
+    {
+     "hour": 6,
+     "departures": 0,
+     "arrivals": 0,
+     "net": 0
+    },
+    {
+     "hour": 7,
+     "departures": 0,
+     "arrivals": 0,
+     "net": 0
+    },
+    {
+     "hour": 8,
+     "departures": 0,
+     "arrivals": 0,
+     "net": 0
+    },
+    {
+     "hour": 9,
+     "departures": 2,
+     "arrivals": 3,
+     "net": 1
+    },
+    {
+     "hour": 10,
+     "departures": 5,
+     "arrivals": 6,
+     "net": 1
+    },
+    {
+     "hour": 11,
+     "departures": 13,
+     "arrivals": 8,
+     "net": -5
+    },
+    {
+     "hour": 12,
+     "departures": 7,
+     "arrivals": 10,
+     "net": 3
+    },
+    {
+     "hour": 13,
+     "departures": 26,
+     "arrivals": 13,
+     "net": -13
+    },
+    {
+     "hour": 14,
+     "departures": 16,
+     "arrivals": 11,
+     "net": -5
+    },
+    {
+     "hour": 15,
+     "departures": 10,
+     "arrivals": 15,
+     "net": 5
+    },
+    {
+     "hour": 16,
+     "departures": 14,
+     "arrivals": 12,
+     "net": -2
+    },
+    {
+     "hour": 17,
+     "departures": 8,
+     "arrivals": 4,
+     "net": -4
+    },
+    {
+     "hour": 18,
+     "departures": 3,
+     "arrivals": 4,
+     "net": 1
+    },
+    {
+     "hour": 19,
+     "departures": 1,
+     "arrivals": 2,
+     "net": 1
+    },
+    {
+     "hour": 20,
+     "departures": 1,
+     "arrivals": 2,
+     "net": 1
+    },
+    {
+     "hour": 21,
+     "departures": 0,
+     "arrivals": 0,
+     "net": 0
+    },
+    {
+     "hour": 22,
+     "departures": 0,
+     "arrivals": 0,
+     "net": 0
+    },
+    {
+     "hour": 23,
+     "departures": 0,
+     "arrivals": 0,
+     "net": 0
+    }
+   ],
+   "evidence": "observed"
+  },
+  {
+   "station_id": "cascais-005",
+   "name": "Alcabideche",
+   "lat": 38.7288,
+   "lng": -9.4102,
+   "day_type": "weekday",
+   "departures": 183,
+   "arrivals": 185,
+   "net_flow": 2,
+   "by_hour": [
+    {
+     "hour": 0,
+     "departures": 0,
+     "arrivals": 0,
+     "net": 0
+    },
+    {
+     "hour": 1,
+     "departures": 0,
+     "arrivals": 0,
+     "net": 0
+    },
+    {
+     "hour": 2,
+     "departures": 0,
+     "arrivals": 0,
+     "net": 0
+    },
+    {
+     "hour": 3,
+     "departures": 0,
+     "arrivals": 0,
+     "net": 0
+    },
+    {
+     "hour": 4,
+     "departures": 0,
+     "arrivals": 0,
+     "net": 0
+    },
+    {
+     "hour": 5,
+     "departures": 1,
+     "arrivals": 0,
+     "net": -1
+    },
+    {
+     "hour": 6,
+     "departures": 7,
+     "arrivals": 5,
+     "net": -2
+    },
+    {
+     "hour": 7,
+     "departures": 9,
+     "arrivals": 9,
+     "net": 0
+    },
+    {
+     "hour": 8,
+     "departures": 33,
+     "arrivals": 23,
+     "net": -10
+    },
+    {
+     "hour": 9,
+     "departures": 27,
+     "arrivals": 35,
+     "net": 8
+    },
+    {
+     "hour": 10,
+     "departures": 16,
+     "arrivals": 27,
+     "net": 11
+    },
+    {
+     "hour": 11,
+     "departures": 3,
+     "arrivals": 4,
+     "net": 1
+    },
+    {
+     "hour": 12,
+     "departures": 2,
+     "arrivals": 1,
+     "net": -1
+    },
+    {
+     "hour": 13,
+     "departures": 0,
+     "arrivals": 0,
+     "net": 0
+    },
+    {
+     "hour": 14,
+     "departures": 0,
+     "arrivals": 1,
+     "net": 1
+    },
+    {
+     "hour": 15,
+     "departures": 4,
+     "arrivals": 2,
+     "net": -2
+    },
+    {
+     "hour": 16,
+     "departures": 16,
+     "arrivals": 15,
+     "net": -1
+    },
+    {
+     "hour": 17,
+     "departures": 18,
+     "arrivals": 19,
+     "net": 1
+    },
+    {
+     "hour": 18,
+     "departures": 22,
+     "arrivals": 16,
+     "net": -6
+    },
+    {
+     "hour": 19,
+     "departures": 11,
+     "arrivals": 12,
+     "net": 1
+    },
+    {
+     "hour": 20,
+     "departures": 10,
+     "arrivals": 11,
+     "net": 1
+    },
+    {
+     "hour": 21,
+     "departures": 4,
+     "arrivals": 4,
+     "net": 0
+    },
+    {
+     "hour": 22,
+     "departures": 0,
+     "arrivals": 1,
+     "net": 1
+    },
+    {
+     "hour": 23,
+     "departures": 0,
+     "arrivals": 0,
+     "net": 0
+    }
+   ],
+   "evidence": "observed"
+  },
+  {
+   "station_id": "cascais-005",
+   "name": "Alcabideche",
+   "lat": 38.7288,
+   "lng": -9.4102,
+   "day_type": "weekend",
+   "departures": 109,
+   "arrivals": 93,
+   "net_flow": -16,
+   "by_hour": [
+    {
+     "hour": 0,
+     "departures": 0,
+     "arrivals": 0,
+     "net": 0
+    },
+    {
+     "hour": 1,
+     "departures": 0,
+     "arrivals": 0,
+     "net": 0
+    },
+    {
+     "hour": 2,
+     "departures": 0,
+     "arrivals": 0,
+     "net": 0
+    },
+    {
+     "hour": 3,
+     "departures": 0,
+     "arrivals": 0,
+     "net": 0
+    },
+    {
+     "hour": 4,
+     "departures": 0,
+     "arrivals": 0,
+     "net": 0
+    },
+    {
+     "hour": 5,
+     "departures": 0,
+     "arrivals": 0,
+     "net": 0
+    },
+    {
+     "hour": 6,
+     "departures": 0,
+     "arrivals": 0,
+     "net": 0
+    },
+    {
+     "hour": 7,
+     "departures": 0,
+     "arrivals": 0,
+     "net": 0
+    },
+    {
+     "hour": 8,
+     "departures": 1,
+     "arrivals": 1,
+     "net": 0
+    },
+    {
+     "hour": 9,
+     "departures": 3,
+     "arrivals": 1,
+     "net": -2
+    },
+    {
+     "hour": 10,
+     "departures": 3,
+     "arrivals": 4,
+     "net": 1
+    },
+    {
+     "hour": 11,
+     "departures": 9,
+     "arrivals": 10,
+     "net": 1
+    },
+    {
+     "hour": 12,
+     "departures": 12,
+     "arrivals": 5,
+     "net": -7
+    },
+    {
+     "hour": 13,
+     "departures": 18,
+     "arrivals": 14,
+     "net": -4
+    },
+    {
+     "hour": 14,
+     "departures": 11,
+     "arrivals": 14,
+     "net": 3
+    },
+    {
+     "hour": 15,
+     "departures": 16,
+     "arrivals": 17,
+     "net": 1
+    },
+    {
+     "hour": 16,
+     "departures": 15,
+     "arrivals": 16,
+     "net": 1
+    },
+    {
+     "hour": 17,
+     "departures": 16,
+     "arrivals": 6,
+     "net": -10
+    },
+    {
+     "hour": 18,
+     "departures": 3,
+     "arrivals": 4,
+     "net": 1
+    },
+    {
+     "hour": 19,
+     "departures": 2,
+     "arrivals": 1,
+     "net": -1
+    },
+    {
+     "hour": 20,
+     "departures": 0,
+     "arrivals": 0,
+     "net": 0
+    },
+    {
+     "hour": 21,
+     "departures": 0,
+     "arrivals": 0,
+     "net": 0
+    },
+    {
+     "hour": 22,
+     "departures": 0,
+     "arrivals": 0,
+     "net": 0
+    },
+    {
+     "hour": 23,
+     "departures": 0,
+     "arrivals": 0,
+     "net": 0
+    }
+   ],
+   "evidence": "observed"
+  },
+  {
+   "station_id": "cascais-006",
+   "name": "São Domingos de Rana",
+   "lat": 38.701,
+   "lng": -9.339,
+   "day_type": "weekday",
+   "departures": 181,
+   "arrivals": 169,
+   "net_flow": -12,
+   "by_hour": [
+    {
+     "hour": 0,
+     "departures": 0,
+     "arrivals": 0,
+     "net": 0
+    },
+    {
+     "hour": 1,
+     "departures": 0,
+     "arrivals": 0,
+     "net": 0
+    },
+    {
+     "hour": 2,
+     "departures": 0,
+     "arrivals": 0,
+     "net": 0
+    },
+    {
+     "hour": 3,
+     "departures": 0,
+     "arrivals": 0,
+     "net": 0
+    },
+    {
+     "hour": 4,
+     "departures": 0,
+     "arrivals": 0,
+     "net": 0
+    },
+    {
+     "hour": 5,
+     "departures": 1,
+     "arrivals": 1,
+     "net": 0
+    },
+    {
+     "hour": 6,
+     "departures": 5,
+     "arrivals": 4,
+     "net": -1
+    },
+    {
+     "hour": 7,
+     "departures": 17,
+     "arrivals": 12,
+     "net": -5
+    },
+    {
+     "hour": 8,
+     "departures": 22,
+     "arrivals": 21,
+     "net": -1
+    },
+    {
+     "hour": 9,
+     "departures": 15,
+     "arrivals": 13,
+     "net": -2
+    },
+    {
+     "hour": 10,
+     "departures": 13,
+     "arrivals": 14,
+     "net": 1
+    },
+    {
+     "hour": 11,
+     "departures": 6,
+     "arrivals": 5,
+     "net": -1
+    },
+    {
+     "hour": 12,
+     "departures": 1,
+     "arrivals": 0,
+     "net": -1
+    },
+    {
+     "hour": 13,
+     "departures": 0,
+     "arrivals": 0,
+     "net": 0
+    },
+    {
+     "hour": 14,
+     "departures": 1,
+     "arrivals": 1,
+     "net": 0
+    },
+    {
+     "hour": 15,
+     "departures": 5,
+     "arrivals": 5,
+     "net": 0
+    },
+    {
+     "hour": 16,
+     "departures": 8,
+     "arrivals": 11,
+     "net": 3
+    },
+    {
+     "hour": 17,
+     "departures": 36,
+     "arrivals": 27,
+     "net": -9
+    },
+    {
+     "hour": 18,
+     "departures": 25,
+     "arrivals": 28,
+     "net": 3
+    },
+    {
+     "hour": 19,
+     "departures": 17,
+     "arrivals": 13,
+     "net": -4
+    },
+    {
+     "hour": 20,
+     "departures": 6,
+     "arrivals": 8,
+     "net": 2
+    },
+    {
+     "hour": 21,
+     "departures": 2,
+     "arrivals": 5,
+     "net": 3
+    },
+    {
+     "hour": 22,
+     "departures": 1,
+     "arrivals": 1,
+     "net": 0
+    },
+    {
+     "hour": 23,
+     "departures": 0,
+     "arrivals": 0,
+     "net": 0
+    }
+   ],
+   "evidence": "observed"
+  },
+  {
+   "station_id": "cascais-006",
+   "name": "São Domingos de Rana",
+   "lat": 38.701,
+   "lng": -9.339,
+   "day_type": "weekend",
+   "departures": 91,
+   "arrivals": 79,
+   "net_flow": -12,
+   "by_hour": [
+    {
+     "hour": 0,
+     "departures": 0,
+     "arrivals": 0,
+     "net": 0
+    },
+    {
+     "hour": 1,
+     "departures": 0,
+     "arrivals": 0,
+     "net": 0
+    },
+    {
+     "hour": 2,
+     "departures": 0,
+     "arrivals": 0,
+     "net": 0
+    },
+    {
+     "hour": 3,
+     "departures": 0,
+     "arrivals": 0,
+     "net": 0
+    },
+    {
+     "hour": 4,
+     "departures": 0,
+     "arrivals": 0,
+     "net": 0
+    },
+    {
+     "hour": 5,
+     "departures": 0,
+     "arrivals": 0,
+     "net": 0
+    },
+    {
+     "hour": 6,
+     "departures": 0,
+     "arrivals": 0,
+     "net": 0
+    },
+    {
+     "hour": 7,
+     "departures": 0,
+     "arrivals": 0,
+     "net": 0
+    },
+    {
+     "hour": 8,
+     "departures": 1,
+     "arrivals": 0,
+     "net": -1
+    },
+    {
+     "hour": 9,
+     "departures": 2,
+     "arrivals": 1,
+     "net": -1
+    },
+    {
+     "hour": 10,
+     "departures": 7,
+     "arrivals": 4,
+     "net": -3
+    },
+    {
+     "hour": 11,
+     "departures": 7,
+     "arrivals": 7,
+     "net": 0
+    },
+    {
+     "hour": 12,
+     "departures": 3,
+     "arrivals": 3,
+     "net": 0
+    },
+    {
+     "hour": 13,
+     "departures": 12,
+     "arrivals": 11,
+     "net": -1
+    },
+    {
+     "hour": 14,
+     "departures": 24,
+     "arrivals": 13,
+     "net": -11
+    },
+    {
+     "hour": 15,
+     "departures": 6,
+     "arrivals": 12,
+     "net": 6
+    },
+    {
+     "hour": 16,
+     "departures": 12,
+     "arrivals": 13,
+     "net": 1
+    },
+    {
+     "hour": 17,
+     "departures": 9,
+     "arrivals": 5,
+     "net": -4
+    },
+    {
+     "hour": 18,
+     "departures": 7,
+     "arrivals": 6,
+     "net": -1
+    },
+    {
+     "hour": 19,
+     "departures": 1,
+     "arrivals": 4,
+     "net": 3
+    },
+    {
+     "hour": 20,
+     "departures": 0,
+     "arrivals": 0,
+     "net": 0
+    },
+    {
+     "hour": 21,
+     "departures": 0,
+     "arrivals": 0,
+     "net": 0
+    },
+    {
+     "hour": 22,
+     "departures": 0,
+     "arrivals": 0,
+     "net": 0
+    },
+    {
+     "hour": 23,
+     "departures": 0,
+     "arrivals": 0,
+     "net": 0
+    }
+   ],
+   "evidence": "observed"
+  },
+  {
+   "station_id": "cascais-007",
+   "name": "Guia",
+   "lat": 38.702,
+   "lng": -9.452,
+   "day_type": "weekday",
+   "departures": 161,
+   "arrivals": 204,
+   "net_flow": 43,
+   "by_hour": [
+    {
+     "hour": 0,
+     "departures": 0,
+     "arrivals": 0,
+     "net": 0
+    },
+    {
+     "hour": 1,
+     "departures": 0,
+     "arrivals": 0,
+     "net": 0
+    },
+    {
+     "hour": 2,
+     "departures": 0,
+     "arrivals": 0,
+     "net": 0
+    },
+    {
+     "hour": 3,
+     "departures": 0,
+     "arrivals": 0,
+     "net": 0
+    },
+    {
+     "hour": 4,
+     "departures": 0,
+     "arrivals": 0,
+     "net": 0
+    },
+    {
+     "hour": 5,
+     "departures": 0,
+     "arrivals": 1,
+     "net": 1
+    },
+    {
+     "hour": 6,
+     "departures": 4,
+     "arrivals": 4,
+     "net": 0
+    },
+    {
+     "hour": 7,
+     "departures": 16,
+     "arrivals": 10,
+     "net": -6
+    },
+    {
+     "hour": 8,
+     "departures": 13,
+     "arrivals": 26,
+     "net": 13
+    },
+    {
+     "hour": 9,
+     "departures": 16,
+     "arrivals": 46,
+     "net": 30
+    },
+    {
+     "hour": 10,
+     "departures": 11,
+     "arrivals": 17,
+     "net": 6
+    },
+    {
+     "hour": 11,
+     "departures": 5,
+     "arrivals": 7,
+     "net": 2
+    },
+    {
+     "hour": 12,
+     "departures": 1,
+     "arrivals": 1,
+     "net": 0
+    },
+    {
+     "hour": 13,
+     "departures": 0,
+     "arrivals": 0,
+     "net": 0
+    },
+    {
+     "hour": 14,
+     "departures": 1,
+     "arrivals": 1,
+     "net": 0
+    },
+    {
+     "hour": 15,
+     "departures": 6,
+     "arrivals": 4,
+     "net": -2
+    },
+    {
+     "hour": 16,
+     "departures": 13,
+     "arrivals": 8,
+     "net": -5
+    },
+    {
+     "hour": 17,
+     "departures": 26,
+     "arrivals": 24,
+     "net": -2
+    },
+    {
+     "hour": 18,
+     "departures": 27,
+     "arrivals": 24,
+     "net": -3
+    },
+    {
+     "hour": 19,
+     "departures": 13,
+     "arrivals": 21,
+     "net": 8
+    },
+    {
+     "hour": 20,
+     "departures": 5,
+     "arrivals": 6,
+     "net": 1
+    },
+    {
+     "hour": 21,
+     "departures": 3,
+     "arrivals": 4,
+     "net": 1
+    },
+    {
+     "hour": 22,
+     "departures": 1,
+     "arrivals": 0,
+     "net": -1
+    },
+    {
+     "hour": 23,
+     "departures": 0,
+     "arrivals": 0,
+     "net": 0
+    }
+   ],
+   "evidence": "observed"
+  },
+  {
+   "station_id": "cascais-007",
+   "name": "Guia",
+   "lat": 38.702,
+   "lng": -9.452,
+   "day_type": "weekend",
+   "departures": 96,
+   "arrivals": 77,
+   "net_flow": -19,
+   "by_hour": [
+    {
+     "hour": 0,
+     "departures": 0,
+     "arrivals": 0,
+     "net": 0
+    },
+    {
+     "hour": 1,
+     "departures": 0,
+     "arrivals": 0,
+     "net": 0
+    },
+    {
+     "hour": 2,
+     "departures": 0,
+     "arrivals": 0,
+     "net": 0
+    },
+    {
+     "hour": 3,
+     "departures": 0,
+     "arrivals": 0,
+     "net": 0
+    },
+    {
+     "hour": 4,
+     "departures": 0,
+     "arrivals": 0,
+     "net": 0
+    },
+    {
+     "hour": 5,
+     "departures": 0,
+     "arrivals": 0,
+     "net": 0
+    },
+    {
+     "hour": 6,
+     "departures": 0,
+     "arrivals": 0,
+     "net": 0
+    },
+    {
+     "hour": 7,
+     "departures": 0,
+     "arrivals": 0,
+     "net": 0
+    },
+    {
+     "hour": 8,
+     "departures": 1,
+     "arrivals": 1,
+     "net": 0
+    },
+    {
+     "hour": 9,
+     "departures": 1,
+     "arrivals": 2,
+     "net": 1
+    },
+    {
+     "hour": 10,
+     "departures": 5,
+     "arrivals": 4,
+     "net": -1
+    },
+    {
+     "hour": 11,
+     "departures": 10,
+     "arrivals": 7,
+     "net": -3
+    },
+    {
+     "hour": 12,
+     "departures": 9,
+     "arrivals": 7,
+     "net": -2
+    },
+    {
+     "hour": 13,
+     "departures": 14,
+     "arrivals": 7,
+     "net": -7
+    },
+    {
+     "hour": 14,
+     "departures": 22,
+     "arrivals": 10,
+     "net": -12
+    },
+    {
+     "hour": 15,
+     "departures": 14,
+     "arrivals": 9,
+     "net": -5
+    },
+    {
+     "hour": 16,
+     "departures": 11,
+     "arrivals": 15,
+     "net": 4
+    },
+    {
+     "hour": 17,
+     "departures": 5,
+     "arrivals": 6,
+     "net": 1
+    },
+    {
+     "hour": 18,
+     "departures": 1,
+     "arrivals": 4,
+     "net": 3
+    },
+    {
+     "hour": 19,
+     "departures": 2,
+     "arrivals": 4,
+     "net": 2
+    },
+    {
+     "hour": 20,
+     "departures": 1,
+     "arrivals": 1,
+     "net": 0
+    },
+    {
+     "hour": 21,
+     "departures": 0,
+     "arrivals": 0,
+     "net": 0
+    },
+    {
+     "hour": 22,
+     "departures": 0,
+     "arrivals": 0,
+     "net": 0
+    },
+    {
+     "hour": 23,
+     "departures": 0,
+     "arrivals": 0,
+     "net": 0
+    }
+   ],
+   "evidence": "observed"
+  },
+  {
+   "station_id": "cascais-008",
+   "name": "Birre",
+   "lat": 38.7215,
+   "lng": -9.4405,
+   "day_type": "weekday",
+   "departures": 187,
+   "arrivals": 185,
+   "net_flow": -2,
+   "by_hour": [
+    {
+     "hour": 0,
+     "departures": 0,
+     "arrivals": 0,
+     "net": 0
+    },
+    {
+     "hour": 1,
+     "departures": 0,
+     "arrivals": 0,
+     "net": 0
+    },
+    {
+     "hour": 2,
+     "departures": 0,
+     "arrivals": 0,
+     "net": 0
+    },
+    {
+     "hour": 3,
+     "departures": 0,
+     "arrivals": 0,
+     "net": 0
+    },
+    {
+     "hour": 4,
+     "departures": 0,
+     "arrivals": 0,
+     "net": 0
+    },
+    {
+     "hour": 5,
+     "departures": 1,
+     "arrivals": 0,
+     "net": -1
+    },
+    {
+     "hour": 6,
+     "departures": 5,
+     "arrivals": 8,
+     "net": 3
+    },
+    {
+     "hour": 7,
+     "departures": 16,
+     "arrivals": 18,
+     "net": 2
+    },
+    {
+     "hour": 8,
+     "departures": 34,
+     "arrivals": 18,
+     "net": -16
+    },
+    {
+     "hour": 9,
+     "departures": 41,
+     "arrivals": 4,
+     "net": -37
+    },
+    {
+     "hour": 10,
+     "departures": 10,
+     "arrivals": 11,
+     "net": 1
+    },
+    {
+     "hour": 11,
+     "departures": 4,
+     "arrivals": 3,
+     "net": -1
+    },
+    {
+     "hour": 12,
+     "departures": 0,
+     "arrivals": 0,
+     "net": 0
+    },
+    {
+     "hour": 13,
+     "departures": 0,
+     "arrivals": 0,
+     "net": 0
+    },
+    {
+     "hour": 14,
+     "departures": 0,
+     "arrivals": 1,
+     "net": 1
+    },
+    {
+     "hour": 15,
+     "departures": 5,
+     "arrivals": 4,
+     "net": -1
+    },
+    {
+     "hour": 16,
+     "departures": 8,
+     "arrivals": 25,
+     "net": 17
+    },
+    {
+     "hour": 17,
+     "departures": 14,
+     "arrivals": 27,
+     "net": 13
+    },
+    {
+     "hour": 18,
+     "departures": 18,
+     "arrivals": 26,
+     "net": 8
+    },
+    {
+     "hour": 19,
+     "departures": 17,
+     "arrivals": 26,
+     "net": 9
+    },
+    {
+     "hour": 20,
+     "departures": 11,
+     "arrivals": 9,
+     "net": -2
+    },
+    {
+     "hour": 21,
+     "departures": 3,
+     "arrivals": 4,
+     "net": 1
+    },
+    {
+     "hour": 22,
+     "departures": 0,
+     "arrivals": 1,
+     "net": 1
+    },
+    {
+     "hour": 23,
+     "departures": 0,
+     "arrivals": 0,
+     "net": 0
+    }
+   ],
+   "evidence": "observed"
+  },
+  {
+   "station_id": "cascais-008",
+   "name": "Birre",
+   "lat": 38.7215,
+   "lng": -9.4405,
+   "day_type": "weekend",
+   "departures": 86,
+   "arrivals": 81,
+   "net_flow": -5,
+   "by_hour": [
+    {
+     "hour": 0,
+     "departures": 0,
+     "arrivals": 0,
+     "net": 0
+    },
+    {
+     "hour": 1,
+     "departures": 0,
+     "arrivals": 0,
+     "net": 0
+    },
+    {
+     "hour": 2,
+     "departures": 0,
+     "arrivals": 0,
+     "net": 0
+    },
+    {
+     "hour": 3,
+     "departures": 0,
+     "arrivals": 0,
+     "net": 0
+    },
+    {
+     "hour": 4,
+     "departures": 0,
+     "arrivals": 0,
+     "net": 0
+    },
+    {
+     "hour": 5,
+     "departures": 0,
+     "arrivals": 0,
+     "net": 0
+    },
+    {
+     "hour": 6,
+     "departures": 0,
+     "arrivals": 0,
+     "net": 0
+    },
+    {
+     "hour": 7,
+     "departures": 0,
+     "arrivals": 0,
+     "net": 0
+    },
+    {
+     "hour": 8,
+     "departures": 1,
+     "arrivals": 1,
+     "net": 0
+    },
+    {
+     "hour": 9,
+     "departures": 1,
+     "arrivals": 1,
+     "net": 0
+    },
+    {
+     "hour": 10,
+     "departures": 3,
+     "arrivals": 3,
+     "net": 0
+    },
+    {
+     "hour": 11,
+     "departures": 6,
+     "arrivals": 8,
+     "net": 2
+    },
+    {
+     "hour": 12,
+     "departures": 9,
+     "arrivals": 8,
+     "net": -1
+    },
+    {
+     "hour": 13,
+     "departures": 11,
+     "arrivals": 15,
+     "net": 4
+    },
+    {
+     "hour": 14,
+     "departures": 10,
+     "arrivals": 7,
+     "net": -3
+    },
+    {
+     "hour": 15,
+     "departures": 13,
+     "arrivals": 19,
+     "net": 6
+    },
+    {
+     "hour": 16,
+     "departures": 12,
+     "arrivals": 5,
+     "net": -7
+    },
+    {
+     "hour": 17,
+     "departures": 10,
+     "arrivals": 7,
+     "net": -3
+    },
+    {
+     "hour": 18,
+     "departures": 6,
+     "arrivals": 5,
+     "net": -1
+    },
+    {
+     "hour": 19,
+     "departures": 3,
+     "arrivals": 1,
+     "net": -2
+    },
+    {
+     "hour": 20,
+     "departures": 1,
+     "arrivals": 1,
+     "net": 0
+    },
+    {
+     "hour": 21,
+     "departures": 0,
+     "arrivals": 0,
+     "net": 0
+    },
+    {
+     "hour": 22,
+     "departures": 0,
+     "arrivals": 0,
+     "net": 0
+    },
+    {
+     "hour": 23,
+     "departures": 0,
+     "arrivals": 0,
+     "net": 0
+    }
+   ],
+   "evidence": "observed"
+  }
+ ]
+}

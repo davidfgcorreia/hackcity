@@ -1,0 +1,691 @@
+{
+ "meta": {
+  "status": "mock",
+  "generated_at": "2026-09-24T12:37:44+00:00",
+  "observed_from": "2026-08-18",
+  "observed_to": "2026-09-08",
+  "timezone_display": "Europe/Lisbon",
+  "coverage": "Cascais operating area",
+  "grid": {
+   "crs": "EPSG:3763",
+   "cell_m": 250
+  },
+  "sources": [
+   {
+    "name": "viagens.xlsx",
+    "retrieved": "2026-09-11",
+    "rows": 53764
+   },
+   {
+    "name": "station_information.json",
+    "retrieved": "2026-09-11",
+    "rows": 157
+   }
+  ],
+  "notes": [
+   "Candidate areas for screening (F2). Weights are provisional and unapproved.",
+   "Mock values. No measurement has been performed yet (F1-F3 open)."
+  ]
+ },
+ "weights": {
+  "demand": 0.35,
+  "parking_opportunity": 0.25,
+  "journey_improvement": 0.2,
+  "coverage_gap": 0.1,
+  "equity": 0.05,
+  "bus_delay": 0.05
+ },
+ "rows": [
+  {
+   "id": "cand-02",
+   "name": "Manique de Baixo",
+   "lat": 38.7286,
+   "lng": -9.383,
+   "bounds": [
+    [
+     38.727477,
+     -9.384439
+    ],
+    [
+     38.729723,
+     -9.381561
+    ]
+   ],
+   "score": 0.766,
+   "rank": 1,
+   "score_without_bus_delay": 0.768,
+   "rank_without_bus_delay": 1,
+   "components": {
+    "demand": {
+     "value": 0.604,
+     "raw": 543,
+     "unit": "trip endpoints",
+     "available": true
+    },
+    "parking_opportunity": {
+     "value": 0.933,
+     "raw": 18,
+     "unit": "supported intervals",
+     "available": true
+    },
+    "journey_improvement": {
+     "value": 0.944,
+     "raw": 6.6,
+     "unit": "minutes saved (modelled)",
+     "available": true
+    },
+    "coverage_gap": {
+     "value": 0.793,
+     "raw": 627,
+     "unit": "m to nearest station",
+     "available": true
+    },
+    "equity": {
+     "value": 0.337,
+     "raw": 876,
+     "unit": "residents within 300 m",
+     "available": true
+    },
+    "bus_delay": {
+     "value": 0.73,
+     "raw": 7.3,
+     "unit": "pooled median delay, min",
+     "available": true
+    }
+   },
+   "distinct_intervals": 18,
+   "nearest_station_m": 1190,
+   "quality": "ok",
+   "evidence": "inferred_proxy",
+   "blockers": [
+    "site feasibility unchecked"
+   ]
+  },
+  {
+   "id": "cand-10",
+   "name": "Livramento",
+   "lat": 38.715,
+   "lng": -9.3958,
+   "bounds": [
+    [
+     38.713877,
+     -9.397239
+    ],
+    [
+     38.716123,
+     -9.394361
+    ]
+   ],
+   "score": 0.748,
+   "rank": 2,
+   "score_without_bus_delay": 0.735,
+   "rank_without_bus_delay": 2,
+   "components": {
+    "demand": {
+     "value": 0.827,
+     "raw": 744,
+     "unit": "trip endpoints",
+     "available": true
+    },
+    "parking_opportunity": {
+     "value": 0.523,
+     "raw": 18,
+     "unit": "supported intervals",
+     "available": true
+    },
+    "journey_improvement": {
+     "value": 0.952,
+     "raw": 6.7,
+     "unit": "minutes saved (modelled)",
+     "available": true
+    },
+    "coverage_gap": {
+     "value": 0.737,
+     "raw": 689,
+     "unit": "m to nearest station",
+     "available": true
+    },
+    "equity": {
+     "value": 0.281,
+     "raw": 730,
+     "unit": "residents within 300 m",
+     "available": true
+    },
+    "bus_delay": {
+     "value": 1,
+     "raw": 10.1,
+     "unit": "pooled median delay, min",
+     "available": true
+    }
+   },
+   "distinct_intervals": 18,
+   "nearest_station_m": 1329,
+   "quality": "ok",
+   "evidence": "inferred_proxy",
+   "blockers": [
+    "site feasibility unchecked"
+   ]
+  },
+  {
+   "id": "cand-04",
+   "name": "Abóboda centro",
+   "lat": 38.7092,
+   "lng": -9.3532,
+   "bounds": [
+    [
+     38.708077,
+     -9.354639
+    ],
+    [
+     38.710323,
+     -9.351761
+    ]
+   ],
+   "score": 0.71,
+   "rank": 3,
+   "score_without_bus_delay": 0.721,
+   "rank_without_bus_delay": 3,
+   "components": {
+    "demand": {
+     "value": 0.881,
+     "raw": 792,
+     "unit": "trip endpoints",
+     "available": true
+    },
+    "parking_opportunity": {
+     "value": 0.586,
+     "raw": 31,
+     "unit": "supported intervals",
+     "available": true
+    },
+    "journey_improvement": {
+     "value": 0.678,
+     "raw": 4.7,
+     "unit": "minutes saved (modelled)",
+     "available": true
+    },
+    "coverage_gap": {
+     "value": 0.687,
+     "raw": 744,
+     "unit": "m to nearest station",
+     "available": true
+    },
+    "equity": {
+     "value": 0.517,
+     "raw": 1344,
+     "unit": "residents within 300 m",
+     "available": true
+    },
+    "bus_delay": {
+     "value": 0.5,
+     "raw": null,
+     "unit": "pooled median delay, min",
+     "available": false
+    }
+   },
+   "distinct_intervals": 31,
+   "nearest_station_m": 584,
+   "quality": "ok",
+   "evidence": "inferred_proxy",
+   "blockers": [
+    "site feasibility unchecked",
+    "no reliable nearby bus delay"
+   ]
+  },
+  {
+   "id": "cand-01",
+   "name": "Alcabideche norte",
+   "lat": 38.7331,
+   "lng": -9.409,
+   "bounds": [
+    [
+     38.731977,
+     -9.410439
+    ],
+    [
+     38.734223,
+     -9.407561
+    ]
+   ],
+   "score": 0.693,
+   "rank": 4,
+   "score_without_bus_delay": 0.708,
+   "rank_without_bus_delay": 4,
+   "components": {
+    "demand": {
+     "value": 0.933,
+     "raw": 839,
+     "unit": "trip endpoints",
+     "available": true
+    },
+    "parking_opportunity": {
+     "value": 0.705,
+     "raw": 9,
+     "unit": "supported intervals",
+     "available": true
+    },
+    "journey_improvement": {
+     "value": 0.292,
+     "raw": 2.0,
+     "unit": "minutes saved (modelled)",
+     "available": true
+    },
+    "coverage_gap": {
+     "value": 0.725,
+     "raw": 702,
+     "unit": "m to nearest station",
+     "available": true
+    },
+    "equity": {
+     "value": 0.786,
+     "raw": 2043,
+     "unit": "residents within 300 m",
+     "available": true
+    },
+    "bus_delay": {
+     "value": 0.39,
+     "raw": 3.9,
+     "unit": "pooled median delay, min",
+     "available": true
+    }
+   },
+   "distinct_intervals": 9,
+   "nearest_station_m": 1514,
+   "quality": "ok",
+   "evidence": "inferred_proxy",
+   "blockers": [
+    "site feasibility unchecked"
+   ]
+  },
+  {
+   "id": "cand-09",
+   "name": "Murtal",
+   "lat": 38.687,
+   "lng": -9.3496,
+   "bounds": [
+    [
+     38.685877,
+     -9.351039
+    ],
+    [
+     38.688123,
+     -9.348161
+    ]
+   ],
+   "score": 0.674,
+   "rank": 5,
+   "score_without_bus_delay": 0.672,
+   "rank_without_bus_delay": 5,
+   "components": {
+    "demand": {
+     "value": 0.931,
+     "raw": 837,
+     "unit": "trip endpoints",
+     "available": true
+    },
+    "parking_opportunity": {
+     "value": 0.792,
+     "raw": 9,
+     "unit": "supported intervals",
+     "available": true
+    },
+    "journey_improvement": {
+     "value": 0.267,
+     "raw": 1.9,
+     "unit": "minutes saved (modelled)",
+     "available": true
+    },
+    "coverage_gap": {
+     "value": 0.387,
+     "raw": 1074,
+     "unit": "m to nearest station",
+     "available": true
+    },
+    "equity": {
+     "value": 0.442,
+     "raw": 1149,
+     "unit": "residents within 300 m",
+     "available": true
+    },
+    "bus_delay": {
+     "value": 0.71,
+     "raw": 7.1,
+     "unit": "pooled median delay, min",
+     "available": true
+    }
+   },
+   "distinct_intervals": 9,
+   "nearest_station_m": 1570,
+   "quality": "ok",
+   "evidence": "inferred_proxy",
+   "blockers": [
+    "site feasibility unchecked"
+   ]
+  },
+  {
+   "id": "cand-06",
+   "name": "Birre / Quinta da Marinha",
+   "lat": 38.718,
+   "lng": -9.4412,
+   "bounds": [
+    [
+     38.716877,
+     -9.442639
+    ],
+    [
+     38.719123,
+     -9.439761
+    ]
+   ],
+   "score": 0.624,
+   "rank": 6,
+   "score_without_bus_delay": 0.606,
+   "rank_without_bus_delay": 7,
+   "components": {
+    "demand": {
+     "value": 0.698,
+     "raw": 628,
+     "unit": "trip endpoints",
+     "available": true
+    },
+    "parking_opportunity": {
+     "value": 0.515,
+     "raw": 22,
+     "unit": "supported intervals",
+     "available": true
+    },
+    "journey_improvement": {
+     "value": 0.642,
+     "raw": 4.5,
+     "unit": "minutes saved (modelled)",
+     "available": true
+    },
+    "coverage_gap": {
+     "value": 0.266,
+     "raw": 1207,
+     "unit": "m to nearest station",
+     "available": true
+    },
+    "equity": {
+     "value": 0.95,
+     "raw": 2470,
+     "unit": "residents within 300 m",
+     "available": true
+    },
+    "bus_delay": {
+     "value": 0.96,
+     "raw": 9.6,
+     "unit": "pooled median delay, min",
+     "available": true
+    }
+   },
+   "distinct_intervals": 22,
+   "nearest_station_m": 589,
+   "quality": "ok",
+   "evidence": "inferred_proxy",
+   "blockers": [
+    "site feasibility unchecked"
+   ]
+  },
+  {
+   "id": "cand-08",
+   "name": "Caparide",
+   "lat": 38.7101,
+   "lng": -9.371,
+   "bounds": [
+    [
+     38.708977,
+     -9.372439
+    ],
+    [
+     38.711223,
+     -9.369561
+    ]
+   ],
+   "score": 0.614,
+   "rank": 7,
+   "score_without_bus_delay": 0.622,
+   "rank_without_bus_delay": 6,
+   "components": {
+    "demand": {
+     "value": 0.728,
+     "raw": 655,
+     "unit": "trip endpoints",
+     "available": true
+    },
+    "parking_opportunity": {
+     "value": 0.835,
+     "raw": 16,
+     "unit": "supported intervals",
+     "available": true
+    },
+    "journey_improvement": {
+     "value": 0.276,
+     "raw": 1.9,
+     "unit": "minutes saved (modelled)",
+     "available": true
+    },
+    "coverage_gap": {
+     "value": 0.342,
+     "raw": 1123,
+     "unit": "m to nearest station",
+     "available": true
+    },
+    "equity": {
+     "value": 0.758,
+     "raw": 1970,
+     "unit": "residents within 300 m",
+     "available": true
+    },
+    "bus_delay": {
+     "value": 0.46,
+     "raw": 4.6,
+     "unit": "pooled median delay, min",
+     "available": true
+    }
+   },
+   "distinct_intervals": 16,
+   "nearest_station_m": 2073,
+   "quality": "ok",
+   "evidence": "inferred_proxy",
+   "blockers": [
+    "site feasibility unchecked"
+   ]
+  },
+  {
+   "id": "cand-07",
+   "name": "Cobre / Trajouce",
+   "lat": 38.7239,
+   "lng": -9.3466,
+   "bounds": [
+    [
+     38.722777,
+     -9.348039
+    ],
+    [
+     38.725023,
+     -9.345161
+    ]
+   ],
+   "score": 0.556,
+   "rank": 8,
+   "score_without_bus_delay": 0.57,
+   "rank_without_bus_delay": 8,
+   "components": {
+    "demand": {
+     "value": 0.69,
+     "raw": 621,
+     "unit": "trip endpoints",
+     "available": true
+    },
+    "parking_opportunity": {
+     "value": 0.278,
+     "raw": 14,
+     "unit": "supported intervals",
+     "available": true
+    },
+    "journey_improvement": {
+     "value": 0.805,
+     "raw": 5.6,
+     "unit": "minutes saved (modelled)",
+     "available": true
+    },
+    "coverage_gap": {
+     "value": 0.291,
+     "raw": 1179,
+     "unit": "m to nearest station",
+     "available": true
+    },
+    "equity": {
+     "value": 0.816,
+     "raw": 2121,
+     "unit": "residents within 300 m",
+     "available": true
+    },
+    "bus_delay": {
+     "value": 0.28,
+     "raw": 2.8,
+     "unit": "pooled median delay, min",
+     "available": true
+    }
+   },
+   "distinct_intervals": 14,
+   "nearest_station_m": 1450,
+   "quality": "ok",
+   "evidence": "inferred_proxy",
+   "blockers": [
+    "site feasibility unchecked"
+   ]
+  },
+  {
+   "id": "cand-03",
+   "name": "Tires / aeródromo",
+   "lat": 38.7168,
+   "lng": -9.36,
+   "bounds": [
+    [
+     38.715677,
+     -9.361439
+    ],
+    [
+     38.717923,
+     -9.358561
+    ]
+   ],
+   "score": null,
+   "rank": null,
+   "score_without_bus_delay": null,
+   "rank_without_bus_delay": null,
+   "components": {
+    "demand": {
+     "value": 0.477,
+     "raw": 429,
+     "unit": "trip endpoints",
+     "available": true
+    },
+    "parking_opportunity": {
+     "value": 0.902,
+     "raw": 3,
+     "unit": "supported intervals",
+     "available": true
+    },
+    "journey_improvement": {
+     "value": 0.729,
+     "raw": 5.1,
+     "unit": "minutes saved (modelled)",
+     "available": true
+    },
+    "coverage_gap": {
+     "value": 0.808,
+     "raw": 611,
+     "unit": "m to nearest station",
+     "available": true
+    },
+    "equity": {
+     "value": 0.574,
+     "raw": 1492,
+     "unit": "residents within 300 m",
+     "available": true
+    },
+    "bus_delay": {
+     "value": 0.83,
+     "raw": 8.3,
+     "unit": "pooled median delay, min",
+     "available": true
+    }
+   },
+   "distinct_intervals": 3,
+   "nearest_station_m": 542,
+   "quality": "insufficient_observations",
+   "evidence": "inferred_proxy",
+   "blockers": [
+    "site feasibility unchecked"
+   ]
+  },
+  {
+   "id": "cand-05",
+   "name": "Parede interior",
+   "lat": 38.6939,
+   "lng": -9.3585,
+   "bounds": [
+    [
+     38.692777,
+     -9.359939
+    ],
+    [
+     38.695023,
+     -9.357061
+    ]
+   ],
+   "score": null,
+   "rank": null,
+   "score_without_bus_delay": null,
+   "rank_without_bus_delay": null,
+   "components": {
+    "demand": {
+     "value": 0.841,
+     "raw": 756,
+     "unit": "trip endpoints",
+     "available": true
+    },
+    "parking_opportunity": {
+     "value": 0.391,
+     "raw": 3,
+     "unit": "supported intervals",
+     "available": true
+    },
+    "journey_improvement": {
+     "value": 0.304,
+     "raw": 2.1,
+     "unit": "minutes saved (modelled)",
+     "available": true
+    },
+    "coverage_gap": {
+     "value": 0.272,
+     "raw": 1200,
+     "unit": "m to nearest station",
+     "available": true
+    },
+    "equity": {
+     "value": 0.59,
+     "raw": 1534,
+     "unit": "residents within 300 m",
+     "available": true
+    },
+    "bus_delay": {
+     "value": 0.34,
+     "raw": 3.4,
+     "unit": "pooled median delay, min",
+     "available": true
+    }
+   },
+   "distinct_intervals": 3,
+   "nearest_station_m": 2313,
+   "quality": "insufficient_observations",
+   "evidence": "inferred_proxy",
+   "blockers": [
+    "site feasibility unchecked"
+   ]
+  }
+ ]
+}

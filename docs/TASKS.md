@@ -1,6 +1,6 @@
 # Task Timeline — Parallel Workstreams
 
-> **Status (24 Sep, evening):** backend workstreams B and C are done, and the field app (D) and review app (E) are built on top of them. ✅ = done. Still open: **B5** validation numbers, **A1**/**A3**, workstream **F** analytics and the pitch (**P1**/**P2**). **Live detection from the provider GBFS feed runs by default** (`GET /api/live`); `make demo` switches to replay mode and sets up a route for op1.
+> **Status (24 Sep, evening):** backend workstreams B and C are done, and the field app (D) and review app (E) are built on top of them. **✅ = done · 🟡 = partly done, see the row.** Still open: **B5** validation numbers, **F0–F3** analytics, and the pitch (**P1**/**P2**). **Live detection from the provider GBFS feed runs by default** (`GET /api/live`); `make demo` switches to replay mode and sets up a route for op1.
 
 **Now: Thu 24 Sep, 12:30 · Devpost deadline: Fri 25 Sep, 10:00 (about 21 h)**
 
@@ -87,7 +87,7 @@ gantt
 | **E5** ✅ | Replay control bar: start, pause, step +30 min, sim clock, speed. **Demo-critical.** | B3 API shape | Buttons call `/api/replay/*`. |
 | **E1** ✅ | Status filter chips with counts. Map colours by status. | — | — |
 | **E2** ✅ | Case detail drawer: evidence timeline, station-boundary distance, 120-minute calculation, reason. | — | Opens from the list and the map. |
-| **A1** | Fresh clone → `cp .env.example .env && make up && make seed && make test` works. Fix anything that fails. | — | Commands documented in README. |
+| **A1** ✅ | Fresh clone → `cp .env.example .env && make up && make seed && make test` works. Fix anything that fails. | — | Commands documented in README. |
 
 ## Phase 2 — Dynamic behaviour and robustness (17:00 → 21:00), Gate **M2** (ops feature freeze)
 
@@ -115,14 +115,14 @@ Scope comes from [analytics_prediction_requirements.md](analytics_prediction_req
 | **F1** | Recovery KPIs per station catchment and H3 hex: abandonments per 100 trip ends, idle hours, time to provider pickup. |
 | **F2** | Station opportunity: hexes with high demand and many out-of-station parkings but no station. |
 | **F3** | Supply/demand by hour: departures, arrivals, net flow per station. |
-| **F4** | Export JSON and add the `/insights` map page (reusing `BaseMap`). |
+| **F4** ✅ | Export JSON and add the `/insights` map page (reusing `BaseMap`). |
 
 ## Phase 4 — Stabilise and pitch (02:00 → 09:30)
 
 | ID | Task |
 |---|---|
-| **Q1** | Bug bash on the demo scenario only. No new features after M2 unless they are demo-critical. |
-| **A3** | Demo script (2 min) and a recorded backup video in case Wi-Fi fails. |
+| **Q1** 🟡 | Loop verified end to end against the live stack (route → photo pickup → re-route, idempotent resend, 422 without ID+photo). **Not done: the real-phone run and the DevTools offline test** — both need a person with a handset. Bug bash on the demo scenario only. No new features after M2 unless they are demo-critical. |
+| **A3** 🟡 | Demo script written and timed against the running stack ([demo_script.md](demo_script.md)). **Backup video not recorded** — needs a screen recorder. |
 | **P1** | Devpost answers (problem, solution, user, prototype, impact, future) and 3-minute pitch slides. Lead with the live demo. |
 | **P2** | Submit by **09:30** (30 min buffer). |
 
