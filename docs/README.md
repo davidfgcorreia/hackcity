@@ -14,7 +14,7 @@ Start with the [project README](../README.md) for the features, how to run it an
 | [HANDOFF.md](HANDOFF.md) | The latest implementation state, what was verified, and dated change notes. |
 | [NEXT_STEPS.md](NEXT_STEPS.md) | Pitch findings and the product backlog. |
 | [prints/](prints/README.md) | Screenshot gallery (desktop and mobile). |
-| [presentation/cascais-micromobility-slides.pdf](presentation/cascais-micromobility-slides.pdf) · [media/](media/) | Final presentation slides (PDF) and the 15 project media images (3:2 PNG). |
+| [presentation/cascais-micromobility-slides.pdf](presentation/cascais-micromobility-slides.pdf) · [media/](media/) | Final presentation slides (PDF), the [submission document](presentation/cascais-micromobility-submission.pdf) (PDF, source `presentation/submission.html`, rebuilt with `weasyprint submission.html cascais-micromobility-submission.pdf`) and the 15 project media images (3:2 PNG). |
 
 ## Background and data (context for the decisions above)
 

@@ -15,9 +15,10 @@
 |---|---|
 | **Project name** | Cascais Micromobility: abandoned bike detection and collection |
 | **Selected challenge** | Hack the City 2026 · Challenge #9: *Plan collection of abandoned micromobility vehicles (Cascais)* ([brief](chalange.md)) |
-| **Team** | David Correia ([@davidfgcorreia](https://github.com/davidfgcorreia)) · [@Diogosousa03](https://github.com/Diogosousa03) · *TODO: add full names of every team member* |
+| **Team** | David Correia (@davidfgcorreia) · Gonçalo Martins (@goncalofecha) · Diogo Sousa (@dmrllsousa) |
 | **Repository** | https://github.com/davidfgcorreia/hackcity |
-| **Demo video** | *TODO: add the video link* |
+| **Demo video** | https://youtu.be/xIjXYXA3tug |
+| **Submission document (PDF)** | [docs/presentation/cascais-micromobility-submission.pdf](docs/presentation/cascais-micromobility-submission.pdf): every answer below in one 4-page document |
 | **Final slides (PDF)** | [docs/presentation/cascais-micromobility-slides.pdf](docs/presentation/cascais-micromobility-slides.pdf) (15 slides; the same images are in [docs/media/](docs/media/)) |
 
 **The problem.** Shared bikes in Cascais must be returned to a station area, but many are left outside it. They block pavements, look like neglect, and the municipality has no tool to see them in time or to check whether the operator collects them. In Bird's own data for 19 Aug–8 Sep 2026 there were **754 abandonments** (more than 120 minutes more than 30 m outside a station). **55.7 % were never collected by Bird**, and when Bird did collect, it was a **median of 12.3 h after the limit**.

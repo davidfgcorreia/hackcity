@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<title>Cascais Micromobility · Hackathon submission</title>
+<style>
+@page { size: A4; margin: 18mm 17mm 18mm 17mm;
+  @bottom-right { content: counter(page) " / " counter(pages); font: 8pt system-ui, sans-serif; color: #6b7280; }
+  @bottom-left { content: "Cascais Micromobility · Hack the City 2026 · Challenge #9"; font: 8pt system-ui, sans-serif; color: #6b7280; } }
+body { font: 10pt/1.5 "Inter", "DejaVu Sans", system-ui, sans-serif; color: #1f2937; }
+h1 { font-size: 22pt; line-height: 1.15; margin: 0 0 4pt; color: #0f3d5e; }
+.sub { color: #4b5563; font-size: 11pt; margin: 0 0 12pt; }
+h2 { font-size: 13pt; color: #0f3d5e; border-bottom: 1.5pt solid #1f7ab5; padding-bottom: 2pt; margin: 16pt 0 6pt; break-after: avoid; }
+table.facts { width: 100%; border-collapse: collapse; margin: 6pt 0 4pt; }
+table.facts th { text-align: left; width: 30%; vertical-align: top; padding: 4pt 8pt 4pt 0; color: #0f3d5e; }
+table.facts td { padding: 4pt 0; vertical-align: top; }
+table.facts tr { border-bottom: 0.5pt solid #e5e7eb; }
+a { color: #1f7ab5; text-decoration: none; }
+ul, ol { margin: 3pt 0 6pt; padding-left: 16pt; } li { margin: 2pt 0; }
+.rule { background: #eef6fc; border-left: 3pt solid #1f7ab5; padding: 6pt 10pt; margin: 8pt 0; }
+.stats { display: flex; gap: 8pt; margin: 8pt 0; }
+.stat { flex: 1; background: #f3f4f6; border-radius: 4pt; padding: 6pt 8pt; }
+.stat b { display: block; font-size: 16pt; color: #0f3d5e; }
+.stat span { font-size: 8.5pt; color: #4b5563; }
+figure { margin: 8pt 0; break-inside: avoid; } figure img { width: 100%; border: 0.5pt solid #d1d5db; border-radius: 3pt; }
+figcaption { font-size: 8.5pt; color: #6b7280; margin-top: 2pt; }
+.two { display: flex; gap: 8pt; } .two figure { flex: 1; }
+code { font: 8.5pt "DejaVu Sans Mono", monospace; background: #f3f4f6; padding: 0 2pt; }
+.pb { break-before: page; }
+</style></head><body>
+
+<h1>Cascais Micromobility</h1>
+<p class="sub">Abandoned bike detection and collection · Hack the City 2026</p>
+
+<table class="facts">
+<tr><th>Project name</th><td>Cascais Micromobility: abandoned bike detection and collection</td></tr>
+<tr><th>Selected challenge</th><td>Challenge #9: Plan collection of abandoned micromobility vehicles (Cascais)</td></tr>
+<tr><th>Team members</th><td>David Correia (@davidfgcorreia)<br>Gonçalo Martins (@goncalofecha)<br>Diogo Sousa (@dmrllsousa)</td></tr>
+<tr><th>Repository</th><td><a href="https://github.com/davidfgcorreia/hackcity">github.com/davidfgcorreia/hackcity</a></td></tr>
+<tr><th>Demo video</th><td><a href="https://youtu.be/xIjXYXA3tug">youtu.be/xIjXYXA3tug</a></td></tr>
+<tr><th>Final slides (PDF)</th><td><code>docs/presentation/cascais-micromobility-slides.pdf</code> in the repository</td></tr>
+</table>
+
+<div class="rule"><b>The rule.</b> A bike is <b>abandoned</b> when it stays more than <b>30 m outside a station area</b> for more than <b>120 minutes</b>. Only minutes between 08:00 and 20:00 (Lisbon time) count. The rule is set in one place and every screen applies it the same way.</div>
+
+<h2>1. The problem</h2>
+<p>Shared bikes in Cascais must be returned to a station area, but many are left outside it. They block pavements and look like neglect. The municipality has no tool to see them in time or to check whether the operator collects them. Bird's own event log for 19 Aug–8 Sep 2026 shows how large the gap is:</p>
+<div class="stats">
+<div class="stat"><b>754</b><span>abandonments in 21 days (35.9 per day)</span></div>
+<div class="stat"><b>55.7 %</b><span>never collected by Bird</span></div>
+<div class="stat"><b>12.3 h</b><span>median Bird response after the 120-minute limit</span></div>
+<div class="stat"><b>40.5 %</b><span>of trip ends inside the painted station area</span></div>
+</div>
+
+<h2>2. The proposed solution</h2>
+<p>One web platform with three connected parts:</p>
+<ol>
+<li><b>Real-time detection.</b> Bird's live GBFS feed is read every 60 s. Each parked bike is measured against its station polygon plus 30 m, and the enforcement minutes are counted. A bike past the limit becomes a <i>case</i> with a timeline (candidate → eligible → assigned → picked up / resolved). A bike that disappears from the feed is marked <i>uncertain</i>, never assumed to be collected.</li>
+<li><b>Dynamic collection route.</b> A pickup mission starts from the team's position, fills the van with the oldest bikes and returns to the Complexo Multisserviços depot. It uses real road routes (OSRM on OpenStreetMap) and is <b>re-planned automatically</b> whenever the pool of bikes changes: a new abandonment, a pickup by the operator, or a rider starting a trip. The <b>mobile field app</b> gives turn-by-turn directions and records the bike ID, a photo and a description at every stop. It works offline.</li>
+<li><b>Decision map.</b> Supply and demand KPIs per station or per grid square (50–1,000 m), public transport context and live vehicles, a 0–100 <b>operator performance score per station</b>, abandonment hotspots, and <b>Laya</b>, an open model that ranks where a new station would help most. Each ranking shows its reasons, confidence and robustness.</li>
+</ol>
+
+<h2>3. Target users and beneficiaries</h2>
+<ul>
+<li><b>Municipal mobility staff</b> (Cascais Próxima / Câmara Municipal): see abandoned bikes live, send a team, and hold the operator to its contract with evidence.</li>
+<li><b>Field collection teams</b>: a phone app that tells them where to go next and records what they found.</li>
+<li><b>Planners and decision makers</b>: evidence for where to add, move or resize stations.</li>
+<li><b>Residents and riders</b>: clearer pavements, and bikes available where people actually need them.</li>
+</ul>
+
+<h2>4. The prototype</h2>
+<p>The prototype runs end to end with Docker. Its main screens:</p>
+<div class="two">
+<figure><img src="../media/02-operations-home.png"><figcaption>Operations home: live status, pickup mission and services.</figcaption></figure>
+<figure><img src="../media/14-collection-route-re-planned-in-real-time.png"><figcaption>The collection route is re-planned in real time.</figcaption></figure>
+</div>
+<div class="two">
+<figure><img src="../media/12-field-app-turn-by-turn-to-each-bike.png"><figcaption>Field app: turn-by-turn directions to each bike.</figcaption></figure>
+<figure><img src="../media/13-evidence-at-every-stop.png"><figcaption>Evidence at every stop: bike ID, photo and description.</figcaption></figure>
+</div>
+<div class="two">
+<figure><img src="../media/09-a-performance-score-for-every-station.png"><figcaption>Bird performance score per station (provisional, 0–100).</figcaption></figure>
+<figure><img src="../media/04-every-candidate-explained-by-laya.png"><figcaption>Decision map: every station candidate explained by Laya.</figcaption></figure>
+</div>
+<p><b>Hands-free demonstration</b> (<code>/field?sim</code>, shown in the <a href="https://youtu.be/xIjXYXA3tug">video</a>): five demo bikes are placed at real past abandonment spots. The van drives out of the depot to the first bike, and the app selects a photo, types a description and records the pickup by itself. The route is then re-planned toward the next bike. Demo data never mixes with real cases or counts.</p>
+
+<h2>5. Technology and data</h2>
+<table class="facts">
+<tr><th>Frontend</th><td>React, Vite and TypeScript; MapLibre GL and Leaflet (heat maps); a responsive field app; PT/EN interface</td></tr>
+<tr><th>Operations</th><td>FastAPI and Postgres: detector, cases, missions, replay and live modes. The pure logic (geometry in EPSG:3763, enforcement clock, routing) is unit-tested.</td></tr>
+<tr><th>Analysis</th><td>FastAPI, PostGIS and DuckDB: an ingest and derive pipeline, the metric grid, the Laya model and the Bird score</td></tr>
+<tr><th>Routing</th><td>A local OSRM engine on an OpenStreetMap graph from Cascais to Lisbon</td></tr>
+<tr><th>Deployment</th><td>Docker Compose with 6 services; tested with pytest and Playwright browser checks</td></tr>
+<tr><th>Data</th><td>Challenge datasets (Bird trips and vehicle events, stations and GBFS snapshots, Waze traffic, MobiCascais card validations, dated transit operation plans); Bird's <b>live GBFS feed</b>; <b>TML / Carris Metropolitana</b> live vehicle positions</td></tr>
+</table>
+
+<h2>6. Expected impact</h2>
+<ul>
+<li><b>Faster response:</b> bikes are flagged at the 120-minute limit instead of a median of 12 hours later, so they spend less time blocking public space.</li>
+<li><b>Accountability:</b> every collection leaves evidence (photo, position, time). The municipality can measure the operator's response station by station and use it in contract discussions.</li>
+<li><b>Efficient field work:</b> collection trips follow a short road route that updates itself, which saves driving time and fuel.</li>
+<li><b>Better investment:</b> station siting is guided by observed demand and abandonment pressure, with the reasons and uncertainty shown next to every recommendation.</li>
+</ul>
+
+<h2>7. Implementation and scalability</h2>
+<ul>
+<li><b>Any operator, any city:</b> detection only needs a standard GBFS feed and station polygons. The rule, the depot, the van size and the time window are settings in one file, and OSRM can load any OpenStreetMap region.</li>
+<li><b>Pilot path:</b> run it next to the current process in Cascais for one month and compare its detections with what teams find in the field. Then tune the rule and the score weights with the municipality.</li>
+<li><b>Production steps:</b> authentication and roles, hosting on municipal or cloud infrastructure, a data-sharing agreement for the operator's event log, and more operators through the same GBFS interface.</li>
+<li><b>Known limits:</b> the historical sample is short (3 weeks of bike data, 1 week of card data); the Laya weights and the station score are provisional, not approved KPIs; and a new station site still needs legal, safety and accessibility review.</li>
+</ul>
+
+<h2>8. Access, testing and demonstration</h2>
+<ol>
+<li>Clone <a href="https://github.com/davidfgcorreia/hackcity">github.com/davidfgcorreia/hackcity</a>, then <code>cd project && cp .env.example .env</code>.</li>
+<li><code>make up</code> starts all services; <code>make seed</code> loads 157 stations and 53,764 bike events; <code>make osrm</code> builds road routing once (about 5 minutes).</li>
+<li>Open <code>http://localhost:5173/</code> (home), <code>/field</code> (field app, also on a phone on the same Wi-Fi), <code>/field?sim</code> (demo) and <code>/data</code> (decision map and Bird performance).</li>
+<li>Tests: <code>make test</code> (backend) and <code>docker compose exec analytics pytest -q</code> (analysis).</li>
+</ol>
+<p>The analysis data dump is shared through a private GitHub release because it contains hashed card IDs. It can also be rebuilt from the supplied datasets.</p>
+
+<h2>9. Links</h2>
+<table class="facts">
+<tr><th>Repository</th><td><a href="https://github.com/davidfgcorreia/hackcity">https://github.com/davidfgcorreia/hackcity</a></td></tr>
+<tr><th>Demo video</th><td><a href="https://youtu.be/xIjXYXA3tug">https://youtu.be/xIjXYXA3tug</a></td></tr>
+<tr><th>Final slides</th><td><code>docs/presentation/cascais-micromobility-slides.pdf</code></td></tr>
+<tr><th>Documentation</th><td><code>README.md</code> and <code>docs/README.md</code> (architecture, decision map guide, the Laya model, findings)</td></tr>
+</table>
+</body></html>
