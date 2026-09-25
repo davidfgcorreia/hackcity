@@ -9,8 +9,52 @@
 
 > **The rule:** a bike is **abandoned** when it stays more than **30 m outside a station area** for more than **120 minutes**. Only minutes between **08:00 and 20:00 Lisbon time** count, and this window can be switched off. The rule lives in one place (`project/.env`) and every screen applies it the same way.
 
+## Hackathon submission
+
+| | |
+|---|---|
+| **Project name** | Cascais Micromobility: abandoned bike detection and collection |
+| **Selected challenge** | Hack the City 2026 · Challenge #9: *Plan collection of abandoned micromobility vehicles (Cascais)* ([brief](chalange.md)) |
+| **Team** | David Correia ([@davidfgcorreia](https://github.com/davidfgcorreia)) · [@Diogosousa03](https://github.com/Diogosousa03) · *TODO: add full names of every team member* |
+| **Repository** | https://github.com/davidfgcorreia/hackcity |
+| **Demo video** | *TODO: add the video link* |
+| **Final slides (PDF)** | [docs/presentation/cascais-micromobility-slides.pdf](docs/presentation/cascais-micromobility-slides.pdf) (15 slides; the same images are in [docs/media/](docs/media/)) |
+
+**The problem.** Shared bikes in Cascais must be returned to a station area, but many are left outside it. They block pavements, look like neglect, and the municipality has no tool to see them in time or to check whether the operator collects them. In Bird's own data for 19 Aug–8 Sep 2026 there were **754 abandonments** (more than 120 minutes more than 30 m outside a station). **55.7 % were never collected by Bird**, and when Bird did collect, it was a **median of 12.3 h after the limit**.
+
+**The proposed solution.** One web platform with three parts:
+1. **Real-time detection** of abandoned bikes from the operator's live GBFS feed, with the exact challenge rule (30 m buffer, 120 minutes), a case timeline and explicit uncertainty.
+2. **A dynamic collection route** on real roads from the municipal depot, re-planned whenever the pool of bikes changes, and a **mobile field app** that records the bike ID, a photo and a description at every stop as evidence.
+3. **A decision map** for planning: supply and demand KPIs per station or any grid square, public transport context, an operator performance score per station, and **Laya**, an open model that ranks where a new station would help most.
+
+**Target users and beneficiaries.**
+- *Municipal mobility staff (Cascais Próxima / Câmara Municipal)*: see abandoned bikes live, send a team, and hold the operator to its contract with evidence.
+- *Field collection teams*: a phone app that tells them where to go next and records what they found.
+- *Planners and decision makers*: evidence for where to add, move or resize stations.
+- *Residents and riders*: clearer pavements and bikes available where people actually need them.
+
+**The prototype.** It runs end to end on a laptop and is described feature by feature in [What it does](#what-it-does). The hands-free [presentation demo](#3-presentation-demo-hands-free-about-30-s) (`/field?sim`) shows a van leaving the depot, reaching a bike and recording a pickup with photo and description. Screenshots of every screen are in the [gallery](docs/prints/README.md).
+
+**Technology and data.**
+- *Technology:* React + Vite + TypeScript and MapLibre/Leaflet (web and field app); FastAPI + Postgres (operations); FastAPI + PostGIS + DuckDB (analysis); OSRM on OpenStreetMap (road routing); Docker Compose. See [Architecture](#architecture).
+- *Data:* the challenge datasets in `datasets/` (Bird trips and vehicle events, stations and GBFS snapshots, Waze traffic, MobiCascais card validations and dated transit operation plans), Bird's **live GBFS feed**, and **TML / Carris Metropolitana** live vehicle positions. Details in the [data source audit](docs/data_source_audit.md).
+
+**Expected impact.**
+- Bikes are flagged **at the 120-minute limit** instead of hours later, so they spend less time blocking public space.
+- Every collection leaves evidence (photo, position, time), so the municipality can **measure the operator's response** station by station and use it in contract discussions.
+- Collection trips follow a short road route that updates itself, which saves driving time and fuel.
+- Station investment is guided by observed demand and abandonment pressure, with the reasons and uncertainty shown next to every recommendation.
+
+**Implementation and scalability.**
+- **Any operator, any city:** detection only needs a standard GBFS feed and station polygons. The rule, the depot, the van size and the time window are settings in one file (`project/.env`), and OSRM can load any OpenStreetMap region.
+- **Pilot path:** run it next to the current process for one month in Cascais, compare its detections with the field, then tune the rule and the score weights with the municipality.
+- **Production steps:** authentication and roles, hosting on municipal or cloud infrastructure, a data-sharing agreement for the operator's event log, and more operators through the same GBFS interface. See [Known limits](#known-limits) and [next steps](docs/NEXT_STEPS.md).
+
+**Access, testing and demonstration.** Follow [Run it](#run-it): `make up`, `make seed`, then open http://localhost:5173. The demo is at `/field?sim`, the decision map at `/data` and the tests run with `make test` and `docker compose exec analytics pytest -q`. The analysis data dump is in a private GitHub release (it contains hashed card IDs), so the `/data` page needs team access or a rebuild from `datasets/`.
+
 ## Contents
 
+- [Hackathon submission](#hackathon-submission)
 - [What it does](#what-it-does)
 - [Key findings from the data](#key-findings-from-the-data)
 - [Architecture](#architecture)
