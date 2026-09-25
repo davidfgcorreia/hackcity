@@ -23,7 +23,8 @@ from app.services import cases, clock, missions
 
 
 def to_event(e: VehicleEvent) -> Event:
-    return Event(e.device_id, e.event_time, e.state, frozenset(e.event_types), e.lat, e.lng)
+    return Event(e.device_id, e.event_time, e.state, frozenset(e.event_types), e.lat, e.lng,
+                 observed_at=e.source_observed_at)
 
 
 class ReplayEngine:
@@ -82,6 +83,7 @@ class ReplayEngine:
             self.tick(self.sim_time)
         elif from_time is not None:
             self.tick(from_time)
+        clock.set_sim_time(self.sim_time)  # resuming after live: the replay owns the clock again
 
     @staticmethod
     def _pause_live() -> None:
@@ -89,10 +91,18 @@ class ReplayEngine:
 
         live.pause()
 
-    async def start(self, from_time: datetime | None, speed: float | None) -> ReplayState:
+    def _switch_from_live(self) -> bool:
+        """Pause live; if live owned the clock, re-route missions onto replay cases (after the seek sets the clock)."""
+        switched = clock.mode() == "live"
         self._pause_live()
+        return switched
+
+    async def start(self, from_time: datetime | None, speed: float | None) -> ReplayState:
+        switched = self._switch_from_live()
         self.speed = speed or self.speed
         await asyncio.to_thread(self._seek, from_time)
+        if switched:
+            await asyncio.to_thread(missions.replan_after_mode_switch, self._sf, "replay")
         if not self.running:
             self.running = True
             self._task = asyncio.create_task(self._run())
@@ -109,9 +119,11 @@ class ReplayEngine:
         return self.state()
 
     async def step(self, minutes: float) -> ReplayState:
-        self._pause_live()
+        switched = self._switch_from_live()
         await asyncio.to_thread(self._seek, None)
         await asyncio.to_thread(self.tick, self.sim_time + timedelta(minutes=minutes))
+        if switched:
+            await asyncio.to_thread(missions.replan_after_mode_switch, self._sf, "replay")
         return self.state()
 
     def reset(self) -> ReplayState:

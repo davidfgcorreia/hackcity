@@ -4,7 +4,7 @@
 
 **Now: Thu 24 Sep, 12:30 · Devpost deadline: Fri 25 Sep, 10:00 (about 21 h)**
 
-Priority order: **operational MVP first**, then the data-analysis MVP, then polish and the pitch. Design is in [operations_architecture.md](operations_architecture.md). Current follow-up analysis and pitch findings are in [NEXT_STEPS.md](NEXT_STEPS.md); [frontend links](FRONTEND_LINKS.md) are available for review.
+Priority order: **operational MVP first**, then the data-analysis MVP, then polish and the pitch. Design is in [operations_architecture.md](../operations_architecture.md). Current follow-up analysis and pitch findings are in [NEXT_STEPS.md](../NEXT_STEPS.md); [frontend links](FRONTEND_LINKS.md) are available for review.
 
 ## How to run in parallel without collisions
 
@@ -20,7 +20,7 @@ Priority order: **operational MVP first**, then the data-analysis MVP, then poli
 | B | Detection pipeline | `app/core/vehicle_state.py`, `app/core/detector.py`, `app/services/replay.py`, `app/services/cases.py`, `app/api/replay.py` |
 | C | Routing & missions | `app/core/routing.py`, `app/services/missions.py`, `app/api/missions.py` |
 | D | Field app (mobile) | `frontend/src/pages/FieldPage.tsx`, `frontend/src/components/field/*`, offline queue |
-| E | Review app (desktop) | `frontend/src/pages/ReviewPage.tsx`, `frontend/src/components/review/*`, `app/api/cases.py` |
+| E | Operations cases in Data Analysis | `frontend/src/pages/DecisionMap.tsx`, `frontend/src/components/review/*`, `app/api/cases.py` |
 | F | Data analytics | `project/analytics/` (new), starts at Gate M1 or when a person is free |
 
 ## Timeline
@@ -107,11 +107,11 @@ gantt
 
 ## Phase 3 — Data-analysis MVP
 
-> **Status:** ingest, analysis tables and the `/insights` page are done. See [analytics_architecture.md](analytics_architecture.md) for commands, findings and the list of what is not built yet.
+> **Status:** ingest and analysis tables are done; `/data` is the analysis workspace. See [analytics_architecture.md](../analytics_architecture.md) for commands and findings.
 
 ### Original plan (17:00 → 02:00, then F owns it), Gate **M3**
 
-Scope comes from [analytics_prediction_requirements.md](analytics_prediction_requirements.md). Keep it separate in `project/analytics/` (a notebook or scripts writing to `analytics/derived/`). Show the result as a third page, `/insights`, fed from static JSON.
+Scope comes from [analytics_prediction_requirements.md](../analytics_prediction_requirements.md). Keep historical aggregates in `project/analytics/` and show them on `/data`.
 
 | ID | Task |
 |---|---|
@@ -119,7 +119,20 @@ Scope comes from [analytics_prediction_requirements.md](analytics_prediction_req
 | **F1** ✅ | Recovery KPIs per station catchment and H3 hex: abandonments per 100 trip ends, idle hours, time to provider pickup. |
 | **F2** ✅ | Station opportunity: hexes with high demand and many out-of-station parkings but no station. |
 | **F3** ✅ | Supply/demand by hour: departures, arrivals, net flow per station. |
-| **F4** ✅ | Export JSON and add the `/insights` map page (reusing `BaseMap`). |
+| **F4** ✅ | Serve analytics aggregates and show them on `/data`. |
+
+### Data Analysis workspace evolution
+
+| ID | Status | Task and acceptance check |
+|---|---|---|
+| **G1** | ✅ | Correct live evidence: only an advancing provider observation time is fresh; after a feed gap, keep the case uncertain and remove an assigned stop. Backend tests cover both transitions and restart persistence. |
+| **G2** | ✅ | Merge case review into `/data?view=live`; keep evidence, corrections, approval and replay controls. `/review` and `/insights` redirect to `/data`. |
+| **G3** | ✅ | Add a multi-layer decision map: 250/500/1000 m and Cascais aggregates preserve count totals, with rates recomputed from summed counts; show stations, parking, candidates, stops, bus/rail shapes and cases. |
+| **G4** | ✅ | Add two-site comparison and sourced context places. The map now has one Historical view with total/average metric control, 50–1,000 m squares, recalculated rankings, live and scheduled transit movement with distinct labels, station balance and people hotspots. |
+| **G5** | Next | Add date, weekday/hour, operator and route filters where source data supports them. Every filter must report its period and unavailable combinations; map, chart and comparison totals must agree. |
+| **G6** | Next | Expand the source catalogue and POI coverage with provenance, update dates, missingness and quality checks. Context places stay out of the station score until reviewed. |
+| **G7** | Next | Add a proposal workflow from a compared site: save rationale, constraints, owner and expected outcome; require reviewer approval before marking a site recommended. |
+| **G8** | Next | Add aggregate CSV/print export with selected filters and definitions; complete Portuguese labels, keyboard access and a reduced-motion visual check. |
 
 ## Phase 4 — Stabilise and pitch (02:00 → 09:30)
 

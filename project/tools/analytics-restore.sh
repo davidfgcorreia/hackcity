@@ -13,3 +13,4 @@ docker compose exec -T analytics-db rm -f /tmp/restore.dump
 trap - EXIT
 docker compose exec -T analytics-db psql -U analytics -d analytics -Atc \
   "select 'restored: ' || count(*) || ' derived tables' from information_schema.tables where table_schema = 'derived'"
+make analytics-map-prep

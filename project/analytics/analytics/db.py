@@ -13,8 +13,10 @@ from analytics.config import PG_URL
 SCHEMAS = ["meta", "ref", "bike", "gtfs", "transit26", "bus26", "transit25", "weather", "derived"]
 
 
-def pg() -> psycopg.Connection:
-    return psycopg.connect(PG_URL, autocommit=True)
+def pg(interactive: bool = False) -> psycopg.Connection:
+    """`interactive` disables JIT: map queries have large cost estimates but finish in well under a
+    second, so JIT compilation (~0.5 s) would dominate their latency."""
+    return psycopg.connect(PG_URL, autocommit=True, **({"options": "-c jit=off"} if interactive else {}))
 
 
 def duck() -> duckdb.DuckDBPyConnection:

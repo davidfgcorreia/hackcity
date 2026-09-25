@@ -23,6 +23,7 @@ class Event:
     event_types: frozenset[str]
     lat: float | None
     lng: float | None
+    observed_at: datetime | None = None  # source location time; defaults to event time for historical events
 
 
 @dataclass(frozen=True)
@@ -62,5 +63,5 @@ def apply_event(prev: VehicleState | None, ev: Event, move_tolerance_m: float) -
         return VehicleState(ev.device_id, ev.state, ev.lat, ev.lng, ev.time, rest_since=ev.time)
 
     # same position: keep clock and position (ignore GPS jitter), record fresh observation
-    observed = ev.time if ev.lat is not None and ev.state in REST_STATES else prev.last_observed_at_rest
+    observed = (ev.observed_at or ev.time) if ev.lat is not None and ev.state in REST_STATES else prev.last_observed_at_rest
     return replace(prev, state=ev.state, last_event_time=ev.time, last_observed_at_rest=observed)

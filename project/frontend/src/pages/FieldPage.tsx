@@ -1,5 +1,5 @@
 import { useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { api, type SubmitResult } from '../api'
 import { FoundBikeForm } from '../components/field/FoundBikeForm'
 import { BottomSheet, type Detent } from '../components/field/BottomSheet'
@@ -7,11 +7,11 @@ import { ManeuverBanner, ManeuverIcon, instruction } from '../components/field/M
 import { MissionSidebar } from '../components/field/MissionSidebar'
 import { NavMap, type CameraMode } from '../components/field/NavMap'
 import { StopList } from '../components/field/StopList'
-import { StopSheet } from '../components/field/StopSheet'
+import { StopSheet, type StopAutoplay } from '../components/field/StopSheet'
 import {
   cacheCases, cacheMission, cachedCases, cachedMission, onQueueChange, queuedCount,
 } from '../components/field/offline'
-import { Badge, Button, FIELD_CSS, colors, fmtClock, fmtDistance, fmtDuration } from '../components/field/ui'
+import { Badge, Button, FIELD_CSS, colors, fmtClock, fmtDistance, fmtDuration, bikeNumbers } from '../components/field/ui'
 import { freshFix, useGeolocation, type FieldPosition } from '../components/field/useGeolocation'
 import { useNavigation, useSimulatedDrive } from '../components/field/useNavigation'
 import { SetLangContext, useLang, useT } from '../i18n'
@@ -22,8 +22,18 @@ const OPERATOR_KEY = 'field:operator'
 const POLL_MS = 5000
 const REPLAN_COOLDOWN_MS = 30_000
 const OFF_ROUTE_COOLDOWN_MS = 20_000
-/** `/field?sim` drives the van along the route (pitch demo without GPS), starting at the depot. */
-const SIMULATE = typeof location !== 'undefined' && new URLSearchParams(location.search).has('sim')
+/** `/field?sim` runs the scripted presentation demo as this operator (backend services/demo.py). */
+const DEMO_OPERATOR = 'demo'
+const DEMO_BIKES = 5
+/** Fast-forward driving (m/s): about 10 s out of the depot to bike 1 and a 2–3 minute full demo. */
+const DEMO_SPEED_MS = 70
+/** The demo shows one complete pickup, then ends a few seconds into the drive to bike 2. */
+const DEMO_AFTER_PICKUP_MS = 7000
+const DEMO_AUTOPLAY: Record<'pt' | 'en', StopAutoplay> = {
+  pt: { photoUrl: '/demo/bike-photo.svg', description: 'Bicicleta estacionada no passeio, a bloquear a passagem. Guarda-lamas traseiro riscado; bateria a 40%.' },
+  en: { photoUrl: '/demo/bike-photo.svg', description: 'Bike parked on the pavement, blocking the way. Rear mudguard scratched; battery at 40%.' },
+}
+/** `/field?sim` drives the van along the demo route (pitch without GPS), starting at the depot. */
 const DEPOT_POSITION: FieldPosition = { lat: 38.736686, lng: -9.386868, accuracy: 5, at: new Date().toISOString() }
 
 /** Mobile field view, Apple-Maps style: road-route navigation map with a maneuver banner,
@@ -31,12 +41,17 @@ const DEPOT_POSITION: FieldPosition = { lat: 38.736686, lng: -9.386868, accuracy
  *  found-bike report and the offline queue. */
 export function FieldPage() {
   const t = useT()
+  const navigate = useNavigate()
+  // Read per mount, not per module load: leaving /field?sim through Home must not keep simulating on /field.
+  const SIMULATE = new URLSearchParams(useLocation().search).has('sim')
   const lang = useLang()
   const setLang = useContext(SetLangContext)
   const [operator, setOperator] = useState(() => {
     try { return localStorage.getItem(OPERATOR_KEY) ?? OPERATORS[0] } catch { return OPERATORS[0] }
   })
   const { position: gpsPosition, live, error: geoError } = useGeolocation()
+  // The demo runs as its own operator so it never touches op1/op2's missions or cached routes.
+  const who = SIMULATE ? DEMO_OPERATOR : operator
 
   const [mission, setMission] = useState<Mission | null>(null)
   const [cases, setCases] = useState<Case[]>([])
@@ -49,8 +64,11 @@ export function FieldPage() {
   const [toast, setToast] = useState<string | null>(null)
   const [pending, setPending] = useState(0)
   const [clockNow, setClockNow] = useState(Date.now())
+  const [demoDone, setDemoDone] = useState(false)
+  const demoStarting = useRef(false)
+  const onDemoArrive = useRef<() => void>(() => {})
 
-  const simPosition = useSimulatedDrive(mission, SIMULATE)
+  const simPosition = useSimulatedDrive(mission, SIMULATE && !demoDone, { speedMs: DEMO_SPEED_MS, onArrive: () => onDemoArrive.current() })
   const position = SIMULATE ? simPosition ?? gpsPosition ?? DEPOT_POSITION : gpsPosition
 
   const version = useRef(0)
@@ -78,27 +96,27 @@ export function FieldPage() {
     if (!at) return
     lastReplan.current = Date.now()
     try {
-      const next = await api.replan(operator, at.lat, at.lng, reason)
+      const next = await api.replan(who, at.lat, at.lng, reason)
       if (reason === 'off_route' || (version.current && next.version !== version.current)) {
         setBanner(next.last_change ?? null)
       }
       setMission(next)
       version.current = next.version
-      cacheMission(operator, next)
+      cacheMission(who, next)
     } catch { /* replan lands with T-C2; polling keeps showing whatever exists */ }
-  }, [operator])
+  }, [who])
 
   // Poll the mission and its cases. A failed request must never blank the route (ER-8).
   useEffect(() => {
     version.current = 0
     initialRouteChecked.current = false
-    setMission(cachedMission(operator))
-    setCases(cachedCases(operator))
+    setMission(cachedMission(who))
+    setCases(cachedCases(who))
 
     let alive = true
     const load = async () => {
       try {
-        const [nextMission, nextCases] = await Promise.all([api.mission(operator), api.cases()])
+        const [nextMission, nextCases] = await Promise.all([api.mission(who), SIMULATE ? api.cases(undefined, false, DEMO_OPERATOR) : api.cases(undefined, true)])
         if (!alive) return
         if (nextMission && version.current && nextMission.version !== version.current) {
           setBanner(nextMission.last_change ?? '')
@@ -107,17 +125,23 @@ export function FieldPage() {
         setMission(nextMission)
         setCases(nextCases)
         setStale(false)
-        cacheMission(operator, nextMission)
+        cacheMission(who, nextMission)
         // Only the cases on the route are cached: that is what the stop sheet needs offline,
         // and it keeps the whole case list out of a limited localStorage quota.
         const onRoute = new Set((nextMission?.stops ?? []).map((s) => s.case_id))
-        cacheCases(operator, nextCases.filter((c) => onRoute.has(c.id)))
+        cacheCases(who, nextCases.filter((c) => onRoute.has(c.id)))
         if (pendingRef.current > 0) {
           const { sent } = await api.flushQueue()
           if (alive && sent > 0) setToast(`${t.synced} (${sent})`)
         }
-        if (SIMULATE && !nextMission && positionRef.current && Date.now() - lastReplan.current > REPLAN_COOLDOWN_MS) {
-          await replanNow()
+        // The demo starts itself: no demo mission yet means a fresh 5-bike mission from the depot.
+        if (SIMULATE && !nextMission && !demoStarting.current) {
+          demoStarting.current = true
+          const started = await api.demo.start().finally(() => { demoStarting.current = false })
+          if (!alive) return
+          version.current = started.version
+          setMission(started)
+          setCases(await api.cases(undefined, false, DEMO_OPERATOR))
         }
       } catch {
         if (alive) setStale(true)
@@ -128,7 +152,7 @@ export function FieldPage() {
     return () => { alive = false; clearInterval(id) }
     // `t` only feeds a toast; leaving it out keeps a language switch from restarting the poll.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [operator, replanNow])
+  }, [who, replanNow])
 
   // Pending-sync badge + resend as soon as the connection is back (T-D5).
   useEffect(() => {
@@ -143,9 +167,9 @@ export function FieldPage() {
   const stops = mission?.stops ?? []
   const planned = useMemo(() => stops.filter((s) => s.status === 'planned').sort((a, b) => a.seq - b.seq), [stops])
   const subjectFor = (stop: Stop | null) => cases.find((c) => c.id === stop?.case_id)
+  const numbers = useMemo(() => bikeNumbers(stops), [stops])
   const stopLabel = (stop?: Stop) =>
-    !stop ? t.none : stop.kind === 'depot' ? 'Complexo Multisserviços'
-      : `${t.bike} ${Math.max(1, planned.findIndex(s => s.id === stop.id) + 1)}`
+    !stop ? t.none : stop.kind === 'depot' ? 'Complexo Multisserviços' : `${t.bike} ${numbers.get(stop.id) ?? ''}`
 
   const onOffRoute = useCallback(() => {
     const cooldownLeft = OFF_ROUTE_COOLDOWN_MS - (Date.now() - lastReplan.current)
@@ -175,13 +199,49 @@ export function FieldPage() {
     return () => clearTimeout(id)
   }, [banner])
 
+  // Demo: the drive holds at the next stop. A bike opens its stop sheet (photo + description);
+  // the depot closes the demo. Recording the outcome re-plans from the bike and driving resumes.
+  onDemoArrive.current = () => {
+    const stop = planned[0]
+    if (!stop || !mission || demoDone) return  // the post-depot re-plan is a zero-length route: arrive once
+    if (stop.kind === 'depot') {
+      api.depotArrived(mission.id, stop.lat, stop.lng).then(setMission).catch(() => {})
+      setDemoDone(true)
+      return
+    }
+    setToast(t.demoArrived(numbers.get(stop.id) ?? 1, DEMO_BIKES))
+    setSelected(stop)
+  }
+
+  async function restartDemo() {
+    if (demoTimer.current) clearTimeout(demoTimer.current)
+    setDemoDone(false)
+    setSelected(null)
+    demoStarting.current = true
+    try {
+      const started = await api.demo.start()
+      version.current = started.version
+      setMission(started)
+      cacheMission(who, started)
+      setCases(await api.cases(undefined, false, DEMO_OPERATOR))
+    } catch { setToast(t.demoStarting) } finally { demoStarting.current = false }
+  }
+
+  // Demo: after the one scripted pickup, drive toward bike 2 briefly, then end.
+  const demoTimer = useRef<number | null>(null)
+  useEffect(() => () => { if (demoTimer.current) clearTimeout(demoTimer.current) }, [])
+
   function handleOutcome(result: SubmitResult, outcome: Outcome) {
     const stop = selected
     setSelected(null)
+    if (SIMULATE && !result.queued && outcome === 'picked_up') {
+      if (demoTimer.current) clearTimeout(demoTimer.current)
+      demoTimer.current = window.setTimeout(() => setDemoDone(true), DEMO_AFTER_PICKUP_MS)
+    }
     if (!result.queued) {
       setMission(result.mission)
       version.current = result.mission.version
-      cacheMission(operator, result.mission)
+      cacheMission(who, result.mission)
       setToast(t.saved)
       return
     }
@@ -193,14 +253,14 @@ export function FieldPage() {
         ...current,
         stops: current.stops.map((s) => (s.id === stop.id ? { ...s, status: 'done', outcome } : s)),
       }
-      cacheMission(operator, updated)
+      cacheMission(who, updated)
       return updated
     })
   }
 
   const offline = stale || pending > 0
   const positionFresh = SIMULATE || (freshFix(gpsPosition, live) && Boolean(gpsPosition && clockNow - Date.parse(gpsPosition.at) < 15_000))
-  const navigating = Boolean(mission && position && (mission.route_legs?.length ?? 0) > 0)
+  const navigating = Boolean(mission && position && (mission.route_legs?.length ?? 0) > 0) && !(SIMULATE && demoDone)
   const nearStop = nav.toStopM != null && nav.toStopM < 60
 
   return (
@@ -241,6 +301,10 @@ export function FieldPage() {
       <div style={{ position: 'absolute', right: 10, top: `calc(${banner !== null ? 196 : 160}px + env(safe-area-inset-top))`, zIndex: 22,
         display: 'flex', flexDirection: 'column', gap: 8, transition: 'top .3s' }}>
         <div className="glass" style={{ borderRadius: 14, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+          <RoundButton label={t.home} onClick={() => navigate('/')}>
+            <path d="M3 11.5 12 4l9 7.5M5.5 9.5V20h5v-5.5h3V20h5V9.5" />
+          </RoundButton>
+          <div style={{ height: 0.5, background: colors.line }} />
           <RoundButton label={t.recentre} onClick={() => setCamera('follow')}>
             <path d="M12 2 4 20l8-4 8 4z" fill={camera === 'follow' ? colors.primary : 'none'} />
           </RoundButton>
@@ -273,7 +337,7 @@ export function FieldPage() {
                 display: 'flex', alignItems: 'center', gap: 8, color: 'inherit', maxWidth: '100%' }}>
                 <span style={{ width: 22, height: 22, borderRadius: next?.kind === 'depot' ? 6 : 11, background: next?.kind === 'depot' ? '#1c1c1e' : colors.danger,
                   color: '#fff', fontSize: 12, fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                  {next?.kind === 'depot' ? '⌂' : next?.seq}
+                  {next?.kind === 'depot' ? '⌂' : next && numbers.get(next.id)}
                 </span>
                 <span style={{ fontSize: 15, fontWeight: 600, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                   {stopLabel(next)}
@@ -334,7 +398,8 @@ export function FieldPage() {
           )}
         </div>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginTop: 14 }}>
-          <Button tone="grey" onClick={() => replanNow()} disabled={!position}>{t.recalculate}</Button>
+          {SIMULATE && <div style={{ gridColumn: '1 / -1' }}><Button wide onClick={restartDemo}>{t.restartDemo}</Button></div>}
+          <Button tone="grey" onClick={() => replanNow()} disabled={!position || SIMULATE}>{t.recalculate}</Button>
           <Button tone="grey" onClick={() => setShowFound(true)}>{t.foundBike}</Button>
         </div>
       </BottomSheet>
@@ -348,11 +413,21 @@ export function FieldPage() {
       )}
 
       {selected && (
-        <StopSheet stop={selected} subject={subjectFor(selected)} actor={operator} position={position}
-          onDone={handleOutcome} onClose={() => setSelected(null)} />
+        <StopSheet stop={selected} subject={subjectFor(selected)} actor={who} position={position}
+          onDone={handleOutcome} onClose={() => setSelected(null)} autoplay={SIMULATE && !demoDone ? DEMO_AUTOPLAY[lang] : undefined} />
+      )}
+      {SIMULATE && demoDone && (
+        <div role="status" className="glass" style={{ position: 'absolute', left: '50%', top: '38%', transform: 'translate(-50%, -50%)', zIndex: 60,
+          width: 'min(88vw, 380px)', borderRadius: 22, padding: '22px 20px', textAlign: 'center', animation: 'pill-in .3s ease-out' }}>
+          <div style={{ width: 52, height: 52, margin: '0 auto 10px', borderRadius: 26, background: colors.ok, color: '#fff', fontSize: 28,
+            display: 'flex', alignItems: 'center', justifyContent: 'center' }}>✓</div>
+          <div style={{ fontSize: 22, fontWeight: 700, marginBottom: 6 }}>{t.demoComplete}</div>
+          <div style={{ fontSize: 15, color: colors.secondary, marginBottom: 16 }}>{t.demoCompleteDetail}</div>
+          <Button wide onClick={restartDemo}>{t.restartDemo}</Button>
+        </div>
       )}
       {showFound && (
-        <FoundBikeForm actor={operator} position={position} onClose={() => setShowFound(false)} />
+        <FoundBikeForm actor={who} position={position} onClose={() => setShowFound(false)} />
       )}
     </div>
   )

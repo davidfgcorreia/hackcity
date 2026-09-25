@@ -192,3 +192,18 @@ def test_a_status_named_event_kind_is_also_understood(client, db):
     ])
     db.commit()
     assert client.get("/api/cases/kpis").json()["median_eligible_to_pickup_min"] == 20.0
+
+
+def test_current_cases_follow_the_active_mode(client, db):
+    from app.services import clock
+    for source in ("live", "replay", "field"):
+        db.add(Case(device_id=f"bike-{source}", status="eligible", source=source, lat=38.7, lng=-9.4, reason="test"))
+    db.commit()
+    clock.set_sim_time(None)
+    assert {c["source"] for c in client.get("/api/cases?status=eligible&current=true").json()} == {"live", "field"}
+    clock.set_sim_time(T0)
+    try:
+        assert {c["source"] for c in client.get("/api/cases?current=true").json()} == {"replay", "field"}
+    finally:
+        clock.set_sim_time(None)
+    assert len(client.get("/api/cases").json()) == 3  # unfiltered view keeps everything for audit

@@ -127,5 +127,8 @@ def run(d) -> None:
              WHERE stop_lat ~ '^-?[0-9.]+$' AND stop_lon ~ '^-?[0-9.]+$';""")
     point_geom("gtfs.stops")
     sql("""CREATE INDEX ON gtfs.stops (agency_id_plan, stop_id); CREATE INDEX ON gtfs.stop_times (plan_id, trip_id);
-           CREATE INDEX ON gtfs.stop_times (plan_id, stop_id); CREATE INDEX ON gtfs.trips (plan_id, trip_id)""")
+           CREATE INDEX ON gtfs.stop_times (plan_id, stop_id); CREATE INDEX ON gtfs.trips (plan_id, trip_id);
+           CREATE INDEX ON gtfs.shapes (plan_id, shape_id);
+           CREATE INDEX ON gtfs.calendar (plan_id, service_id);
+           CREATE INDEX ON gtfs.calendar_dates (plan_id, service_id, date)""")
     print(f"  bbox for trip filter: {BBOX}")

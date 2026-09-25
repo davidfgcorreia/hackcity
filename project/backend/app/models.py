@@ -19,6 +19,22 @@ class Station(Base):
     area: Mapped[dict] = mapped_column(JSON)  # GeoJSON MultiPolygon, [lon, lat]
 
 
+class StationStatus(Base):
+    __tablename__ = "station_status_snapshots"
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    station_id: Mapped[str] = mapped_column(String, index=True)
+    bikes_available: Mapped[int]
+    reported_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    collected_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), index=True)
+
+
+class StationTarget(Base):
+    __tablename__ = "station_targets"
+    station_id: Mapped[str] = mapped_column(String, primary_key=True)
+    bikes: Mapped[int]
+    updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+
+
 class VehicleEvent(Base):
     """Provider event: supplied history (viagens.xlsx) or a live GBFS transition."""
     __tablename__ = "vehicle_events"
@@ -32,6 +48,7 @@ class VehicleEvent(Base):
     lng: Mapped[float | None]
     trip_id: Mapped[str | None]
     event_time: Mapped[datetime] = mapped_column(DateTime(timezone=True), index=True)
+    source_observed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     battery: Mapped[float | None]  # fraction 0–1
     received_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
 
@@ -42,10 +59,11 @@ class Case(Base):
     device_id: Mapped[str] = mapped_column(String, index=True)
     # candidate | uncertain | supported | eligible | assigned | picked_up | resolved
     status: Mapped[str] = mapped_column(String, index=True)
-    source: Mapped[str] = mapped_column(String, default="live")  # live | replay | field
+    source: Mapped[str] = mapped_column(String, default="live")  # live | replay | field | demo
     lat: Mapped[float]
     lng: Mapped[float]
     rest_since: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    last_observed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     distance_outside_m: Mapped[float | None]
     reason: Mapped[str] = mapped_column(Text, default="")
     field_confirmed: Mapped[bool] = mapped_column(default=False)

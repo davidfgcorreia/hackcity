@@ -10,7 +10,7 @@ from app.core.vehicle_state import Event, apply_event
 from app.models import Case, Stop
 from app.schemas import MissionOut
 from app.schemas import Outcome
-from app.services import cases, missions
+from app.services import cases, clock, missions
 from tests.conftest import T0
 
 RULES = Rules(abandon_minutes=120, fresh_max_age_min=60, require_fresh_observation=True)
@@ -33,8 +33,8 @@ REST = (0, "available", ("trip_end",), POS)
 SEEN = (110, "available", ("located",), POS)
 
 
-def eligible_case(db, device, lat, lng, minutes_ago=200):
-    c = Case(device_id=device, status="eligible", source="replay", lat=lat, lng=lng, rest_since=at(-minutes_ago), reason="test")
+def eligible_case(db, device, lat, lng, minutes_ago=200, source="replay"):
+    c = Case(device_id=device, status="eligible", source=source, lat=lat, lng=lng, rest_since=at(-minutes_ago), reason="test")
     db.add(c)
     db.commit()
     return c
@@ -142,6 +142,20 @@ def test_assigned_bike_starting_trip_is_removed_from_route(db):
     assert m.version == 2 and "started a trip" in m.last_change
 
 
+def test_assigned_bike_missing_from_feed_waits_for_verification(db):
+    s = state(REST, SEEN)
+    cases.sync_all(db, {"b": s}, OUTSIDE, at(125), RULES, source="replay")
+    missions.replan(db, "op1", 38.70, -9.42, "start")
+    missing = state(REST, SEEN, (130, "missing", ("gbfs_disappeared",), (None, None)))
+    reasons = cases.sync_all(db, {"b": missing}, OUTSIDE, at(131), RULES, source="replay")
+    db.commit()
+    missions.replan_all(db, "; ".join(reasons))
+    case = db.scalar(select(Case))
+    mission = missions.current_mission(db, "op1")
+    assert case.status == "uncertain" and "missing" in case.reason
+    assert [stop.kind for stop in mission.stops if stop.status == "planned"] == ["depot"]
+
+
 def _photo():
     return UploadFile(io.BytesIO(b"jpg"), filename="p.jpg")
 
@@ -214,3 +228,27 @@ def test_replan_stores_road_route_and_etas(db):
     assert m.route_geojson["type"] == "LineString" and len(m.route_legs) == 3  # 2 stops + depot
     etas = [s.eta_s for s in sorted(m.stops, key=lambda s: s.seq) if s.status == "planned"]
     assert etas == sorted(etas) and etas[0] > 0
+
+
+def test_replay_mission_never_routes_live_cases(db):
+    eligible_case(db, "replay00", 38.701, -9.42)
+    eligible_case(db, "live0000", 38.702, -9.42, source="live")
+    eligible_case(db, "field000", 38.703, -9.42, source="field")
+    m = missions.replan(db, "op1", 38.700, -9.42, "test")  # conftest sets a simulated clock: replay mode
+    routed = {s.case_id for s in m.stops if s.kind == "pickup" and s.status == "planned"}
+    by_device = {c.device_id: c for c in db.scalars(select(Case))}
+    assert routed == {by_device["replay00"].id, by_device["field000"].id}
+    assert by_device["live0000"].status == "eligible"
+
+
+def test_switch_to_live_drops_replay_stops_and_releases_their_cases(db):
+    replay_case = eligible_case(db, "replay00", 38.701, -9.42)
+    live_case = eligible_case(db, "live0000", 38.702, -9.42, source="live")
+    missions.replan(db, "op1", 38.700, -9.42, "test")
+    assert db.get(Case, replay_case.id).status == "assigned"
+
+    clock.set_sim_time(None)  # live mode
+    m = missions.replan(db, "op1", 38.700, -9.42, "Switched to live detection")
+    planned = [s.case_id for s in m.stops if s.kind == "pickup" and s.status == "planned"]
+    assert planned == [live_case.id]
+    assert db.get(Case, replay_case.id).status == "eligible"  # not left "assigned" to a stop that no longer exists

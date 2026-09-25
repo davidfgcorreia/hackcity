@@ -4,8 +4,10 @@ import { createContext, useContext } from 'react'
 const pt = {
   // field · navigation
   arrived: 'Cheguei', arrival: 'chegada', offRoute: 'Fora da rota — a recalcular', rerouted: 'Nova rota calculada',
-  straightLine: 'Rota aproximada — sem motor de estradas', overview: 'Visão geral', recentre: 'Seguir',
-  simulated: 'Simulação', directions: 'Indicações', upNext: 'A seguir', toDepot: 'Regressar ao armazém',
+  straightLine: 'Rota aproximada — sem motor de estradas', overview: 'Visão geral', recentre: 'Seguir', home: 'Início',
+  simulated: 'Simulação', demoArrived: (n: number, total: number) => `Chegou à bicicleta ${n} de ${total}`,
+  demoComplete: 'Demonstração concluída', demoCompleteDetail: 'Bicicleta 1 recolhida com fotografia e descrição · a caminho da bicicleta 2. A rota atualiza-se a cada recolha.',
+  restartDemo: 'Reiniciar demonstração', demoStarting: 'A preparar a demonstração…', directions: 'Indicações', upNext: 'A seguir', toDepot: 'Regressar ao armazém',
   settings: 'Definições', language: 'Idioma',
   // shell
   route: 'Rota', next: 'Próxima paragem', depot: 'Armazém', noMission: 'Sem missão ativa',
@@ -27,7 +29,7 @@ const pt = {
   outsideBy: 'Fora da área', reason: 'Motivo', uncertain: 'Incerto',
   needsApproval: 'Aguarda aprovação', blocked: 'Bloqueado',
   recordOutcome: 'Registar resultado', photo: 'Fotografia', addPhoto: 'Adicionar fotografia',
-  notes: 'Notas', submit: 'Submeter', pickupNeedsIdAndPhoto: 'A recolha exige ID da bicicleta e fotografia',
+  notes: 'Descrição', notesPlaceholder: 'Estado, local, danos…', submit: 'Submeter', pickupNeedsIdAndPhoto: 'A recolha exige ID da bicicleta e fotografia',
   saved: 'Registado', savedOffline: 'Guardado no dispositivo — será enviado com ligação',
 
   // field · found bike (D4)
@@ -46,11 +48,13 @@ const pt = {
   // review · replay (E5)
   replay: 'Replay', start: 'Iniciar', pause: 'Pausa', step30: '+30 min',
   simClock: 'Relógio simulado', speed: 'Velocidade', notStarted: 'não iniciado', from: 'início',
+  liveMode: 'Tempo real', replayMode: 'Replay', backToLive: 'Voltar ao tempo real', startReplay: 'Abrir replay', hideReplay: 'Fechar',
+  liveFeed: 'Feed GBFS', lastPoll: 'última leitura', livePaused: 'Tempo real em pausa',
 
   // review · case detail (E2, E3, E4)
   detail: 'Detalhe do caso', timeline: 'Linha temporal de evidência',
   boundaryDistance: 'Distância à área da estação', ruleCalc: 'Regra dos 120 minutos',
-  ruleMet: 'cumprida', ruleNotMet: 'não cumprida', threshold: 'limiar',
+  ruleMet: 'cumprida', ruleNotMet: 'não cumprida', threshold: 'limiar', countedIn: 'contados em',
   correct: 'Corrigir', approve: 'Aprovar', block: 'Bloquear', unblock: 'Desbloquear',
   export: 'Exportar', actor: 'Quem regista', reasonLabel: 'Motivo da alteração',
   reasonRequired: 'Indique quem regista e o motivo', before: 'antes', after: 'depois',
@@ -71,8 +75,10 @@ const pt = {
 const en: typeof pt = {
   // field · navigation
   arrived: 'Arrived', arrival: 'arrival', offRoute: 'Off route — recalculating', rerouted: 'New route calculated',
-  straightLine: 'Approximate route — road engine unavailable', overview: 'Overview', recentre: 'Follow',
-  simulated: 'Simulation', directions: 'Directions', upNext: 'Up next', toDepot: 'Return to depot',
+  straightLine: 'Approximate route — road engine unavailable', overview: 'Overview', recentre: 'Follow', home: 'Home',
+  simulated: 'Simulation', demoArrived: (n: number, total: number) => `Arrived at bike ${n} of ${total}`,
+  demoComplete: 'Demo complete', demoCompleteDetail: 'Bike 1 collected with a photo and description · on the way to bike 2. The route updates after every pickup.',
+  restartDemo: 'Restart demo', demoStarting: 'Preparing the demo…', directions: 'Directions', upNext: 'Up next', toDepot: 'Return to depot',
   settings: 'Settings', language: 'Language',
   route: 'Route', next: 'Next stop', depot: 'Depot', noMission: 'No active mission',
   cases: 'Cases', routeChanged: 'Route changed', offline: 'Offline — records saved locally',
@@ -90,7 +96,7 @@ const en: typeof pt = {
   outsideBy: 'Outside the area by', reason: 'Reason', uncertain: 'Uncertain',
   needsApproval: 'Awaiting approval', blocked: 'Blocked',
   recordOutcome: 'Record outcome', photo: 'Photo', addPhoto: 'Add photo',
-  notes: 'Notes', submit: 'Submit', pickupNeedsIdAndPhoto: 'A pickup needs a bicycle ID and a photo',
+  notes: 'Description', notesPlaceholder: 'Condition, location, damage…', submit: 'Submit', pickupNeedsIdAndPhoto: 'A pickup needs a bicycle ID and a photo',
   saved: 'Recorded', savedOffline: 'Saved on the device — it will be sent once back online',
 
   foundBike: 'Found another bicycle', foundBikeTitle: 'Report a bicycle found in the field',
@@ -105,10 +111,12 @@ const en: typeof pt = {
 
   replay: 'Replay', start: 'Start', pause: 'Pause', step30: '+30 min',
   simClock: 'Simulated clock', speed: 'Speed', notStarted: 'not started', from: 'from',
+  liveMode: 'Live', replayMode: 'Replay', backToLive: 'Back to live', startReplay: 'Open replay', hideReplay: 'Close',
+  liveFeed: 'GBFS feed', lastPoll: 'last poll', livePaused: 'Live paused',
 
   detail: 'Case detail', timeline: 'Evidence timeline',
   boundaryDistance: 'Distance to the station area', ruleCalc: '120-minute rule',
-  ruleMet: 'met', ruleNotMet: 'not met', threshold: 'threshold',
+  ruleMet: 'met', ruleNotMet: 'not met', threshold: 'threshold', countedIn: 'counted in',
   correct: 'Correct', approve: 'Approve', block: 'Block', unblock: 'Unblock',
   export: 'Export', actor: 'Recorded by', reasonLabel: 'Reason for the change',
   reasonRequired: 'Give the actor and a reason', before: 'before', after: 'after',

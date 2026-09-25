@@ -45,6 +45,7 @@ class CaseOut(ORM):
     lat: float
     lng: float
     rest_since: datetime | None
+    last_observed_at: datetime | None
     distance_outside_m: float | None
     reason: str
     needs_approval: bool

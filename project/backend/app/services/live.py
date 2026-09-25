@@ -25,7 +25,7 @@ from app.core.gbfs_tracker import Sighting, Tracker
 from app.core.geo import ZoneIndex
 from app.core.vehicle_state import VehicleState, apply_event
 from app.db import SessionLocal
-from app.models import Station, VehicleEvent
+from app.models import Station, StationStatus, VehicleEvent
 from app.schemas import LiveState
 from app.services import cases, clock, missions
 from app.services.replay import to_event
@@ -89,11 +89,14 @@ class LiveEngine:
     def _restore(self, db, now: datetime) -> None:
         """Fold stored gbfs transitions so parking clocks survive an API restart."""
         type_of = {}
+        source_seen = {}
         for e in db.scalars(select(VehicleEvent).where(VehicleEvent.source == "gbfs").order_by(VehicleEvent.event_time)):
             self.states[e.device_id] = apply_event(self.states.get(e.device_id), to_event(e), settings.move_tolerance_m)
             if e.vehicle_type_id:
                 type_of[e.device_id] = (self._types.get(e.vehicle_type_id, "unknown"), e.vehicle_type_id)
-        self.tracker.restore(self.states, type_of, now)
+            if e.source_observed_at:
+                source_seen[e.device_id] = e.source_observed_at
+        self.tracker.restore(self.states, type_of, now, source_seen)
         self._restored = True
 
     def poll_once(self, now: datetime | None = None) -> list[str]:
@@ -105,6 +108,15 @@ class LiveEngine:
             if not self._restored:
                 self._restore(db, now)
             bikes = self._fetch(feeds["free_bike_status"])["data"]["bikes"]
+            if "station_status" in feeds:
+                try:
+                    statuses = self._fetch(feeds["station_status"])["data"]["stations"]
+                    db.add_all(StationStatus(station_id=s["station_id"],
+                                             bikes_available=max(0, int(s["num_bikes_available"])),
+                                             reported_at=_ts(s.get("last_reported")), collected_at=now)
+                               for s in statuses if s.get("num_bikes_available") is not None)
+                except (ValueError, KeyError, httpx.HTTPError) as exc:
+                    log.warning("station_status unavailable: %s", exc)
             sightings = [
                 Sighting(b["vehicle_type_id"], self._types.get(b["vehicle_type_id"], "unknown"), b["lat"], b["lon"],
                          bool(b.get("is_disabled")), bool(b.get("is_reserved")), b.get("current_fuel_percent"),
@@ -116,19 +128,18 @@ class LiveEngine:
             types = {t.id: t.sighting.vehicle_type_id for t in self.tracker.tracks.values()}
             rows = []
             for ev in self.tracker.update(sightings, now):
-                prev = self.states.get(ev.device_id)
-                self.states[ev.device_id] = apply_event(prev, ev, settings.move_tolerance_m)
-                if ev.event_types != {"located"} or (prev and prev.state != ev.state):
-                    type_id = self.tracker.tracks[ev.device_id].sighting.vehicle_type_id \
-                        if ev.device_id in self.tracker.tracks else types.get(ev.device_id)
-                    rows.append(dict(id=f"gbfs-{uuid4().hex}", source="gbfs", device_id=ev.device_id,
-                                     vehicle_type_id=type_id, state=ev.state, event_types=sorted(ev.event_types),
-                                     lat=ev.lat, lng=ev.lng, event_time=now, received_at=now))
+                self.states[ev.device_id] = apply_event(self.states.get(ev.device_id), ev, settings.move_tolerance_m)
+                type_id = self.tracker.tracks[ev.device_id].sighting.vehicle_type_id \
+                    if ev.device_id in self.tracker.tracks else types.get(ev.device_id)
+                rows.append(dict(id=f"gbfs-{uuid4().hex}", source="gbfs", device_id=ev.device_id,
+                                 vehicle_type_id=type_id, state=ev.state, event_types=sorted(ev.event_types),
+                                 lat=ev.lat, lng=ev.lng, event_time=now, source_observed_at=ev.observed_at,
+                                 received_at=now))
             if rows:
                 db.execute(insert(VehicleEvent).values(rows))
             gone = [d for d, s in self.states.items() if not s.at_rest and d not in self.tracker.tracks]
             changes = cases.sync_all(db, self.states, self._distance, now, cases.rules("live"), source="live")
-            for d in gone:  # a vanished vehicle never comes back under the same track id
+            for d in gone:  # historical terminal states, never missing-feed uncertainty
                 del self.states[d]
             db.commit()
             if changes:
@@ -137,11 +148,28 @@ class LiveEngine:
             self.last_poll, self.last_error = now, None
             return changes
 
+    def bike_positions(self) -> list[dict]:
+        """Ephemeral track IDs; no rotating public bike IDs leave this API."""
+        with self._lock:
+            out = []
+            for track in self.tracker.tracks.values():
+                st = self.states.get(track.id)
+                distance = self._distance(track.sighting.lat, track.sighting.lng) if self._distance else None
+                out.append({"id": track.id, "lat": track.sighting.lat, "lng": track.sighting.lng,
+                            "state": track.state, "last_seen": track.last_seen,
+                            "last_reported": track.last_source_reported,
+                            "rest_since": st.rest_since if st else None,
+                            "distance_outside_m": distance})
+            return out
+
     async def start(self) -> LiveState:
         from app.services.replay import engine as replay  # live and replay are exclusive modes
 
         replay.pause()
+        switched = clock.mode() == "replay"
         clock.set_sim_time(None)
+        if switched:  # routes still point at replay cases until re-planned
+            await asyncio.to_thread(missions.replan_after_mode_switch, self._sf, "live")
         if not self.running:
             self.running = True
             self._task = asyncio.create_task(self._run())

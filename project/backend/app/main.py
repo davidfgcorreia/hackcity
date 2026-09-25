@@ -3,7 +3,7 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
 
-from app.api import cases, live, missions, replay, stations
+from app.api import cases, demo, live, missions, replay, stations, transit
 from app.config import settings
 from app.db import init_db
 from app.services.live import engine as live_engine
@@ -19,7 +19,7 @@ async def lifespan(_: FastAPI):
 
 
 app = FastAPI(title="Hackcity operations API", lifespan=lifespan)
-for r in (stations.router, cases.router, missions.router, live.router, replay.router):
+for r in (stations.router, cases.router, missions.router, live.router, replay.router, transit.router, demo.router):
     app.include_router(r, prefix="/api")
 app.mount("/api/uploads", StaticFiles(directory=settings.uploads_dir, check_dir=False), name="uploads")
 

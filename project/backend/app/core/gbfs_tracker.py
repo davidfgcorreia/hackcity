@@ -2,13 +2,13 @@
 
 GBFS 2.x rotates `bike_id` on every response (privacy), so identity is re-established by
 position: a sighting of the same vehicle type within `tolerance_m` of a tracked vehicle, with a
-compatible battery level, is the same parked vehicle. Every poll that re-finds a vehicle is a
-fresh same-position observation. Pure, no I/O.
+compatible battery level, is the same parked vehicle. A repeat counts as fresh only when the
+provider's `last_reported` advances. Pure, no I/O.
 
 Emitted events use the same shape as the provider event log, so the detector is unchanged:
   gbfs_appeared    -> new track (rest clock starts at first sighting: a lower bound)
   located          -> re-found at (about) the same position
-  gbfs_disappeared -> missing for longer than `gone_grace_s` (trip started or provider pickup)
+  gbfs_disappeared -> missing for longer than `gone_grace_s`; cause remains unknown
 """
 from dataclasses import dataclass, field
 from datetime import datetime, timedelta
@@ -17,7 +17,7 @@ from uuid import uuid4
 from app.core.geo import haversine_m
 from app.core.vehicle_state import Event, VehicleState
 
-NOT_IN_FEED = "not_in_feed"
+NOT_IN_FEED = "missing"
 
 
 @dataclass(frozen=True)
@@ -37,6 +37,9 @@ class Track:
     id: str
     sighting: Sighting
     last_seen: datetime
+    state: str
+    missing_since: datetime | None = None
+    last_source_reported: datetime | None = None
 
 
 @dataclass
@@ -45,6 +48,7 @@ class Tracker:
     fuel_tolerance: float = 0.05
     gone_grace_s: float = 180
     stale_report_min: float = 30
+    missing_retention_s: float = 86_400
     tracks: dict[str, Track] = field(default_factory=dict)
 
     def state_of(self, s: Sighting, now: datetime) -> str:
@@ -83,24 +87,49 @@ class Tracker:
             if best:
                 self._continue(unmatched.pop(best[1].id), s, now, events)
             else:
-                t = Track(f"{s.form_factor}-{uuid4().hex[:12]}", s, now)
+                state = self.state_of(s, now)
+                t = Track(f"{s.form_factor}-{uuid4().hex[:12]}", s, now, state,
+                          last_source_reported=s.last_reported)
                 self.tracks[t.id] = t
-                events.append(Event(t.id, now, self.state_of(s, now), frozenset({"gbfs_appeared"}), s.lat, s.lng))
+                events.append(Event(t.id, now, state, frozenset({"gbfs_appeared"}), s.lat, s.lng,
+                                    observed_at=s.last_reported))
         for t in unmatched.values():
-            if (now - t.last_seen).total_seconds() > self.gone_grace_s:
-                del self.tracks[t.id]
+            missing_for = (now - t.last_seen).total_seconds()
+            if missing_for > self.gone_grace_s and t.missing_since is None:
+                t.missing_since = now
+                t.state = NOT_IN_FEED
                 events.append(Event(t.id, now, NOT_IN_FEED, frozenset({"gbfs_disappeared"}), None, None))
+            if missing_for > self.missing_retention_s:
+                del self.tracks[t.id]
         return events
 
     def _continue(self, t: Track, s: Sighting, now: datetime, events: list[Event]) -> None:
-        t.sighting, t.last_seen = s, now
-        events.append(Event(t.id, now, self.state_of(s, now), frozenset({"located"}), s.lat, s.lng))
+        previous = t.last_source_reported
+        state = self.state_of(s, now)
+        fresh = (s.last_reported is not None and s.last_reported <= now
+                 and (previous is None or s.last_reported > previous)
+                 and state != "non_contactable")
+        changed = state != t.state
+        t.sighting, t.last_seen, t.state, t.missing_since = s, now, state, None
+        if s.last_reported and (previous is None or s.last_reported > previous):
+            t.last_source_reported = s.last_reported
+        if fresh:
+            events.append(Event(t.id, now, state, frozenset({"located"}), s.lat, s.lng,
+                                observed_at=s.last_reported))
+        elif changed:
+            # A changed feed flag is useful evidence, but an unchanged source timestamp
+            # must never turn this poll into a new location observation.
+            events.append(Event(t.id, now, state, frozenset({"feed_state"}), None, None))
 
-    def restore(self, states: dict[str, VehicleState], type_of: dict[str, tuple[str, str]], now: datetime) -> None:
+    def restore(self, states: dict[str, VehicleState], type_of: dict[str, tuple[str, str]], now: datetime,
+                source_seen: dict[str, datetime] | None = None) -> None:
         """Rebuild tracks after a restart from persisted state, so parking clocks survive.
         `type_of`: device_id -> (form_factor, vehicle_type_id)."""
         for st in states.values():
             if st.at_rest and st.lat is not None and st.device_id in type_of:
                 ff, type_id = type_of[st.device_id]
-                s = Sighting(type_id, ff, st.lat, st.lng, False, False, None, None)
-                self.tracks[st.device_id] = Track(st.device_id, s, now)
+                s = Sighting(type_id, ff, st.lat, st.lng, False, False, None,
+                             (source_seen or {}).get(st.device_id))
+                self.tracks[st.device_id] = Track(st.device_id, s, st.last_event_time, st.state,
+                                                   st.last_event_time if st.state == NOT_IN_FEED else None,
+                                                   s.last_reported)

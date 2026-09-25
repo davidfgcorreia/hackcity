@@ -1,10 +1,10 @@
 import { dequeueOutcome, queueOutcome, queuedOutcomes, type QueuedOutcome } from './components/field/offline'
 import {
   mockCaseDetail, mockCasesNow, mockKpis, mockMissionNow, mockPatchCase, mockRecordOutcome,
-  mockReplan, mockReplayState, mockReportFieldCase,
+  mockLiveState, mockReplan, mockReplayState, mockReportFieldCase,
 } from './mocks'
 import type {
-  Case, CaseCorrectionIn, CaseDetail, FieldCaseIn, Kpis, Mission, Outcome, ReplayState, Station,
+  Case, CaseCorrectionIn, CaseDetail, FieldCaseIn, Kpis, LiveState, Mission, Outcome, ReplayState, Station,
 } from './types'
 
 const MOCKS = import.meta.env.VITE_USE_MOCKS === 'true'
@@ -55,8 +55,11 @@ const postOutcome = (r: QueuedOutcome) =>
 
 export const api = {
   stations: () => get<Station[]>('/stations'),
-  cases: (status?: string) =>
-    MOCKS ? Promise.resolve(mockCasesNow()) : get<Case[]>(`/cases${status ? `?status=${status}` : ''}`),
+  /** `current` keeps only the active mode's cases (live or replay, plus field reports), as the mission planner does. */
+  cases: (status?: string, current = false, source?: string) => {
+    const q = new URLSearchParams({ ...(status ? { status } : {}), ...(current ? { current: 'true' } : {}), ...(source ? { source } : {}) }).toString()
+    return MOCKS ? Promise.resolve(mockCasesNow()) : get<Case[]>(`/cases${q ? `?${q}` : ''}`)
+  },
   caseDetail: (id: number) => (MOCKS ? Promise.resolve(mockCaseDetail(id)) : get<CaseDetail>(`/cases/${id}`)),
   kpis: () => (MOCKS ? Promise.resolve(mockKpis()) : get<Kpis>('/cases/kpis')),
 
@@ -89,6 +92,13 @@ export const api = {
   /** T-C1/T-C2: the mission starts from where the operator actually is. */
   replan: (operator_id: string, lat: number, lng: number, reason?: 'off_route') =>
     MOCKS ? Promise.resolve(mockReplan(operator_id)) : post<Mission>('/missions/replan', { operator_id, lat, lng, reason }),
+  /** Van unloaded at the depot: the next trip is planned from there. */
+  depotArrived: (missionId: number, lat: number, lng: number) =>
+    MOCKS ? Promise.resolve(mockReplan('demo')) : post<Mission>(`/missions/${missionId}/depot`, { lat, lng }),
+  /** Presentation demo: resets 5 fixed bikes and operator "demo"'s mission from the depot. */
+  demo: {
+    start: () => (MOCKS ? Promise.resolve(mockReplan('demo')) : post<Mission>('/demo/mission')),
+  },
 
   recordOutcome: async (stopId: number, data: OutcomeInput): Promise<SubmitResult> => {
     if (MOCKS) return { queued: false, mission: mockRecordOutcome(stopId, data.outcome) }
@@ -132,6 +142,12 @@ export const api = {
       }
     }
     return { sent, pending: (await queuedOutcomes()).length }
+  },
+
+  live: {
+    state: () => (MOCKS ? Promise.resolve(mockLiveState()) : get<LiveState>('/live')),
+    /** Resumes real-time detection; the backend pauses the replay and clears the simulated clock. */
+    start: () => (MOCKS ? Promise.resolve(mockLiveState(true)) : post<LiveState>('/live/start')),
   },
 
   replay: {

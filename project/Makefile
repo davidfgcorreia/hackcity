@@ -1,4 +1,4 @@
-.PHONY: up down logs seed test psql reset-db demo osrm analytics-dump analytics-restore
+.PHONY: up down logs seed test psql reset-db demo osrm analytics-dump analytics-restore analytics-map-prep enforce-window-on enforce-window-off
 
 up:        ## start db + api + web
 	docker compose up -d --build
@@ -32,3 +32,10 @@ analytics-dump:     ## dump the analytics DB (slim) for the GitHub Release
 	sh tools/analytics-dump.sh .data
 analytics-restore:  ## download the shared analytics DB from the GitHub Release and restore it
 	sh tools/analytics-restore.sh
+analytics-map-prep: ## build scheduled transit segments, then the abandonment-clock tables (parking, recovery, candidates, Bird)
+	docker compose exec -T analytics python -c 'from pathlib import Path; from analytics.db import sql; sql(Path("/code/analytics/derive/sql/09_schedule.sql").read_text())'
+	docker compose exec -T analytics python -m analytics.derive enforcement
+enforce-window-on:  ## count the 120-min abandonment clock only 08:00–20:00 Lisbon (API + analysis)
+	sh tools/set-enforcement.sh true
+enforce-window-off: ## count the abandonment clock around the clock (24 h)
+	sh tools/set-enforcement.sh false

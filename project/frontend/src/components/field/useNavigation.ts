@@ -33,6 +33,8 @@ function prepare(m: Mission | null): Prepared | null {
   const cum = [0]
   for (let i = 1; i < xy.length; i++) cum.push(cum[i - 1] + Math.hypot(xy[i][0] - xy[i - 1][0], xy[i][1] - xy[i - 1][1]))
   const length = cum[cum.length - 1]
+  // A zero-length route (e.g. depot to depot after unloading) has nothing to follow; 0/0 below would be NaN.
+  if (length < 1) return null
   const legs = m.route_legs ?? []
   const routeM = legs.reduce((a, l) => a + l.distance_m, 0) || length
   const scale = length / routeM   // OSRM step metres -> polyline metres
@@ -128,28 +130,37 @@ export function useNavigation(mission: Mission | null, position: FieldPosition |
   return state
 }
 
-/** Demo helper (`/field?sim`): drives along the planned route instead of reading GPS. */
-export function useSimulatedDrive(mission: Mission | null, enabled: boolean, speedMs = 14): FieldPosition | null {
+/** Demo helper (`/field?sim`): drives along the planned route instead of reading GPS.
+ *  It holds at the end of the first leg (the next planned stop) and calls `onArrive` once per route;
+ *  recording the stop's outcome re-plans from there, the route changes, and driving resumes. */
+export function useSimulatedDrive(mission: Mission | null, enabled: boolean,
+  { speedMs = 45, tickMs = 250, onArrive }: { speedMs?: number; tickMs?: number; onArrive?: () => void } = {}): FieldPosition | null {
   const route = useMemo(() => prepare(mission), [mission?.id, mission?.version])
   const [pos, setPos] = useState<FieldPosition | null>(null)
   const along = useRef(0)
-  useEffect(() => { along.current = 0 }, [route])
+  const arrived = useRef(false)
+  const onArriveRef = useRef(onArrive)
+  onArriveRef.current = onArrive
+  useEffect(() => { along.current = 0; arrived.current = false }, [route])
   useEffect(() => {
     if (!enabled || !route) return
+    const stopAt = route.legEnds[0] ?? route.length
     const tick = () => {
-      along.current = Math.min(route.length, along.current + speedMs)
+      along.current = Math.min(stopAt, along.current + speedMs * tickMs / 1000)
       let i = 0
       while (i + 1 < route.cum.length - 1 && route.cum[i + 1] < along.current) i++
       const seg = route.cum[i + 1] - route.cum[i] || 1
-      const t = (along.current - route.cum[i]) / seg
+      const t = Math.min(1, (along.current - route.cum[i]) / seg)
       const [a, b] = [route.coords[i], route.coords[i + 1]]
       const heading = (Math.atan2(route.xy[i + 1][0] - route.xy[i][0], route.xy[i + 1][1] - route.xy[i][1]) * 180) / Math.PI
+      const holding = along.current >= stopAt
       setPos({ lng: a[0] + (b[0] - a[0]) * t, lat: a[1] + (b[1] - a[1]) * t, accuracy: 5,
-        heading: (heading + 360) % 360, speed: speedMs, at: new Date().toISOString() })
+        heading: (heading + 360) % 360, speed: holding ? 0 : speedMs, at: new Date().toISOString() })
+      if (holding && !arrived.current) { arrived.current = true; onArriveRef.current?.() }
     }
     tick()
-    const id = setInterval(tick, 1000)
+    const id = setInterval(tick, tickMs)
     return () => clearInterval(id)
-  }, [enabled, route, speedMs])
+  }, [enabled, route, speedMs, tickMs])
   return pos
 }

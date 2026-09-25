@@ -1,7 +1,7 @@
 // Used when VITE_USE_MOCKS=true so UI work never waits on the backend.
 // Mutating helpers keep the mock stack behaving like the real one: recording an outcome
 // removes the stop and bumps the mission version, reporting a bike creates a case.
-import type { Case, CaseDetail, CaseEvent, FieldCaseIn, Kpis, Mission, Outcome, ReplayState } from './types'
+import type { Case, CaseDetail, CaseEvent, FieldCaseIn, Kpis, LiveState, Mission, Outcome, ReplayState } from './types'
 
 export const mockCases: Case[] = [
   { id: 1, device_id: 'bike-001', status: 'eligible', source: 'detector', lat: 38.6975, lng: -9.4230, rest_since: '2026-09-01T08:00:00Z', distance_outside_m: 85, reason: '85 m outside for 190 min; fresh observation', needs_approval: false, blocked_reason: null, updated_at: '2026-09-01T11:10:00Z' },
@@ -111,10 +111,22 @@ export function mockKpis(): Kpis {
   }
 }
 
+let live: LiveState = { running: true, last_poll: null, last_error: null, vehicles_in_feed: 0, tracked: 0, form_factors: 'bicycle', last_changes: [] }
+
+/** Mirrors the backend: live and replay are exclusive modes. */
+export function mockLiveState(running?: boolean): LiveState {
+  if (running !== undefined) {
+    live = { ...live, running }
+    if (running) replay = { ...replay, running: false }
+  }
+  return { ...live }
+}
+
 export function mockReplayState(change?: Partial<ReplayState> & { stepMinutes?: number }): ReplayState {
   if (change) {
     const { stepMinutes, ...rest } = change
     replay = { ...replay, ...rest }
+    if (rest.running || stepMinutes) live = { ...live, running: false }
     if (stepMinutes && replay.sim_time) {
       replay = { ...replay, sim_time: new Date(Date.parse(replay.sim_time) + stepMinutes * 60_000).toISOString() }
     }

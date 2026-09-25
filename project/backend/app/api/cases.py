@@ -27,11 +27,26 @@ STAFF_EVENT_KINDS = {"correction", "approved", "export", "override"}
 FIELD_EVENT_KINDS = {"field_outcome", "field_report"}
 
 
+@router.get("/rules")
+def detection_rules():
+    """The active abandonment rule, so every screen explains the same clock."""
+    return {"abandon_minutes": settings.abandon_minutes, "buffer_m": settings.buffer_m,
+            "enforce_window": settings.enforce_window, "enforce_from_hour": settings.enforce_from_hour,
+            "enforce_until_hour": settings.enforce_until_hour, "enforce_tz": settings.enforce_tz}
+
+
 @router.get("/cases", response_model=list[CaseOut])
-def list_cases(status: CaseStatus | None = None, db: Session = Depends(get_db)):
+def list_cases(status: CaseStatus | None = None, current: bool = False, source: str | None = None,
+               db: Session = Depends(get_db)):
+    """`current=true` keeps only the active mode's cases (live or replay, plus field reports);
+    `source` selects one source (the field demo loads `demo`)."""
     q = select(Case).order_by(Case.updated_at.desc())
     if status:
         q = q.where(Case.status == status)
+    if current:
+        q = q.where(Case.source.in_(cases_svc.active_sources()))
+    if source:
+        q = q.where(Case.source == source)
     return db.scalars(q).all()
 
 
@@ -141,9 +156,10 @@ def export_case(case_id: int, actor: str | None = None, db: Session = Depends(ge
 
     reference = _reference_time(case)
     rest_since = _aware(case.rest_since)
-    minutes = None
+    minutes = counted = None
     if rest_since and reference:
         minutes = round((reference - rest_since).total_seconds() / 60, 1)
+        counted = round(cases_svc.rules(case.source).counted_minutes(rest_since, reference), 1)
 
     record = {
         "export_version": 1,
@@ -154,6 +170,8 @@ def export_case(case_id: int, actor: str | None = None, db: Session = Depends(ge
             "source": "docs/operations_requirements.md §4",
             "abandon_minutes": settings.abandon_minutes,
             "comparison": "strictly greater than",
+            "enforcement_window": (f"{settings.enforce_from_hour:02d}:00–{settings.enforce_until_hour:02d}:00 {settings.enforce_tz}"
+                                   if settings.enforce_window else "off: the clock runs 24 h"),
             "station_area_buffer_m": settings.buffer_m,
             "boundary_counts_as_inside": True,
             "metric_crs": settings.metric_crs,
@@ -167,9 +185,11 @@ def export_case(case_id: int, actor: str | None = None, db: Session = Depends(ge
             "reason": case.reason,
             "distance_outside_m": case.distance_outside_m,
             "rest_since": case.rest_since.isoformat() if case.rest_since else None,
+            "last_observed_at": case.last_observed_at.isoformat() if case.last_observed_at else None,
             "reference_time": reference.isoformat() if reference else None,
             "minutes_at_rest": minutes,
-            "exceeds_threshold": (minutes > settings.abandon_minutes) if minutes is not None else None,
+            "counted_minutes": counted,
+            "exceeds_threshold": (counted > settings.abandon_minutes) if counted is not None else None,
             "field_confirmed": case.field_confirmed,
             "needs_approval": case.needs_approval,
             "blocked_reason": case.blocked_reason,

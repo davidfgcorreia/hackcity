@@ -139,4 +139,4 @@ Before the product can be specified for real municipal use, confirm:
 - Who may approve field-found bicycles, override decisions, and view or change case evidence; the formal evidence-retention rule.
 - Whether real work may use staff-confirmed cases if the provider cannot supply the required live data. This fallback was explicitly left open pending provider API confirmation.
 
-Broader contract oversight, station planning, and multimodal travel analysis will be defined in a later requirements document. The source discussion and decisions are recorded in [initial.md](initial.md), [start_questions.md](start_questions.md), and [responses.md](responses.md).
+Broader contract oversight, station planning, and multimodal travel analysis will be defined in a later requirements document. The source discussion and decisions are recorded in [initial.md](initial.md), [planning/start_questions.md](planning/start_questions.md), and [planning/responses.md](planning/responses.md).

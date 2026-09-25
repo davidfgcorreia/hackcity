@@ -41,7 +41,7 @@ export interface Candidate {
 export interface Candidates { cells: FC<Candidate>; weights: { component: string; weight: number; status: string; input: string }[]; meta: Meta }
 export interface StationP { station_id: string; name: string; departures: number; arrivals: number; net_flow: number; weekday_departures_per_day: number }
 export interface HourRow { is_weekend: boolean; hour_local: number; departures: number; arrivals: number; net_flow: number; n_days: number }
-export interface StopP { agency_id: string; agency_name: string; stop_id: string; stop_name: string; weekday_departures: number; departures_per_hour: number; weekly_boardings: number }
+export interface StopP { agency_id: string; agency_name: string; stop_id: string; stop_name: string; weekday_departures: number; departures_per_hour: number; weekly_boardings: number; max_routes_in_an_hour?: number }
 export interface DelayRow { route: string; time_window: string; services: number; observed: number; median_delay_min: number; p90_delay_min: number; median_early_min: number; n_days: number }
 export interface Transit { stops: FC<StopP>; bus_delay: DelayRow[];
   transfer_proxy: { summary: { kind: string; bike_endpoints: number; with_transit_proxy: number; pct: number }[]; placebo: { pct: number } }; boardings_by_hour: { is_weekend: boolean; hour_local: number; validations: number }[]; meta: Meta }
@@ -55,4 +55,25 @@ export interface Weather { by_class: { factor: string; level: string; hours: num
 export interface Inventory {
   steps: { target: string; step: string; rows_read: number | null; rows_kept: number | null; filter: string; finished_at: string }[]
   coverage: { agency_id: string; agency_name: string | null; validations: number; geolocated: number; pct_geolocated: number; in_cascais: number }[]
+}
+export type LayaComponent = 'demand' | 'abandonment' | 'consistency' | 'coverage_gain' | 'footfall' | 'transit_gap'
+export interface LayaRec {
+  geometry: GeoJSON.Polygon; cell_id: string; laya_rank: number; laya_score: number; confidence: number
+  confidence_label: 'high' | 'medium' | 'low'; robustness: number; verdict: string
+  screening_rank: number | null; screening_score: number | null
+  trip_endpoints: number; trip_starts: number; trip_ends: number; outside_intervals: number; supported_120: number
+  departures_per_hour_333m: number; nearest_station_m: number; nearest_station: string | null; operators_333m: string | null
+  active_days: number; weekend_share: number | null; hourly: number[]; median_hours_parked: number | null
+  provider_recoveries: number; reused_by_rider: number; weekly_boardings_333m: number; journeys_750m: number
+  stops_333m: string | null; lat: number; lon: number
+  components: Record<LayaComponent, number>; contributions: Record<LayaComponent, number>; reasons: string[]; caveats: string[]
+}
+export interface Laya {
+  model: { name: string; version: string; openness: string; confidence: string; robustness: string; eligibility: string
+    not_modelled: string[]; components: { key: LayaComponent; weight: number; input: string; label: string; method: string }[] }
+  size_m?: number; pool_size: number; recommendations: LayaRec[]
+  /** Every eligible cell scored against the same top N; only with `?pool=true`. */
+  pool?: LayaRec[]
+  summary: { strong: number; pilot: number; also_top_in_screening: number; trip_endpoints: number; supported_120: number }
+  abandonment_clock: string; meta: Meta
 }

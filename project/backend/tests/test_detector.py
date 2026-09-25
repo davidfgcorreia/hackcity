@@ -84,3 +84,21 @@ def test_location_error_overlapping_buffer_is_uncertain():
 def test_non_contactable_is_uncertain():
     s = fold(ev(0), ev(10, state="non_contactable", types=("comms_lost",)))
     assert evaluate(s, OUTSIDE, at(300), RULES).verdict == Verdict.uncertain
+
+
+def test_clock_pauses_outside_08_to_20_lisbon():
+    evening = datetime(2026, 9, 1, 18, 30, tzinfo=timezone.utc)  # 19:30 Lisbon
+    s = fold(Event("bike", evening, "available", frozenset({"trip_end"}), *POS))
+    late_night = evening + timedelta(hours=10)  # 05:30 Lisbon: 600 min parked, 30 counted
+    r = evaluate(s, OUTSIDE, late_night, RULES)
+    assert r.verdict == Verdict.candidate and r.rest_minutes == 600 and r.counted_minutes == 30
+    next_morning = datetime(2026, 9, 2, 8, 31, tzinfo=timezone.utc)  # 09:31 Lisbon: 121 counted
+    assert evaluate(s, OUTSIDE, next_morning, RULES, field_confirmed=True).verdict == Verdict.eligible
+
+
+def test_window_can_be_switched_off_so_the_clock_runs_24_hours():
+    evening = datetime(2026, 9, 1, 18, 30, tzinfo=timezone.utc)  # 19:30 Lisbon
+    s = fold(Event("bike", evening, "available", frozenset({"trip_end"}), *POS))
+    always = Rules(abandon_minutes=120, fresh_max_age_min=60, require_fresh_observation=True, enforce_window=False)
+    r = evaluate(s, OUTSIDE, evening + timedelta(minutes=121), always, field_confirmed=True)
+    assert r.verdict == Verdict.eligible and r.counted_minutes == 121 and "24 h" in r.reason

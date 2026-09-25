@@ -18,7 +18,7 @@ WITH cells AS (
          (SELECT count(*) FROM derived.trip_endpoints e WHERE e.cell_id = c.cell_id AND e.kind = 'start') AS trip_starts,
          (SELECT count(*) FROM derived.trip_endpoints e WHERE e.cell_id = c.cell_id AND e.kind = 'end') AS trip_ends,
          (SELECT count(*) FROM derived.parking_intervals p WHERE p.cell_id = c.cell_id AND p.outside) AS outside_intervals,
-         (SELECT count(*) FROM derived.parking_intervals p WHERE p.cell_id = c.cell_id AND p.outside AND p.minutes > 120) AS supported_120,
+         (SELECT count(*) FROM derived.parking_intervals p WHERE p.cell_id = c.cell_id AND p.outside AND p.enforced_minutes > 120) AS supported_120,
          (SELECT COALESCE(sum(s.weekday_daytime_departures_per_hour), 0) FROM derived.stop_service s
            WHERE ST_DWithin(s.geom_m, c.c_m, 333)) AS departures_per_hour_333m,
          (SELECT min(ST_Distance(s.area_m, c.c_m)) FROM derived.stations_m s) AS nearest_station_m,

@@ -2,7 +2,7 @@
 
 ## Project Structure & Module Organization
 
-This repository is a planning and data workspace for the Cascais micromobility challenge. `docs/initial.md` contains the detailed proposal; `chalange.md` contains the short challenge brief. Source material lives in `datasets/`: bicycle trips and events, station and GBFS JSON, Waze traffic data, vehicle CSVs, and dated transit operation plans. The operations MVP lives in `project/` (`backend/` FastAPI, `frontend/` React, `docker-compose.yml`); see `docs/operations_architecture.md` and the parallel task plan in `docs/TASKS.md`. Put new implementation code and its tests in clearly named subdirectories under `project/`; keep supplied data in `datasets/` and design notes in `docs/`.
+This repository is a planning and data workspace for the Cascais micromobility challenge. `docs/initial.md` contains the detailed proposal; `chalange.md` contains the short challenge brief. Source material lives in `datasets/`: bicycle trips and events, station and GBFS JSON, Waze traffic data, vehicle CSVs, and dated transit operation plans. The operations MVP lives in `project/` (`backend/` FastAPI, `frontend/` React, `docker-compose.yml`); see `README.md` (features and quick start), `docs/README.md` (documentation index) and `docs/operations_architecture.md`; the hackathon task plan is archived in `docs/planning/TASKS.md`. Screenshots live in `docs/prints/` (named `desktop-NN-…` / `mobile-NN-…`, listed in `docs/prints/README.md`). Put new implementation code and its tests in clearly named subdirectories under `project/`; keep supplied data in `datasets/` and design notes in `docs/`.
 
 ## Build, Test, and Development Commands
 

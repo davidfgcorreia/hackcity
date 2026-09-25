@@ -11,6 +11,11 @@ def state():
     return engine.state()
 
 
+@router.get("/live/bikes")
+def bikes():
+    return {"bikes": engine.bike_positions(), "last_poll": engine.last_poll}
+
+
 @router.post("/live/start", response_model=LiveState)
 async def start():
     """Resume real-time detection (pauses the replay)."""

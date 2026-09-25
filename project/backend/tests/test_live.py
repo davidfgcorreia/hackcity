@@ -2,7 +2,7 @@ from datetime import timedelta
 
 from sqlalchemy import select
 
-from app.models import Case, VehicleEvent
+from app.models import Case, StationStatus, VehicleEvent
 from app.services.live import LiveEngine
 from tests.conftest import T0
 
@@ -53,10 +53,12 @@ def test_live_feed_drives_detection_with_strict_rule(session_factory):
     live.poll_once(T0 + timedelta(minutes=125))
     with session_factory() as db:
         case = db.scalar(select(Case))
-        assert case.status == "resolved" and "disappeared from the live feed" in case.reason
+        assert case.status == "uncertain" and "missing" in case.reason
+        assert case.last_observed_at == T0 + timedelta(minutes=121)
         assert case.source == "live"
-        # only transitions are stored, not every poll
+        # New source observations are stored so their timestamps survive a restart.
         assert db.scalar(select(VehicleEvent.event_types).where(VehicleEvent.source == "gbfs")) == ["gbfs_appeared"]
+        assert db.scalar(select(VehicleEvent).where(VehicleEvent.source == "gbfs").order_by(VehicleEvent.event_time.desc())).source_observed_at is None
 
 
 def test_scooters_filtered_and_station_parking_ignored(session_factory):
@@ -77,3 +79,20 @@ def test_parking_clock_survives_restart(session_factory):
     restarted.poll_once(T0 + timedelta(minutes=200))
     [state] = restarted.states.values()
     assert state.rest_since == T0
+
+
+def test_station_status_is_recorded_without_inventing_stock_from_trips(session_factory):
+    class FeedWithStatus(FakeFeed):
+        def __call__(self, url):
+            if url.endswith("station_status.json"):
+                return {"data": {"stations": [{"station_id": "s1", "num_bikes_available": 4,
+                                               "last_reported": int(T0.timestamp())}]}}
+            return super().__call__(url)
+
+    live = LiveEngine(session_factory, fetch=FeedWithStatus())
+    live.poll_once(T0)
+    with session_factory() as db:
+        snapshot = db.scalar(select(StationStatus))
+        assert snapshot.station_id == "s1"
+        assert snapshot.bikes_available == 4
+        assert snapshot.reported_at == T0

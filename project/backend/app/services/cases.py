@@ -16,6 +16,7 @@ from app.config import settings
 from app.core.detector import Result, Rules, Verdict, evaluate
 from app.core.vehicle_state import VehicleState
 from app.models import Case, CaseEvent
+from app.services import clock
 
 OPEN = ("candidate", "uncertain", "supported", "eligible", "assigned")
 GONE_REASON = {
@@ -23,13 +24,20 @@ GONE_REASON = {
     "reserved": "was reserved",
     "removed": "was recovered by the provider",
     "elsewhere": "left the operating area",
-    "not_in_feed": "disappeared from the live feed (trip started or provider pickup)",
+    "missing": "missing from the live feed; cause unverified",
 }
+
+
+def active_sources() -> tuple[str, str]:
+    """Case sources that belong to the current mode: field reports plus the running detector's cases.
+    Cases left by the other mode stay in the database but are neither routed nor counted."""
+    return ("field", clock.mode())
 
 
 def rules(source: str) -> Rules:
     fresh = settings.replay_require_fresh_observation if source == "replay" else settings.require_fresh_observation
-    return Rules(settings.abandon_minutes, settings.fresh_max_age_min, fresh, settings.default_location_error_m)
+    return Rules(settings.abandon_minutes, settings.fresh_max_age_min, fresh, settings.default_location_error_m,
+                 settings.enforce_window, settings.enforce_from_hour, settings.enforce_until_hour, settings.enforce_tz)
 
 
 def short(device_id: str) -> str:
@@ -74,30 +82,35 @@ def _apply(db: Session, case: Case | None, state: VehicleState, result: Result, 
     status = result.verdict.value
     if case is None:
         case = Case(device_id=state.device_id, status=status, source=source, lat=state.lat, lng=state.lng,
-                    rest_since=state.rest_since, distance_outside_m=result.distance_outside_m, reason=result.reason)
+                    rest_since=state.rest_since, last_observed_at=state.last_observed_at_rest,
+                    distance_outside_m=result.distance_outside_m, reason=result.reason)
         db.add(case)
         db.add(CaseEvent(case=case, kind="status", actor="detector", event_time=now,
-                         detail={"from": None, "to": status, "reason": result.reason}))
+                         detail={"from": None, "to": status, "reason": result.reason,
+                                 "last_observed_at": state.last_observed_at_rest.isoformat() if state.last_observed_at_rest else None}))
         return f"new eligible bike {bike}" if status == "eligible" else None
 
     if (case.lat, case.lng) != (state.lat, state.lng):  # state position only changes on a confirmed move
         db.add(CaseEvent(case=case, kind="moved", actor="detector", event_time=now,
                          detail={"from": [case.lat, case.lng], "to": [state.lat, state.lng]}))
         case.lat, case.lng, case.field_confirmed = state.lat, state.lng, False
-    case.rest_since, case.distance_outside_m, case.reason = state.rest_since, result.distance_outside_m, result.reason
+    case.rest_since, case.last_observed_at = state.rest_since, state.last_observed_at_rest
+    case.distance_outside_m, case.reason = result.distance_outside_m, result.reason
 
     if case.status == "assigned":
         if status == "eligible":
             return None
-        set_status(db, case, status, result.reason, now)
+        set_status(db, case, status, result.reason, now, last_observed_at=state.last_observed_at_rest)
         return f"bike {bike} no longer eligible ({status}) — stop removed"
     if case.needs_approval or case.status == status:
         return None
-    set_status(db, case, status, result.reason, now)
+    set_status(db, case, status, result.reason, now, last_observed_at=state.last_observed_at_rest)
     return f"new eligible bike {bike}" if status == "eligible" else None
 
 
-def set_status(db: Session, case: Case, status: str, reason: str, now: datetime, actor: str = "detector") -> None:
+def set_status(db: Session, case: Case, status: str, reason: str, now: datetime, actor: str = "detector",
+               last_observed_at: datetime | None = None) -> None:
     db.add(CaseEvent(case=case, kind="status", actor=actor, event_time=now,
-                     detail={"from": case.status, "to": status, "reason": reason}))
+                     detail={"from": case.status, "to": status, "reason": reason,
+                             "last_observed_at": last_observed_at.isoformat() if last_observed_at else None}))
     case.status, case.reason = status, reason

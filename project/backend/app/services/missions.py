@@ -18,7 +18,7 @@ from app.core.routing import Node, plan_mission
 from app.models import Case, CaseEvent, Mission, Stop
 from app.schemas import Outcome
 from app.services import clock, road
-from app.services.cases import set_status, short
+from app.services.cases import active_sources, set_status, short
 
 _lock = threading.RLock()  # replay thread and HTTP handlers both replan
 
@@ -63,6 +63,12 @@ def replan_all(db: Session, reason: str) -> None:
         replan(db, m.operator_id, m.start_lat, m.start_lng, reason)
 
 
+def replan_after_mode_switch(session_factory, mode: str) -> None:
+    """Re-route every active mission onto the new mode's cases right away, not at the next detector change."""
+    with session_factory() as db:
+        replan_all(db, f"Switched to {mode} detection")
+
+
 def onboard(m: Mission) -> int:
     """Bikes in the van: pickups completed since the last depot visit."""
     done = [s for s in m.stops if s.status == "done"]
@@ -77,8 +83,11 @@ def _plan(db: Session, m: Mission, reason: str) -> None:
     old_order = [s.case_id for s in sorted(planned, key=lambda s: s.seq) if s.kind != "depot"]
     old_geometry, old_engine = m.route_geojson, m.routing_engine
 
+    # Only the current mode's cases: a live van must never be sent to replayed sample bikes, or vice versa.
+    # The presentation demo operator only ever gets its own fixed demo bikes (services/demo.py).
+    sources = ("demo",) if m.operator_id == "demo" else active_sources()
     cases = db.scalars(select(Case).where(
-        Case.blocked_reason.is_(None), Case.needs_approval.is_(False),
+        Case.source.in_(sources), Case.blocked_reason.is_(None), Case.needs_approval.is_(False),
         or_(Case.status == "eligible", (Case.status == "assigned") & Case.id.in_(list(stop_by_case) or [-1])),
     )).all()
     by_id = {c.id: c for c in cases}
@@ -90,6 +99,10 @@ def _plan(db: Session, m: Mission, reason: str) -> None:
     for s in planned:
         if s.kind != "depot" and s.case_id not in plan.order:
             s.status = "removed"
+            # A stop dropped because its case left scope (e.g. a mode switch) must not leave the case "assigned".
+            case = db.get(Case, s.case_id) if s.case_id not in by_id else None
+            if case is not None and case.status == "assigned":
+                set_status(db, case, "eligible", f"removed from mission {m.id}: not in the current mode", now, actor="router")
     base = max((s.seq for s in m.stops if s.status == "done"), default=0)
     ordered: list[Stop] = []
     for i, cid in enumerate(plan.order, 1):

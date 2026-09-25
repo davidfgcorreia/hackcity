@@ -2,7 +2,7 @@ import { useState } from 'react'
 import type { Mission, Stop } from '../../types'
 import type { Lang } from '../../i18n'
 import type { NavState } from './useNavigation'
-import { colors, fmtDistance, fmtDuration } from './ui'
+import { colors, fmtDistance, fmtDuration, bikeNumbers } from './ui'
 
 /** First stop: remaining from the van. Later stops: the extra driving leg from the previous stop. */
 export function stopEstimate(mission: Mission, nav: NavState, stops: Stop[], index: number): { seconds: number | null; metres: number | null } {
@@ -27,6 +27,7 @@ export function MissionSidebar({ mission, nav, lang, statusVisible, onSelect }: 
 }) {
   const [open, setOpen] = useState(false)
   const bikes = mission.stops.filter(s => s.status === 'planned').sort((a, b) => a.seq - b.seq)
+  const numbers = bikeNumbers(mission.stops)
   const pickupCount = bikes.filter(s => s.kind !== 'depot').length
   const en = lang === 'en'
   return <aside aria-label={en ? 'Mission stops' : 'Paragens da missão'} className="glass" style={{
@@ -46,7 +47,7 @@ export function MissionSidebar({ mission, nav, lang, statusVisible, onSelect }: 
       {pickupCount === 0 && <p style={{ padding: '0 14px', color: colors.secondary }}>{en ? 'No bikes on this mission' : 'Sem bicicletas nesta missão'}</p>}
       {bikes.map((stop, index) => {
         const depot = stop.kind === 'depot'
-        const bikeNumber = bikes.slice(0, index + 1).filter(s => s.kind !== 'depot').length
+        const bikeNumber = numbers.get(stop.id)
         const estimate = stopEstimate(mission, nav, bikes, index)
         const extra = index > nav.legIndex ? '+' : ''
         return <button key={stop.id} onClick={() => onSelect(stop)} style={{ width: '100%', border: 0, borderBottom: `1px solid ${colors.line}`,

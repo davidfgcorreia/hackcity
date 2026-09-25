@@ -16,6 +16,13 @@ SAMPLE_WEEK = (20260831, 20260906)          # 2026 transit sample (validations, 
 BIKE_PERIOD = ("2026-08-18", "2026-09-08")   # bicycle trips/events
 LOCAL_TZ = "Europe/Lisbon"
 
+# Abandonment clock, shared with the operations API through project/.env. With the window on, only
+# minutes between the two local hours count toward the 120; `make enforce-window-on|off` switches it.
+ENFORCE_WINDOW = os.environ.get("ENFORCE_WINDOW", "true").strip().lower() in ("1", "true", "yes", "on")
+ENFORCE_FROM_HOUR = int(os.environ.get("ENFORCE_FROM_HOUR", "8"))
+ENFORCE_UNTIL_HOUR = int(os.environ.get("ENFORCE_UNTIL_HOUR", "20"))
+ENFORCE_TZ = os.environ.get("ENFORCE_TZ", LOCAL_TZ)
+
 # APEX 2025 carries a linkable card number: store only a salted hash (requirements: restricted use)
 CARD_SALT = os.environ.get("ANALYTICS_CARD_SALT", "hackcity-2026")
 

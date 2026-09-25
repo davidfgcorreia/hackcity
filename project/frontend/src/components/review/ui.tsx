@@ -18,8 +18,8 @@ export const ui = {
 }
 
 /** Rule constants mirrored from backend/app/config.py for display only — the decision is
- *  always the backend's (docs/operations_requirements.md §4). */
-export const ABANDON_MINUTES = 120
+ *  always the backend's (docs/operations_requirements.md §4). The abandonment clock and its
+ *  enforcement window come from /api/rules (src/enforcement.ts). */
 export const BUFFER_M = 30
 
 export function Button({ children, onClick, tone = 'primary', disabled, small, type = 'button' }: {

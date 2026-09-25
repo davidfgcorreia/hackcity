@@ -7,9 +7,10 @@
  */
 import { useCallback, useEffect, useState, type ReactNode } from 'react'
 import { ApiError, api } from '../../api'
+import { countedMinutes, useRules, windowLabel } from '../../enforcement'
 import { useT } from '../../i18n'
 import { CASE_STATUSES, type Case, type CaseDetail, type CaseEvent, type CaseStatus } from '../../types'
-import { ABANDON_MINUTES, BUFFER_M, Button, STATUS_COLOR, Tag, fmt, inputStyle, ui } from './ui'
+import { BUFFER_M, Button, STATUS_COLOR, Tag, fmt, inputStyle, ui } from './ui'
 
 const ACTOR_KEY = 'review:actor'
 
@@ -20,6 +21,7 @@ export function CaseDrawer({ caseId, simTime, onClose, onChanged }: {
   onChanged: (updated: Case) => void
 }) {
   const t = useT()
+  const rules = useRules()
   const [detail, setDetail] = useState<CaseDetail | null>(null)
   const [actor, setActor] = useState(() => {
     try { return localStorage.getItem(ACTOR_KEY) ?? '' } catch { return '' }
@@ -83,12 +85,14 @@ export function CaseDrawer({ caseId, simTime, onClose, onChanged }: {
     return <Panel onClose={onClose} title={t.detail}><p style={{ color: ui.grey }}>{t.loading}</p></Panel>
   }
 
-  // The 120-minute rule, measured against the moment the reviewer is looking at (T-E2).
+  // The 120-minute rule, measured against the moment the reviewer is looking at (T-E2). Only minutes
+  // inside the enforcement window count when it is on (backend/app/core/enforcement.py).
   const reference = simTime ?? detail.updated_at
   const minutes = detail.rest_since
     ? Math.round((Date.parse(reference) - Date.parse(detail.rest_since)) / 60000)
     : null
-  const ruleMet = minutes !== null && minutes > ABANDON_MINUTES
+  const counted = detail.rest_since ? Math.round(countedMinutes(Date.parse(detail.rest_since), Date.parse(reference), rules)) : null
+  const ruleMet = counted !== null && counted > rules.abandon_minutes
 
   return (
     <Panel onClose={onClose} title={`${t.detail} #${detail.id}`}>
@@ -104,7 +108,7 @@ export function CaseDrawer({ caseId, simTime, onClose, onChanged }: {
         <Line label={t.restSince} value={fmt(detail.rest_since)} />
         <Line label={simTime ? t.simClock : t.recordedAt} value={fmt(reference)} />
         <Line label={t.parkedFor}
-          value={minutes === null ? t.noData : `${minutes} ${t.minutesShort} (${t.threshold} ${ABANDON_MINUTES})`} />
+          value={minutes === null ? t.noData : `${minutes} ${t.minutesShort} · ${counted} ${t.countedIn} ${windowLabel(rules)} (${t.threshold} ${rules.abandon_minutes})`} />
         <div style={{ marginTop: 4 }}>
           <Tag color={ruleMet ? ui.ok : ui.grey}>{ruleMet ? t.ruleMet : t.ruleNotMet}</Tag>
         </div>

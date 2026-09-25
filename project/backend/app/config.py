@@ -11,6 +11,10 @@ class Settings(BaseSettings):
 
     # Detection rule (operations_requirements.md §4)
     abandon_minutes: int = 120          # strictly more than this qualifies
+    enforce_window: bool = True         # ENFORCE_WINDOW=false: the clock runs 24 h (`make enforce-window-off`)
+    enforce_from_hour: int = 8          # the 120-minute clock only runs 08:00–20:00 local time
+    enforce_until_hour: int = 20
+    enforce_tz: str = "Europe/Lisbon"
     buffer_m: float = 30.0              # buffer around the station *area*, not the centre
     metric_crs: str = "EPSG:3763"       # ETRS89 / PT-TM06, all metre maths
     move_tolerance_m: float = 10.0      # GPS noise below this is not a move

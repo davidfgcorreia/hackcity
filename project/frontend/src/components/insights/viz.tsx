@@ -22,11 +22,14 @@ export function divColor(v: number, maxAbs: number) {
   return DIVERGING[Math.round((t + 1) * 3)]
 }
 
+let numberLocale = 'en-GB'
+/** /data sets this from the PT/EN switch so every chart and table formats numbers the same way. */
+export const setNumberLocale = (locale: string) => { numberLocale = locale }
 export const fmtN = (n: number | null | undefined, d = 0) => {
   if (n == null || Number.isNaN(Number(n))) return '—'
   const v = Number(n)
   const digits = Number.isInteger(v) ? 0 : d
-  return v.toLocaleString('en-GB', { maximumFractionDigits: digits, minimumFractionDigits: digits })
+  return v.toLocaleString(numberLocale, { maximumFractionDigits: digits, minimumFractionDigits: digits })
 }
 
 export const card: CSSProperties = { background: '#fff', border: `1px solid ${C.line}`, borderRadius: 10, padding: 16 }
@@ -175,3 +178,8 @@ export function Section({ title, children, aside }: { title: string; children: R
     </section>
   )
 }
+
+/** Bird station score bands (poor < 40 ≤ fair < 70 ≤ good). Validated all-pairs with the dataviz script
+ *  (worst CVD ΔE 9.1, normal 22.9); amber/aqua sit below 3:1 on white, so every use carries a text label. */
+export const SCORE_COLOR: Record<'poor' | 'fair' | 'good', string> = { poor: '#c0302f', fair: '#eda100', good: '#1baf7a' }
+export const scoreBandColor = (band: string | null | undefined) => band ? SCORE_COLOR[band as keyof typeof SCORE_COLOR] ?? C.muted : C.muted

@@ -5,7 +5,7 @@ import maplibregl from 'maplibre-gl'
 import 'maplibre-gl/dist/maplibre-gl.css'
 import { useEffect, useRef } from 'react'
 import type { Case, Mission, Stop } from '../../types'
-import { colors } from './ui'
+import { colors, bikeNumbers } from './ui'
 import type { FieldPosition } from './useGeolocation'
 
 export type CameraMode = 'follow' | 'overview' | 'free'
@@ -20,7 +20,9 @@ function pinSize(zoom: number, mode: CameraMode, active: boolean): number {
   return active ? 38 : 30
 }
 
-function paintPin(el: HTMLElement, stop: Stop, active: boolean, size: number): void {
+function paintPin(el: HTMLElement, stop: Stop, active: boolean, size: number, bikeNumber?: number): void {
+  if (bikeNumber != null) el.dataset.bike = String(bikeNumber)  // kept for zoom repaints, which pass no number
+  const label = el.dataset.bike ?? String(stop.seq)
   el.dataset.stopId = String(stop.id)
   el.dataset.caseId = String(stop.case_id ?? '')
   el.dataset.lat = String(stop.lat)
@@ -42,16 +44,16 @@ function paintPin(el: HTMLElement, stop: Stop, active: boolean, size: number): v
   el.style.cursor = 'pointer'
   el.style.boxShadow = compact ? '0 1px 3px rgba(0,0,0,.45)' : '0 2px 8px rgba(0,0,0,.35)'
   el.style.transition = 'width .15s, height .15s, border-radius .15s'
-  el.title = depot ? 'Complexo Multisserviços' : `Bicicleta ${stop.seq}`
+  el.title = depot ? 'Complexo Multisserviços' : `Bicicleta ${label}`
   const content = compact ? '' : depot
     ? '<svg width="16" height="16" viewBox="0 0 24 24" fill="#fff"><path d="M3 10 12 3l9 7v11h-6v-6H9v6H3z"/></svg>'
-    : done ? '✓' : String(stop.seq)
+    : done ? '✓' : label
   if (el.innerHTML !== content) el.innerHTML = content
 }
 
-function pinEl(stop: Stop, active: boolean, size: number): HTMLElement {
+function pinEl(stop: Stop, active: boolean, size: number, bikeNumber?: number): HTMLElement {
   const el = document.createElement('div')
-  paintPin(el, stop, active, size)
+  paintPin(el, stop, active, size, bikeNumber)
   return el
 }
 
@@ -163,17 +165,18 @@ export function NavMap({ mission, position, snapped, heading, travelled, ahead, 
     if (!m) return
     const visible = new Set((mission?.stops ?? []).filter(s => s.status !== 'removed').map(s => s.id))
     for (const [id, entry] of pins.current) if (!visible.has(id)) { entry.marker.remove(); pins.current.delete(id) }
+    const numbers = bikeNumbers(mission?.stops ?? [])
     for (const s of mission?.stops ?? []) {
       if (!visible.has(s.id)) continue
       let entry = pins.current.get(s.id)
       if (!entry) {
-        const el = pinEl(s, s.id === activeStopId, pinSize(m.getZoom(), mode, s.id === activeStopId))
+        const el = pinEl(s, s.id === activeStopId, pinSize(m.getZoom(), mode, s.id === activeStopId), numbers.get(s.id))
         const record = { marker: new maplibregl.Marker({ element: el }).setLngLat([s.lng, s.lat]).addTo(m), stop: s }
         el.addEventListener('click', e => { e.stopPropagation(); onSelect(record.stop) })
         pins.current.set(s.id, record)
         entry = record
       } else {
-        paintPin(entry.marker.getElement(), s, s.id === activeStopId, pinSize(m.getZoom(), mode, s.id === activeStopId))
+        paintPin(entry.marker.getElement(), s, s.id === activeStopId, pinSize(m.getZoom(), mode, s.id === activeStopId), numbers.get(s.id))
         entry.marker.setLngLat([s.lng, s.lat])
         entry.stop = s
       }

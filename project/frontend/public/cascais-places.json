@@ -1,0 +1,15 @@
+{
+  "source": "OpenStreetMap contributors via Nominatim search, retrieved 2026-09-24",
+  "note": "Selected context locations, not a complete inventory or measured bicycle demand.",
+  "places": [
+    {"name": "Escola Secundária de Cascais", "category": "school", "lat": 38.6962682, "lng": -9.4334566},
+    {"name": "Escola Básica Prof. António Pereira Coutinho", "category": "school", "lat": 38.7036515, "lng": -9.4356656},
+    {"name": "King's College School", "category": "school", "lat": 38.7104115, "lng": -9.4385403},
+    {"name": "IPS Cascais British International School", "category": "school", "lat": 38.7349231, "lng": -9.3841435},
+    {"name": "Escola Básica e Secundária de Carcavelos", "category": "school", "lat": 38.6982400, "lng": -9.3370625},
+    {"name": "Colégio Marista de Carcavelos", "category": "school", "lat": 38.6913543, "lng": -9.3442092},
+    {"name": "CascaiShopping", "category": "shopping", "lat": 38.7379605, "lng": -9.3992318},
+    {"name": "Gliza Shopping", "category": "shopping", "lat": 38.7062178, "lng": -9.3857559},
+    {"name": "Hospital de Cascais Dr. José de Almeida", "category": "hospital", "lat": 38.7300853, "lng": -9.4184925}
+  ]
+}

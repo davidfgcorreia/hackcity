@@ -7,14 +7,34 @@ move > 10 m) and ends at the next non-rest event or real move. End reasons:
   left_area / other   trip_leave_jurisdiction, decommissioned, ...
   moved               relocated > 10 m while at rest
   censored            still open when the data ends
-`later_evidence`: a same-position observation more than 120 min after the start (the ops rule's
-fresh evidence). `left_censored`: the first event seen for the bike was mid-rest.
+`enforced_minutes`: minutes of the interval inside the 08:00–20:00 Europe/Lisbon enforcement window;
+the abandonment clock pauses outside it (all minutes when ENFORCE_WINDOW=false). `abandoned_at`: when those counted minutes pass 120 (null
+if they never do). `later_evidence`: a same-position observation after `abandoned_at` (the ops
+rule's fresh evidence). `left_censored`: the first event seen for the bike was mid-rest.
 """
 import math
+from datetime import timedelta
+from zoneinfo import ZoneInfo
 
 import pandas as pd
 
+from analytics.config import ENFORCE_FROM_HOUR, ENFORCE_TZ, ENFORCE_UNTIL_HOUR, ENFORCE_WINDOW
 from analytics.db import pg, release, replace_table, sql
+from analytics.enforcement import enforced_minutes, threshold_reached_at
+
+ABANDON_MINUTES = 120
+
+
+def counted_clock(start, end, window: bool = ENFORCE_WINDOW):
+    """(counted minutes, moment the 120 was passed or None) under the configured enforcement rule."""
+    if not window:
+        minutes = (end - start).total_seconds() / 60
+        return minutes, start + timedelta(minutes=ABANDON_MINUTES) if minutes > ABANDON_MINUTES else None
+    tz = ZoneInfo(ENFORCE_TZ)
+    counted = enforced_minutes(start, end, tz, ENFORCE_FROM_HOUR, ENFORCE_UNTIL_HOUR)
+    at = threshold_reached_at(start, ABANDON_MINUTES, tz, ENFORCE_FROM_HOUR, ENFORCE_UNTIL_HOUR) if counted > ABANDON_MINUTES else None
+    return counted, at
+
 
 REST = {"available", "non_operational"}
 UNCERTAIN = {"non_contactable", "missing"}
@@ -38,9 +58,10 @@ def intervals(ev: pd.DataFrame, data_end) -> list[dict]:
 
         def close(end_time, reason):
             minutes = (end_time - cur["start"]).total_seconds() / 60
-            out.append({**cur, "end": end_time, "end_reason": reason, "minutes": minutes,
-                        "later_evidence": cur["last_obs"] is not None
-                        and (cur["last_obs"] - cur["start"]).total_seconds() / 60 > 120})
+            counted, abandoned_at = counted_clock(cur["start"], end_time)
+            out.append({**cur, "end": end_time, "end_reason": reason, "minutes": minutes, "enforced_minutes": counted,
+                        "abandoned_at": abandoned_at,
+                        "later_evidence": abandoned_at is not None and cur["last_obs"] is not None and cur["last_obs"] > abandoned_at})
 
         for r in g.itertuples(index=False):
             if r.vehicle_state not in REST | UNCERTAIN:
@@ -76,7 +97,8 @@ def run(d) -> None:
     d.register("iv_df", df)
     n = replace_table(d, "derived.parking_intervals", """
         SELECT row_number() OVER () AS interval_id, device_id, start AS start_time, "end" AS end_time, lat, lon,
-               start_event, end_reason, minutes, observations, last_obs, later_evidence, left_censored, uncertain
+               start_event, end_reason, minutes, enforced_minutes, abandoned_at, observations, last_obs, later_evidence,
+               left_censored, uncertain
         FROM iv_df""")
     release(d)
     sql("""ALTER TABLE derived.parking_intervals
@@ -88,4 +110,8 @@ def run(d) -> None:
              outside = NOT EXISTS (SELECT 1 FROM derived.stations_m s WHERE ST_DWithin(s.area_m, p.pt_m, 30)),
              distance_outside_m = (SELECT min(ST_Distance(s.parking_zone_m, p.pt_m)) FROM derived.stations_m s),
              cell_id = (SELECT g.cell_id FROM derived.grid_250 g WHERE ST_Intersects(g.geom_m, p.pt_m) LIMIT 1);""")
+    sql(f"""DROP TABLE IF EXISTS derived.enforcement_setting;
+           CREATE TABLE derived.enforcement_setting AS SELECT {str(ENFORCE_WINDOW).lower()} enabled,
+             {ENFORCE_FROM_HOUR} from_hour, {ENFORCE_UNTIL_HOUR} until_hour, '{ENFORCE_TZ}'::text tz,
+             {ABANDON_MINUTES} abandon_minutes, now() built_at""")
     print(f"  derived.parking_intervals        {n} intervals")

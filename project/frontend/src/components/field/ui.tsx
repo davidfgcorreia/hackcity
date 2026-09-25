@@ -2,6 +2,7 @@
  *  materials, 44 px+ touch targets (sized for a gloved thumb). The presentation uses a fixed
  *  light palette, including when the phone requests dark mode. */
 import type { CSSProperties, ReactNode } from 'react'
+import type { Stop } from '../../types'
 
 export const colors = {
   primary: '#0a84ff',
@@ -118,3 +119,14 @@ export const fmtDuration = (s: number | null | undefined) =>
 
 export const fmtClock = (secondsFromNow: number) =>
   new Date(Date.now() + secondsFromNow * 1000).toLocaleTimeString('pt-PT', { hour: '2-digit', minute: '2-digit' })
+
+/** One stable number per bike for the whole mission: collected bikes keep theirs and the next target
+ *  continues the count (1, 2, 3…), so the map pins, sidebar, stop list and banner always agree.
+ *  Done pickups come first, then planned ones in route order; removed stops are skipped. */
+export function bikeNumbers(stops: Stop[]): Map<number, number> {
+  const bikes = stops.filter(s => s.kind !== 'depot' && s.status !== 'removed')
+  // Re-plans number new stops after the highest completed seq, so seq order is completion order.
+  const done = bikes.filter(s => s.status === 'done').sort((a, b) => a.seq - b.seq)
+  const planned = bikes.filter(s => s.status !== 'done').sort((a, b) => a.seq - b.seq)
+  return new Map([...done, ...planned].map((s, i) => [s.id, i + 1]))
+}

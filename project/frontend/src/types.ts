@@ -15,7 +15,7 @@ export interface Station { id: string; name: string; lat: number; lng: number; a
 
 export interface Case {
   id: number; device_id: string; status: CaseStatus; source: string
-  lat: number; lng: number; rest_since: string | null; distance_outside_m: number | null
+  lat: number; lng: number; rest_since: string | null; last_observed_at?: string | null; distance_outside_m: number | null
   reason: string; needs_approval: boolean; blocked_reason: string | null; updated_at: string
 }
 
@@ -55,6 +55,15 @@ export interface CaseCorrectionIn {
 
 /** GET/POST /replay* — demo mode clock. `last_changes` is newest first. */
 export interface ReplayState { running: boolean; sim_time: string | null; speed: number; last_changes: string[] }
+
+/** GET/POST /live* — real-time GBFS detection. Live and replay are exclusive: starting one pauses the other. */
+export interface LiveState {
+  running: boolean; last_poll: string | null; last_error: string | null
+  vehicles_in_feed: number; tracked: number; form_factors: string; last_changes: string[]
+}
+
+/** Which clock the operations view is on: the live feed, or the replayed sample. */
+export type OpsMode = 'live' | 'replay'
 
 /** GET /cases/kpis — ops KPI strip (T-E6). */
 export interface Kpis {

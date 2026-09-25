@@ -4,9 +4,9 @@ CREATE TABLE derived.recovery_by_cell AS
 WITH iv AS (
   SELECT cell_id,
          count(*) AS outside_intervals,
-         count(*) FILTER (WHERE minutes > 120) AS supported_120,
-         count(*) FILTER (WHERE minutes > 120 AND later_evidence) AS supported_with_evidence,
-         percentile_cont(0.5) WITHIN GROUP (ORDER BY minutes) FILTER (WHERE minutes > 120) / 60 AS median_hours_parked,
+         count(*) FILTER (WHERE enforced_minutes > 120) AS supported_120,
+         count(*) FILTER (WHERE enforced_minutes > 120 AND later_evidence) AS supported_with_evidence,
+         percentile_cont(0.5) WITHIN GROUP (ORDER BY minutes) FILTER (WHERE enforced_minutes > 120) / 60 AS median_hours_parked,
          count(*) FILTER (WHERE end_reason = 'provider_recovery') AS provider_recoveries,
          percentile_cont(0.5) WITHIN GROUP (ORDER BY minutes) FILTER (WHERE end_reason = 'provider_recovery') / 60
            AS median_hours_to_provider_recovery
@@ -32,16 +32,16 @@ CREATE TABLE derived.b5_detector_validation AS
 SELECT
   count(*) FILTER (WHERE end_reason = 'provider_recovery') AS provider_recoveries_total,
   count(*) FILTER (WHERE end_reason = 'provider_recovery' AND outside) AS provider_recoveries_outside,
-  count(*) FILTER (WHERE end_reason = 'provider_recovery' AND outside AND minutes > 120) AS flagged_before_recovery,
-  round(100.0 * count(*) FILTER (WHERE end_reason = 'provider_recovery' AND outside AND minutes > 120)
+  count(*) FILTER (WHERE end_reason = 'provider_recovery' AND outside AND enforced_minutes > 120) AS flagged_before_recovery,
+  round(100.0 * count(*) FILTER (WHERE end_reason = 'provider_recovery' AND outside AND enforced_minutes > 120)
         / NULLIF(count(*) FILTER (WHERE end_reason = 'provider_recovery' AND outside), 0), 1) AS pct_flagged,
-  round((percentile_cont(0.5) WITHIN GROUP (ORDER BY minutes - 120)
-        FILTER (WHERE end_reason = 'provider_recovery' AND outside AND minutes > 120))::numeric, 0) AS median_lead_minutes,
-  round((percentile_cont(0.9) WITHIN GROUP (ORDER BY minutes - 120)
-        FILTER (WHERE end_reason = 'provider_recovery' AND outside AND minutes > 120))::numeric, 0) AS p90_lead_minutes,
-  count(*) FILTER (WHERE outside AND minutes > 120) AS supported_intervals,
-  count(*) FILTER (WHERE outside AND minutes > 120 AND end_reason = 'new_trip') AS supported_ended_by_new_trip,
-  count(*) FILTER (WHERE outside AND minutes > 120 AND end_reason = 'provider_recovery') AS supported_ended_by_provider,
-  count(*) FILTER (WHERE outside AND minutes > 120 AND end_reason = 'censored') AS supported_still_open_at_data_end,
-  count(*) FILTER (WHERE outside AND minutes > 120 AND later_evidence) AS supported_with_later_evidence
+  round((percentile_cont(0.5) WITHIN GROUP (ORDER BY extract(epoch FROM end_time - abandoned_at) / 60)
+        FILTER (WHERE end_reason = 'provider_recovery' AND outside AND enforced_minutes > 120))::numeric, 0) AS median_lead_minutes,
+  round((percentile_cont(0.9) WITHIN GROUP (ORDER BY extract(epoch FROM end_time - abandoned_at) / 60)
+        FILTER (WHERE end_reason = 'provider_recovery' AND outside AND enforced_minutes > 120))::numeric, 0) AS p90_lead_minutes,
+  count(*) FILTER (WHERE outside AND enforced_minutes > 120) AS supported_intervals,
+  count(*) FILTER (WHERE outside AND enforced_minutes > 120 AND end_reason = 'new_trip') AS supported_ended_by_new_trip,
+  count(*) FILTER (WHERE outside AND enforced_minutes > 120 AND end_reason = 'provider_recovery') AS supported_ended_by_provider,
+  count(*) FILTER (WHERE outside AND enforced_minutes > 120 AND end_reason = 'censored') AS supported_still_open_at_data_end,
+  count(*) FILTER (WHERE outside AND enforced_minutes > 120 AND later_evidence) AS supported_with_later_evidence
 FROM derived.parking_intervals;

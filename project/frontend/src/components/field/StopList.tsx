@@ -2,7 +2,7 @@
  *  (ops req §7). */
 import { useT } from '../../i18n'
 import type { Case, Stop } from '../../types'
-import { Badge, colors, fmtClock, fmtDuration, fmtTime } from './ui'
+import { Badge, colors, fmtClock, fmtDuration, fmtTime, bikeNumbers } from './ui'
 
 export function StopList({ stops, cases, onSelect }: {
   stops: Stop[]
@@ -11,7 +11,7 @@ export function StopList({ stops, cases, onSelect }: {
 }) {
   const t = useT()
   const visible = stops.filter((s) => s.status !== 'removed')
-  const plannedBikes = visible.filter(s => s.kind !== 'depot' && s.status === 'planned')
+  const numbers = bikeNumbers(visible)
 
   return (
     <ul style={{ listStyle: 'none', margin: 0, padding: 0, background: colors.card, borderRadius: 14, overflow: 'hidden' }}>
@@ -31,10 +31,10 @@ export function StopList({ stops, cases, onSelect }: {
                 background: s.kind === 'depot' ? '#1c1c1e' : done ? colors.grey : colors.danger,
                 color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center',
                 font: '700 14px system-ui',
-              }}>{s.kind === 'depot' ? '■' : s.seq}</span>
+              }}>{s.kind === 'depot' ? '■' : numbers.get(s.id)}</span>
               <span style={{ flex: 1, minWidth: 0 }}>
                 <span style={{ fontWeight: 600, fontSize: 16 }}>
-                  {s.kind === 'depot' ? 'Complexo Multisserviços' : `${t.bike} ${s.status === 'planned' ? plannedBikes.findIndex(b => b.id === s.id) + 1 : s.seq}`}
+                  {s.kind === 'depot' ? 'Complexo Multisserviços' : `${t.bike} ${numbers.get(s.id)}`}
                 </span>
                 {s.eta_s != null && s.status === 'planned' && (
                   <span style={{ display: 'block', fontSize: 13, color: colors.primary, fontWeight: 600 }}>

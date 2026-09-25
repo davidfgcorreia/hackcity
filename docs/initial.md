@@ -149,7 +149,7 @@ Infrastructure, service selection and technology stack are intentionally deferre
 
 ## 6. Open decisions and external verification
 
-The full interview and project-team answers are in [start_questions.md](start_questions.md) and [responses.md](responses.md). The following items must be resolved before claiming a production-ready live detector or finalizing operating rules:
+The full interview and project-team answers are in [planning/start_questions.md](planning/start_questions.md) and [planning/responses.md](planning/responses.md). The following items must be resolved before claiming a production-ready live detector or finalizing operating rules:
 
 1. **Provider API:** availability of a stable live bicycle ID; event and position endpoints; update delay; location accuracy; timestamp semantics; and which event proves company recovery. The supplied public GBFS ID is volatile.
 2. **Eligibility policy:** contractual authority and exceptions; precise evidence criteria for movement and continued parking; and how company disputes are handled by existing municipal processes.
